@@ -48,7 +48,7 @@ backend/
 - **Backend Framework:** Django 5.1.6 with Django REST Framework
 - **Database:** PostgreSQL
 - **Authentication:** JWT (JSON Web Tokens) via SimpleJWT
-- **API Documentation:** Swagger/ReDoc via drf-yasg
+- **API Documentation:** Swagger/ReDoc via drf-spectacular
 - **Development Tools:** Django Debug Toolbar
 - **Static Files:** Served via WhiteNoise
 - **CORS Support:** django-cors-headers for cross-origin requests
@@ -100,20 +100,33 @@ cp .env.dist .env
 Edit the `.env` file to set the following variables:
 
 ```
-SECRET_KEY=your_secret_key
+# Django settings
+SECRET_KEY=your_secure_secret_key
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 
-# Database configuration
+# Database
 DB_NAME=sports_event_db
 DB_USER=your_database_user
 DB_PASSWORD=your_database_password
 DB_HOST=localhost
 DB_PORT=5432
 
+# Localization
+LANGUAGE_CODE=en-us
+TIME_ZONE=UTC
+
+# REST Framework
+REST_PAGE_SIZE=20
+
 # JWT Settings
-JWT_ACCESS_TOKEN_LIFETIME_MINUTES=60
-JWT_REFRESH_TOKEN_LIFETIME_DAYS=1
+JWT_ACCESS_TOKEN_LIFETIME_MINUTES=15
+JWT_REFRESH_TOKEN_LIFETIME_DAYS=7
+JWT_ROTATE_REFRESH_TOKENS=True
+JWT_BLACKLIST_AFTER_ROTATION=True
+
+# CORS
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 ```
 
 5. **Create a PostgreSQL database**
@@ -129,28 +142,37 @@ GRANT ALL PRIVILEGES ON DATABASE sports_event_db TO your_database_user;
 \q
 ```
 
-6. **Set up the app URLs**
+Alternatively, you can use these simplified commands:
 
-Ensure all application URL files are properly configured with at least an empty urlpatterns list:
+```bash
+# Connect to PostgreSQL
+psql -U postgres
 
-- users/urls.py
-- users/auth_urls.py
-- events/urls.py
-- teams/urls.py
-- games/urls.py
-- scores/urls.py
-- leaderboards/urls.py
+# In PostgreSQL prompt
+CREATE DATABASE sports_event_db;
+\q
+```
 
-7. **Apply migrations**
+6. **Apply migrations**
+
+Since migration files are already included, you just need to apply them:
 
 ```bash
 python manage.py migrate
 ```
 
-8. **Create a superuser (admin)**
+7. **Create a superuser (admin)**
 
 ```bash
 python manage.py createsuperuser
+```
+
+Follow the prompts to create an admin user.
+
+8. **Collect static files**
+
+```bash
+python manage.py collectstatic
 ```
 
 9. **Run the development server**
@@ -164,8 +186,23 @@ The server will start at http://127.0.0.1:8000/
 ## API Documentation
 
 Once the server is running, you can access:
-- Swagger UI: http://127.0.0.1:8000/swagger/
-- ReDoc: http://127.0.0.1:8000/redoc/
+- API Root: http://127.0.0.1:8000/
+- Admin panel: http://127.0.0.1:8000/admin/
+- Swagger UI: http://127.0.0.1:8000/api/swagger/
+- ReDoc: http://127.0.0.1:8000/api/redoc/
+- API Schema: http://127.0.0.1:8000/api/schema/
+
+## API Endpoints
+
+The following API endpoints are available:
+
+- Authentication: `/api/auth/`, `/api/token/`
+- Users: `/api/users/`
+- Events: `/api/events/`
+- Teams: `/api/teams/`
+- Games: `/api/games/`
+- Scores: `/api/scores/`
+- Leaderboards: `/api/leaderboards/`
 
 ## Authentication
 
@@ -191,6 +228,17 @@ Remember to add the new app to INSTALLED_APPS in settings.py.
 python manage.py test
 ```
 
+## Troubleshooting
+
+If you encounter any issues:
+
+1. Check that your database credentials are correct in the `.env` file
+2. Ensure PostgreSQL service is running
+3. Verify that all dependencies were installed correctly
+4. Check the Django error logs for specific error messages
+
+For database connection issues, you may need to adjust the PostgreSQL authentication settings in `pg_hba.conf` or try using `localhost` instead of `127.0.0.1` as the DB_HOST.
+
 ## Deployment Considerations
 
 For production deployment:
@@ -199,4 +247,3 @@ For production deployment:
 - Use a production-grade web server (Gunicorn, uWSGI)
 - Set up proper database credentials
 - Configure proper security settings
-
