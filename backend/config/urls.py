@@ -3,33 +3,25 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-
-# Create schema for Swagger/ReDoc API documentation
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Sports Event Management API",
-        default_version='v1',
-        description="API for the sports event management system",
-        contact=openapi.Contact(email="contact@sportseventmanagement.com"),
-        license=openapi.License(name="MIT License"),
-    ),
-    public=True,
-    permission_classes=[permissions.AllowAny],
-)
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
     # Django admin
     path("admin/", admin.site.urls),
    
-    # API Documentation
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    # API Documentation with drf-spectacular
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    
+    # Backward compatibility for old URLs
+    path('swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui-old'),
+    path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc-old'),
    
     # API authentication
     path('api/auth/', include('rest_framework.urls')),
    
+    path('accounts/', include('django.contrib.auth.urls')),
     # JWT tokens
     path('api/token/', include('users.auth_urls')),
    
@@ -47,7 +39,7 @@ if settings.DEBUG:
     # Add Debug Toolbar
     import debug_toolbar
     urlpatterns.append(path('__debug__/', include(debug_toolbar.urls)))
-    
+   
     # Serve static and media files
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
