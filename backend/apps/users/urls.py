@@ -1,10 +1,11 @@
 from django.urls import path
-from . import views
+from .views import UserListView, UserDetailView, ProfileView, PasswordChangeView
 
 app_name = 'users'
 
 urlpatterns = [
-    # Will contain user-related endpoints like:
-    # path('profile/', views.ProfileView.as_view(), name='profile'),
-    # path('register/', views.RegisterView.as_view(), name='register'),
+    path('', UserListView.as_view(), name='user-list'),
+    path('<int:pk>/', UserDetailView.as_view(), name='user-detail'),
+    path('profile/', ProfileView.as_view(), name='profile'),
+    path('change-password/', PasswordChangeView.as_view(), name='change-password'),
 ]
