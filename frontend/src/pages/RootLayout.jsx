@@ -9,7 +9,7 @@ function RootLayout() {
   return (
     <div style={{ display: "flex" }}>
       {!isLoginPage && <MainNavigation />}
-      <main style={{ width: "100%" }}>
+      <main style={{ width: "100%", backgroundColor: '#f3f3f3' }}>
         <Outlet />
       </main>
     </div>

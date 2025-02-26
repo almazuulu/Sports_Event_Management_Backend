@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
-  width: 15rem;
+  width: 17rem;
   border-right: 1px solid gray;
   background-color: white;
   padding: 8px;
@@ -26,5 +26,15 @@
   gap: 8px;
   padding: 4px;
   justify-content: center;
+}
+
+.navigationSection {
+  margin-bottom: 0.7rem;
+}
+
+.label {
+  color: gray;
+  font-size: x-small;
+  font-weight: bold;
 }
   
