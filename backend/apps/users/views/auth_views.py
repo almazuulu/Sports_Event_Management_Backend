@@ -5,9 +5,25 @@ from ..serializers import PasswordChangeSerializer
 
 
 class PasswordChangeView(APIView):
+    """
+    Change the password for the current authenticated user.
+    
+    Requires submitting the old password for verification,
+    along with a new password and confirmation.
+    
+    * Requires authentication
+    * Returns 200 OK on success
+    * Returns 400 Bad Request if passwords don't match or old password is incorrect
+    """
     permission_classes = [permissions.IsAuthenticated]
    
     def post(self, request):
+        """
+        Process password change request.
+        
+        Validates old password and ensures new password matches confirmation
+        before updating the user's password in the database.
+        """
         serializer = PasswordChangeSerializer(data=request.data)
         if serializer.is_valid():
             user = request.user
