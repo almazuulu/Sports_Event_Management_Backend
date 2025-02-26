@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sports Management - API Navigation</title>
+    <title>Sports Event Management - API Navigation</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .api-card {
@@ -29,13 +29,18 @@
             font-size: 0.8rem;
             padding: 0.35em 0.65em;
         }
+        .method-get { background-color: #0d6efd; }
+        .method-post { background-color: #198754; }
+        .method-put { background-color: #ffc107; color: #212529; }
+        .method-patch { background-color: #6f42c1; }
+        .method-delete { background-color: #dc3545; }
     </style>
 </head>
 <body>
     <div class="hero-section">
         <div class="container text-center">
             <h1 class="display-4 fw-bold mb-3">Sports Event Management System</h1>
-            <p class="lead">Welcome to the API documentation for your sports application</p>
+            <p class="lead">Comprehensive API for managing sports events, teams, games, and users</p>
         </div>
     </div>
 
@@ -64,15 +69,19 @@
                         <h5 class="card-title mb-0">Authentication</h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">Manage tokens and authorization in the system</p>
+                        <p class="card-text">Manage JWT tokens and user authentication</p>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Get Token
-                                <a href="/api/token/" class="badge bg-primary badge-api text-decoration-none">POST</a>
+                                Obtain JWT Token
+                                <a href="/api/auth/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Authentication
-                                <a href="/api/auth/" class="badge bg-primary badge-api text-decoration-none">GET/POST</a>
+                                Refresh Token
+                                <a href="/api/auth/refresh/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Verify Token
+                                <a href="/api/auth/verify/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                         </ul>
                     </div>
@@ -89,16 +98,24 @@
                         <p class="card-text">Create and manage users with different roles</p>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                User List
-                                <a href="/api/users/" class="badge bg-success badge-api text-decoration-none">GET</a>
+                                User List (Admin only)
+                                <a href="/api/users/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Create User
-                                <a href="/api/users/" class="badge bg-success badge-api text-decoration-none">POST</a>
+                                <a href="/api/users/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                User Details
-                                <span class="badge bg-secondary badge-api">GET /:id</span>
+                                User Profile
+                                <a href="/api/users/profile/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Profile
+                                <span class="badge method-patch text-white badge-api">PATCH</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Change Password
+                                <a href="/api/users/change-password/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                         </ul>
                     </div>
@@ -116,15 +133,23 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Event List
-                                <a href="/api/events/" class="badge bg-info badge-api text-decoration-none">GET</a>
+                                <a href="/api/events/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Create Event
-                                <a href="/api/events/" class="badge bg-info badge-api text-decoration-none">POST</a>
+                                <a href="/api/events/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Event Details
-                                <span class="badge bg-secondary badge-api">GET /:id</span>
+                                <span class="badge method-get text-white badge-api">GET /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Event
+                                <span class="badge method-put badge-api">PUT /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Delete Event
+                                <span class="badge method-delete text-white badge-api">DELETE /:id</span>
                             </li>
                         </ul>
                     </div>
@@ -144,11 +169,23 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Team List
-                                <a href="/api/teams/" class="badge bg-warning text-dark badge-api text-decoration-none">GET</a>
+                                <a href="/api/teams/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Create Team
-                                <a href="/api/teams/" class="badge bg-warning text-dark badge-api text-decoration-none">POST</a>
+                                <a href="/api/teams/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Team Details
+                                <span class="badge method-get text-white badge-api">GET /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Team
+                                <span class="badge method-patch text-white badge-api">PATCH /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Delete Team
+                                <span class="badge method-delete text-white badge-api">DELETE /:id</span>
                             </li>
                         </ul>
                     </div>
@@ -166,11 +203,19 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Game List
-                                <a href="/api/games/" class="badge bg-danger badge-api text-decoration-none">GET</a>
+                                <a href="/api/games/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Create Game
-                                <a href="/api/games/" class="badge bg-danger badge-api text-decoration-none">POST</a>
+                                <a href="/api/games/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Game Details
+                                <span class="badge method-get text-white badge-api">GET /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Game Status
+                                <span class="badge method-patch text-white badge-api">PATCH /:id</span>
                             </li>
                         </ul>
                     </div>
@@ -187,16 +232,20 @@
                         <p class="card-text">Track scores and view leaderboards</p>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Scores
-                                <a href="/api/scores/" class="badge bg-dark badge-api text-decoration-none">GET</a>
+                                Scores List
+                                <a href="/api/scores/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Record Score
-                                <a href="/api/scores/" class="badge bg-dark badge-api text-decoration-none">POST</a>
+                                <a href="/api/scores/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Leaderboards
-                                <a href="/api/leaderboards/" class="badge bg-dark badge-api text-decoration-none">GET</a>
+                                Event Leaderboard
+                                <a href="/api/leaderboards/event/:id" class="badge method-get text-white badge-api text-decoration-none">GET</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Team Leaderboard
+                                <a href="/api/leaderboards/team/:id" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                         </ul>
                     </div>
@@ -206,8 +255,18 @@
     </div>
 
     <div class="footer">
-        <div class="container text-center">
-            <p class="mb-0">© 2025 Sports Event Management System. All rights reserved.</p>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">© 2025 Sports Event Management System</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">
+                        <a href="/api/swagger/" class="text-decoration-none me-3">API Docs</a>
+                        <a href="#" class="text-decoration-none">Support</a>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
