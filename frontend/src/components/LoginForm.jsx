@@ -3,11 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 import classes from "./LoginForm.module.css";
 
-const USERS = {
-  "admin@example.com": { role: "admin", password: "admin123" },
-  "user@example.com": { role: "user", password: "user123" },
-};
-
 function LoginForm() {
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState("");
@@ -21,28 +16,41 @@ function LoginForm() {
     setUserPassword(event.target.value);
   };
 
-  const formHandler = (event) => {
+  const formHandler = async (event) => {
     event.preventDefault();
 
-    if (USERS[userEmail] && USERS[userEmail].password === userPassword) {
-      localStorage.setItem("authToken", "token"); // Store auth token
-      localStorage.setItem("userRole", USERS[userEmail].role); // Store role
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/token/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          login: userEmail,
+          email: userEmail,
+          password: userPassword,
+        }),
+      });
 
-      // Redirect based on role
-      if (USERS[userEmail].role === "admin") {
-        navigate("/admin");
-      } else if (USERS[userEmail].role === "user") {
-        navigate("/user/dashboard");
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("accessToken", data.access);
+        localStorage.setItem("refreshToken", data.refresh);
+        navigate("dashboard");
+      } else {
+        alert(data?.detail || "Invalid credentials. Try again!");
       }
-    } else {
-      alert("Invalid credentials. Try again!");
+    } catch (error) {
+      console.error("Login error:", error);
+      alert("Something went wrong. Please try again later.");
     }
   };
   return (
     <div className={classes.container}>
       <div className={classes.card}>
         <h2 className={classes.title}>Sign In</h2>
-        <form method="post" onSubmit={formHandler}>
+        <form onSubmit={formHandler}>
           <div className={classes.inputGroup}>
             <label htmlFor="email" className={classes.label}>
               Email:

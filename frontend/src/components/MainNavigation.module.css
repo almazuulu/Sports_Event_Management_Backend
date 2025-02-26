@@ -1,0 +1,30 @@
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 15rem;
+  border-right: 1px solid gray;
+  background-color: white;
+  padding: 8px;
+  transition: width 0.3s ease;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+}
+
+.titleSection {
+  margin-bottom: 12px;
+  border-bottom: 1px solid gray;
+  padding-bottom: 12px;
+}
+
+.titleContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  justify-content: center;
+}
+  
