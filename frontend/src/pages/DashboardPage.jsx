@@ -1,39 +1,38 @@
 // src/components/Dashboard.js
-import React from "react";
 import Card from "../components/Cardnew";
-import Table from "./Table";
-import "../styles/Dashboard.css";
-import Navbar from "../pages/Navbar";
-import  EventCard from "../pages/Eventcard"
-import SportsCard from "./Matches";
+import Table from "../components/Table";
+import classes from "../styles/Dashboard.module.css";
+import Navbar from "../components/Navbar";
+import  EventCard from "../components/EventCard";
+import SportsCard from "../components/Matches";
 
 const Dashboard = () => {
   return (
    <div>
      <Navbar/>
   
-    <div className="dashboard">
+    <div className={classes.dashboard}>
       
       <h2></h2>
 
-      <div className="dashboard-cards">
+      <div className={classes.dashboardCards}>
        <Card/>
 
       </div>
 
-      <div className="dashboard-content">
-        <div className="table-container">
+      <div className={classes.dashboardContent}>
+        <div className={classes.tableContainer}>
           <h3>My Teams</h3>
           <Table />
         </div>
         
-        <div className="events">
+        <div className={classes.events}>
         <EventCard/>
         </div>
       </div>
 
-      <div className="sports-info">
-        <div className="info-box">
+      <div className={classes.sportsInfo}>
+        <div className={classes.infoBox}>
           <h3></h3>
           <SportsCard/>
         </div>

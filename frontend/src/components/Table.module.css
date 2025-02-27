@@ -1,7 +1,7 @@
 
   
   /* Table Title */
-  .table-title {
+  .tableTitle {
     font-size: 18px;
     font-weight: 600;
     color: #333;
@@ -9,13 +9,13 @@
   }
   
   /* Table Wrapper */
-  .table-wrapper {
+  .tableWrapper {
     overflow-x: auto;
     border-radius: 8px;
   }
   
   /* Styled Table */
-  .modern-table {
+  .modernTable {
     width: 100%;
     border-collapse: collapse;
     background: white;
@@ -24,13 +24,13 @@
   }
   
   /* Table Header */
-  .modern-table thead {
+  .modernTable thead {
     background: #f8f9fa;
     color: #333;
     text-align: left;
   }
   
-  .modern-table th {
+  .modernTable th {
     padding: 14px;
     font-size: 14px;
     font-weight: 600;
@@ -38,23 +38,23 @@
   }
   
   /* Table Body */
-  .modern-table tbody tr {
+  .modernTable tbody tr {
     background: white;
     transition: background 0.3s ease;
   }
   
   /* Row Hover Effect */
-  .modern-table tbody tr:hover {
+  .modernTable tbody tr:hover {
     background: rgba(0, 0, 0, 0.05);
   }
   
   /* Alternating Row Colors */
-  .modern-table tbody tr:nth-child(even) {
+  .modernTable tbody tr:nth-child(even) {
     background: #f9fafb;
   }
   
   /* Table Data */
-  .modern-table td {
+  .modernTable td {
     padding: 16px;
     font-size: 14px;
     color: #444;
@@ -62,18 +62,18 @@
   }
   
   /* Remove Border for Last Row */
-  .modern-table tbody tr:last-child td {
+  .modernTable tbody tr:last-child td {
     border-bottom: none;
   }
   
   /* Team Info */
-  .team-info {
+  .teamInfo {
     display: flex;
     align-items: center;
     gap: 10px;
   }
   
-  .team-logo {
+  .teamLogo {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -82,7 +82,7 @@
   }
   
   /* Sport Badge */
-  .sport-badge {
+  .sportBadge {
     padding: 5px 10px;
     font-size: 12px;
     font-weight: 600;
@@ -91,11 +91,11 @@
   }
   
   /* Sport Colors */
-  .sport-badge.football {
+  .sportBadge.football {
     background: #fbbf24;
   }
   
-  .sport-badge.basketball {
+  .sportBadge.basketball {
     background: #f97316;
   }
   
@@ -107,24 +107,24 @@
   
   /* Responsive Table */
   @media (max-width: 768px) {
-    .modern-table th,
-    .modern-table td {
+    .modernTable th,
+    .modernTable td {
       padding: 10px;
       font-size: 12px;
     }
   
-    .team-logo {
+    .teamLogo {
       width: 28px;
       height: 28px;
     }
   }
-  .team-info {
+  .teamInfo {
     display: flex;
     align-items: center;
     gap: 10px;
   }
   
-  .team-icon-wrapper {
+  .teamIconWrapper {
     width: 40px;
     height: 40px;
     display: flex;
@@ -135,7 +135,7 @@
     border: 2px solid #000; /* Black border */
   }
   
-  .team-icon {
+  .teamIcon {
     font-size: 20px;
     color: #000; /* Black icon */
   }

@@ -1,6 +1,5 @@
-// src/components/Table.js
-import React from "react";
-import "../pages/Table.css";
+
+import classes from "../components/Table.module.css";
 import { FaUsers } from "react-icons/fa";
 
 const teams = [
@@ -14,8 +13,8 @@ const teams = [
 const Table = () => {
   return (
     
-      <div className="table-wrapper">
-        <table className="modern-table">
+      <div className={classes.tableWrapper}>
+        <table className={classes.modernTable}>
           <thead>
             <tr>
               <th>Team Name</th>
@@ -30,9 +29,9 @@ const Table = () => {
             {teams.map((team, index) => (
               <tr key={index}>
                 <td>
-                <div className="team-info">
-      <div className="team-icon-wrapper">
-        <FaUsers className="team-icon" /> {/* Team icon inside a circle */}
+                <div className={classes.teamInfo}>
+      <div className={classes.teamIconWrapper}>
+        <FaUsers className={classes.teamIcon} /> {/* Team icon inside a circle */}
       </div>
       <span>{team.name}</span>
     </div>
@@ -43,7 +42,7 @@ const Table = () => {
                 <td>{team.members}</td>
                 <td>{team.wins}</td>
                 <td>{team.losses}</td>
-                <td className="rating">{team.rating}</td>
+                <td className={classes.rating}>{team.rating}</td>
               </tr>
             ))}
           </tbody>

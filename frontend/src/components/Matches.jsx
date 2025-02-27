@@ -1,14 +1,13 @@
-import React from "react";
-import "../pages/Matches.css";
+import classes from  "../components/Matches.module.css";
 
 const SportsCards = () => {
   return (
-    <div className="sports-container">
+    <div className={classes.sportsContainer}>
       {/* My Single-Player Sports Card */}
-      <div className="sports-card">
-        <div className="card-header">
+      <div className={classes.sportsCard}>
+        <div className={classes.cardHeader}>
           <h3>Upcoming Matches</h3>
-          <span className="menu-icon">⋮</span>
+          <span className={classes.menuIcon}>⋮</span>
         </div>
         <table>
           <thead>
@@ -25,10 +24,10 @@ const SportsCards = () => {
       </div>
 
       {/* My Team-Player Sports Card */}
-      <div className="sports-card">
-        <div className="card-header">
+      <div className={classes.sportsCard}>
+        <div className={classes.cardHeader}>
           <h3>Ongoing Matches</h3>
-          <span className="menu-icon">⋮</span>
+          <span className={classes.menuIcon}>⋮</span>
         </div>
         <table>
           <thead>

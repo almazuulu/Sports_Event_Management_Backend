@@ -1,14 +1,14 @@
 /* EventCard.css */
 
   
-  .event-title {
+  .eventTitle {
     font-size: 18px;
     font-weight: 600;
     color: #444;
     margin-bottom: 12px;
   }
   
-  .event-card {
+  .eventCard {
     display: flex;
     align-items: center;
     background: rgba(240, 240, 240, 0.6);
@@ -17,11 +17,11 @@
     transition: box-shadow 0.3s ease-in-out;
   }
   
-  .event-card:hover {
+  .eventCard:hover {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
   }
   
-  .date-box {
+  .dateBox {
     background:#2563eb; /* Blue background */
     color: white;
     width: 50px;
@@ -34,24 +34,24 @@
     font-weight: bold;
   }
   
-  .date-number {
+  .dateNumber {
     font-size: 20px;
   }
   
-  .date-day {
+  .dateDay {
     font-size: 12px;
   }
   
-  .event-details {
+  .eventDetails {
     margin-left: 12px;
   }
   
-  .event-time {
+  .eventTime {
     font-size: 12px;
     color: #777;
   }
   
-  .event-name {
+  .eventName {
     font-size: 16px;
     color: #2563eb;
     font-weight: 600;
@@ -60,7 +60,7 @@
   
   
   
-  .event-description {
+  .eventDescription {
     font-size: 12px;
     color: #777;
   }
