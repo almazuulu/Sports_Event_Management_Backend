@@ -1,0 +1,142 @@
+
+  
+  /* Table Title */
+  .table-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+  }
+  
+  /* Table Wrapper */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+  }
+  
+  /* Styled Table */
+  .modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Table Header */
+  .modern-table thead {
+    background: #f8f9fa;
+    color: #333;
+    text-align: left;
+  }
+  
+  .modern-table th {
+    padding: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+  
+  /* Table Body */
+  .modern-table tbody tr {
+    background: white;
+    transition: background 0.3s ease;
+  }
+  
+  /* Row Hover Effect */
+  .modern-table tbody tr:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Alternating Row Colors */
+  .modern-table tbody tr:nth-child(even) {
+    background: #f9fafb;
+  }
+  
+  /* Table Data */
+  .modern-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: #444;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Remove Border for Last Row */
+  .modern-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+  
+  /* Team Info */
+  .team-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .team-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+  }
+  
+  /* Sport Badge */
+  .sport-badge {
+    padding: 5px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    color: white;
+  }
+  
+  /* Sport Colors */
+  .sport-badge.football {
+    background: #fbbf24;
+  }
+  
+  .sport-badge.basketball {
+    background: #f97316;
+  }
+  
+  /* Rating Points Styling */
+  .rating {
+    font-weight: bold;
+    color: #2563eb;
+  }
+  
+  /* Responsive Table */
+  @media (max-width: 768px) {
+    .modern-table th,
+    .modern-table td {
+      padding: 10px;
+      font-size: 12px;
+    }
+  
+    .team-logo {
+      width: 28px;
+      height: 28px;
+    }
+  }
+  .team-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .team-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; /* Makes it a circle */
+    background-color: #fff; /* White background */
+    border: 2px solid #000; /* Black border */
+  }
+  
+  .team-icon {
+    font-size: 20px;
+    color: #000; /* Black icon */
+  }
+  

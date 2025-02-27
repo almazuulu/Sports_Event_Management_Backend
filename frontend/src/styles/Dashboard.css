@@ -1,0 +1,167 @@
+/* General Styles */
+body {
+    font-family: "Arial", sans-serif;
+    background: #f4f7fc;
+    margin: 0;
+    padding: 0;
+  }
+  
+  h2 {
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Navbar */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    background: white;
+    padding: 20px 20px;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .nav-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f1f3f5;
+    border-radius: 8px;
+    padding: 10px 15px;
+    width: 250px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .search-container:hover,
+  .search-container:focus-within {
+    background: #e9ecef;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    flex: 1;
+  }
+  
+  .search-input::placeholder {
+    color: #6c757d;
+  }
+  
+  .search-icon {
+    color: #6c757d;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  
+  .nav-right .icon {
+    font-size: 22px;
+    margin-left: 15px;
+    cursor: pointer;
+  }
+  
+  .user-icon {
+    font-size: 22px;
+  }
+  
+  /* Dashboard */
+  .dashboard {
+    padding: 20px;
+  }
+  
+  .dashboard-cards {
+    display: flex;
+    gap: 60px;
+    
+  }
+  
+  .card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 300px;
+  }
+  
+  .card h2 {
+    color: #222;
+  }
+  
+  .dashboard-content {
+    display: flex;
+    margin-top: 20px;
+    gap: 20px;
+  }
+  
+  .table-container {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    flex: 2;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .events {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    flex: 0.7;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .table-container:hover {
+    transform: scale(1.02);
+  }
+  .events:hover {
+    transform: scale(1.02);
+  }
+  
+  .dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .dashboard-table th, .dashboard-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .sport-badge {
+    background: gold;
+    padding: 2px 5px;
+    border-radius: 3px;
+  }
+  
+  /* Events */
+  .event-card {
+    display: flex;
+    align-items: center;
+    background: #eef;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  
+  .event-date {
+    background: blue;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  .event-title {
+    font-weight: bold;
+  }
