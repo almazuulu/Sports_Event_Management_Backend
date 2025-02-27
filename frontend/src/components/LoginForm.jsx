@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import classes from "./LoginForm.module.css";
 import { saveTokens } from "../utils/FetchClient";
+import { toast } from "react-toastify";
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -56,11 +57,11 @@ function LoginForm() {
           navigate("dashboard");
         }
       } else {
-        alert(data?.detail || "Invalid credentials. Try again!");
+        toast.error("Invalid credentials! Please, try again.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Something went wrong. Please try again later.");
+      toast.error("Something went wrong. Please try again later.");
     }
   };
   return (

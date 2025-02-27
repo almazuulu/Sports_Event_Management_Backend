@@ -29,12 +29,24 @@
 }
 
 .navigationSection {
-  margin-bottom: 0.7rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid gray;
+}
+
+.labelContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 0.3rem 0;
 }
 
 .label {
   color: gray;
-  font-size: x-small;
+  font-size: small;
   font-weight: bold;
+  cursor: pointer;
 }
+
+
   

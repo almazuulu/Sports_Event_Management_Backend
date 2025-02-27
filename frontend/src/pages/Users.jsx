@@ -7,7 +7,7 @@ import classes from "./Users.module.css";
 function UsersPage() {
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate("create-user");
+    navigate("create-new");
   };
 
   return (

@@ -70,8 +70,6 @@ const fetchWithAuth = async (url, options = {}) => {
     headers["Content-Type"] = "application/json";
   }
 
-  console.log(headers)
-
   return fetch(`${API_URL}${url}`, { ...options, headers });
 };
 

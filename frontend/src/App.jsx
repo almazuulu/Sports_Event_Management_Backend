@@ -6,10 +6,12 @@ import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 import UserDetailPage from "./pages/UserDetail";
-import EditUserPage from "./pages/EditUser";
-import UserRootLayout from "./pages/UsersRoot";
 import UsersPage from "./pages/Users";
 import NewUserPage from "./pages/NewUser";
+import MyProfilePage from "./pages/MyProfile";
+import ChangePasswordPage from "./pages/ChangePassword";
+import SettingsRootLayout from "./pages/SettingsRoot";
+import ManageUsersLayout from "./pages/ManageUsersLayout";
 
 const router = createBrowserRouter([
   {
@@ -25,16 +27,29 @@ const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <DashboardPage /> },
           {
-            path: "manage-users",
-            element: <UserRootLayout />,
+            path: "settings",
+            element: <SettingsRootLayout />,
             children: [
-              { index: true, element: <UsersPage /> },
-              { path: "create-user", element: <NewUserPage /> },
               {
-                path: ":userId",
+                path: "my-profile",
+                element: <MyProfilePage />,
+              },
+              {
+                path: "change-password",
+                element: <ChangePasswordPage />,
+              },
+              {
+                element: <ProtectedRoute allowedRoles={["admin"]} />,
                 children: [
-                  { index: true, element: <UserDetailPage /> },
-                  { path: "edit", element: <EditUserPage /> },
+                  {
+                    path: "manage-users",
+                    element: <ManageUsersLayout />,
+                    children: [
+                      { index: true, element: <UsersPage /> },
+                      { path: "create-new", element: <NewUserPage /> },
+                      { path: ":userId", element: <UserDetailPage /> },
+                    ],
+                  },
                 ],
               },
             ],
