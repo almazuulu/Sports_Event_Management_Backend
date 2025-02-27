@@ -80,7 +80,11 @@ const sections = [
         title: "Create New Event",
         path: "/events/create-new",
       },
-      // { Icon: FiSettings, title: "Manage Event Settings", path: "/" },
+      {
+        Icon: FiSettings,
+        title: "Manage Sport Events",
+        path: "/events/manage-sport-events",
+      },
     ],
   },
   {

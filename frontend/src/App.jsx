@@ -10,10 +10,10 @@ import UsersPage from "./pages/Users";
 import NewUserPage from "./pages/NewUser";
 import MyProfilePage from "./pages/MyProfile";
 import ChangePasswordPage from "./pages/ChangePassword";
-import SettingsRootLayout from "./pages/SettingsRoot";
-import ManageUsersLayout from "./pages/ManageUsersLayout";
-import EventsRootLayout from "./pages/EventsRoot";
 import NewEventPage from "./pages/NewEvent";
+import SportEventsPage from "./pages/SportEvents";
+import PageRootLayout from "./pages/PageRoot";
+import NewSportEventPage from "./pages/NewSportEvent";
 
 const router = createBrowserRouter([
   {
@@ -30,7 +30,7 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <DashboardPage /> },
           {
             path: "events",
-            element: <EventsRootLayout />,
+            element: <PageRootLayout />,
             children: [
               {
                 path: "view-events",
@@ -40,11 +40,25 @@ const router = createBrowserRouter([
                 path: "create-new",
                 element: <NewEventPage />,
               },
+              {
+                element: <ProtectedRoute allowedRoles={["admin"]} />,
+                children: [
+                  {
+                    path: "manage-sport-events",
+                    element: <PageRootLayout />,
+                    children: [
+                      { index: true, element: <SportEventsPage /> },
+                      { path: "create-new", element: <NewSportEventPage /> },
+                      // { path: ":sportEventId", element: <UserDetailPage /> },
+                    ],
+                  },
+                ],
+              },
             ],
           },
           {
             path: "settings",
-            element: <SettingsRootLayout />,
+            element: <PageRootLayout />,
             children: [
               {
                 path: "my-profile",
@@ -59,7 +73,7 @@ const router = createBrowserRouter([
                 children: [
                   {
                     path: "manage-users",
-                    element: <ManageUsersLayout />,
+                    element: <PageRootLayout />,
                     children: [
                       { index: true, element: <UsersPage /> },
                       { path: "create-new", element: <NewUserPage /> },
