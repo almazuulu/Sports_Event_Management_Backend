@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import classes from "./LoginForm.module.css";
+import { saveTokens } from "../utils/FetchClient";
+import { toast } from "react-toastify";
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -35,15 +37,31 @@ function LoginForm() {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("accessToken", data.access);
-        localStorage.setItem("refreshToken", data.refresh);
-        navigate("dashboard");
+        saveTokens(data.access, data.refresh);
+
+        const profileResponse = await fetch(
+          "http://127.0.0.1:8000/api/users/profile/",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${data.access}`,
+            },
+          }
+        );
+
+        const profileData = await profileResponse.json();
+
+        if (profileResponse.ok) {
+          localStorage.setItem("userRole", profileData.role);
+          navigate("dashboard");
+        }
       } else {
-        alert(data?.detail || "Invalid credentials. Try again!");
+        toast.error("Invalid credentials! Please, try again.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Something went wrong. Please try again later.");
+      toast.error("Something went wrong. Please try again later.");
     }
   };
   return (
