@@ -74,9 +74,13 @@ const sections = [
     label: "EVENTS",
     key: "events",
     options: [
-      { Icon: TiPinOutline, title: "View Events", path: "/" },
-      { Icon: FaRegCalendarAlt, title: "Create New Event", path: "/" },
-      { Icon: FiSettings, title: "Manage Event Settings", path: "/" },
+      { Icon: TiPinOutline, title: "View Events", path: "/events/view-events" },
+      {
+        Icon: FaRegCalendarAlt,
+        title: "Create New Event",
+        path: "/events/create-new",
+      },
+      // { Icon: FiSettings, title: "Manage Event Settings", path: "/" },
     ],
   },
   {

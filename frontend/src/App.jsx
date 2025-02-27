@@ -12,6 +12,8 @@ import MyProfilePage from "./pages/MyProfile";
 import ChangePasswordPage from "./pages/ChangePassword";
 import SettingsRootLayout from "./pages/SettingsRoot";
 import ManageUsersLayout from "./pages/ManageUsersLayout";
+import EventsRootLayout from "./pages/EventsRoot";
+import NewEventPage from "./pages/NewEvent";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +28,20 @@ const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: "dashboard", element: <DashboardPage /> },
+          {
+            path: "events",
+            element: <EventsRootLayout />,
+            children: [
+              {
+                path: "view-events",
+                // element:  view events page,
+              },
+              {
+                path: "create-new",
+                element: <NewEventPage />,
+              },
+            ],
+          },
           {
             path: "settings",
             element: <SettingsRootLayout />,
