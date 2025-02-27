@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
-  width: 15rem;
+  width: 17rem;
   border-right: 1px solid gray;
   background-color: white;
   padding: 8px;
@@ -27,4 +27,26 @@
   padding: 4px;
   justify-content: center;
 }
+
+.navigationSection {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid gray;
+}
+
+.labelContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 0.3rem 0;
+}
+
+.label {
+  color: gray;
+  font-size: small;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+
   

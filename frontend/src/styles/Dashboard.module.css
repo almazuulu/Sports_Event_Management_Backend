@@ -1,0 +1,167 @@
+/* General Styles */
+body {
+    font-family: "Arial", sans-serif;
+    background: #f4f7fc;
+    margin: 0;
+    padding: 0;
+  }
+  
+  h2 {
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Navbar */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    background: white;
+    padding: 20px 20px;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .navLeft {
+    display: flex;
+    align-items: center;
+  }
+  
+  .searchContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #f1f3f5;
+    border-radius: 8px;
+    padding: 10px 15px;
+    width: 250px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .searchContainer:hover,
+  .searchContainer:focus-within {
+    background: #e9ecef;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .searchInput {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    flex: 1;
+  }
+  
+  .searchInput::placeholder {
+    color: #6c757d;
+  }
+  
+  .searchIcon {
+    color: #6c757d;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  
+  .navRight .icon {
+    font-size: 22px;
+    margin-left: 15px;
+    cursor: pointer;
+  }
+  
+  .userIcon {
+    font-size: 22px;
+  }
+  
+  /* Dashboard */
+  .dashboard {
+    padding: 20px;
+  }
+  
+  .dashboardCards {
+    display: flex;
+    gap: 60px;
+    
+  }
+  
+  .card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 300px;
+  }
+  
+  .card h2 {
+    color: #222;
+  }
+  
+  .dashboardContent {
+    display: flex;
+    margin-top: 20px;
+    gap: 20px;
+  }
+  
+  .tableContainer {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    flex: 1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .events {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    flex: 0.7;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .tableContainer:hover {
+    transform: scale(1.02);
+  }
+  .events:hover {
+    transform: scale(1.02);
+  }
+  
+  .dashboardTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .dashboardTable th, .dashboardTable td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .sportBadge {
+    background: gold;
+    padding: 2px 5px;
+    border-radius: 3px;
+  }
+  
+  /* Events */
+  .eventCard {
+    display: flex;
+    align-items: center;
+    background: #eef;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  
+  .eventDate {
+    background: blue;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  .eventTitle {
+    font-weight: bold;
+  }
