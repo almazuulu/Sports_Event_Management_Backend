@@ -219,13 +219,22 @@ SPECTACULAR_SETTINGS = {
     # Enable enum names to show proper labels in dropdowns instead of values
     'ENUM_NAME_OVERRIDES': {},
     
-    # Add authentication settings
+    # Правильная настройка JWT авторизации для Swagger UI
     'SECURITY': [
         {
-            'bearer': []
+            'Bearer Auth': []
         }
     ],
     
+    # Настройка компонентов безопасности
+    'SECURITY_DEFINITIONS': {
+        'Bearer Auth': {
+            'type': 'http',
+            'scheme': 'bearer',
+            'bearerFormat': 'JWT',
+            'description': 'Введите JWT токен в формате: Bearer [token]',
+        }
+    },
     
     # Nice extras
     'SORT_OPERATIONS': False,
@@ -235,7 +244,7 @@ SPECTACULAR_SETTINGS = {
         'displayOperationId': True,
         'defaultModelsExpandDepth': 3,
         'defaultModelExpandDepth': 3,
-        'docExpansion': 'list',  # or 'none' or 'full'
+        'docExpansion': 'list',
     }
 }
 

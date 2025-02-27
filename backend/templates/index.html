@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sports Management - API Navigation</title>
+    <title>Sports Event Management - API Navigation</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .api-card {
             transition: transform 0.3s, box-shadow 0.3s;
             margin-bottom: 20px;
+            height: 100%;
         }
         .api-card:hover {
             transform: translateY(-5px);
@@ -16,18 +17,51 @@
         }
         .hero-section {
             background: linear-gradient(135deg, #0d6efd 0%, #198754 100%);
-            padding: 60px 0;
-            margin-bottom: 40px;
+            padding: 80px 0;
+            margin-bottom: 50px;
             color: white;
         }
         .footer {
             background-color: #f8f9fa;
-            padding: 20px 0;
-            margin-top: 40px;
+            padding: 30px 0;
+            margin-top: 50px;
         }
         .badge-api {
             font-size: 0.8rem;
             padding: 0.35em 0.65em;
+        }
+        .method-get { background-color: #0d6efd; }
+        .method-post { background-color: #198754; }
+        .method-put { background-color: #ffc107; color: #212529; }
+        .method-patch { background-color: #6f42c1; }
+        .method-delete { background-color: #dc3545; }
+        
+        .card-header {
+            font-weight: 600;
+        }
+        
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+        }
+        
+        .list-group-item:first-child {
+            border-top: none;
+        }
+        
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stats-card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .card-icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -35,20 +69,71 @@
     <div class="hero-section">
         <div class="container text-center">
             <h1 class="display-4 fw-bold mb-3">Sports Event Management System</h1>
-            <p class="lead">Welcome to the API documentation for your sports application</p>
+            <p class="lead">Professional API for managing sports events, teams, games, and users</p>
+            <div class="mt-4">
+                <a href="/api/swagger/" class="btn btn-light me-2">API Documentation</a>
+                <a href="/api/auth/" class="btn btn-outline-light">Get Started</a>
+            </div>
         </div>
     </div>
 
     <div class="container">
+        {% comment %} <!-- Statistics Cards -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h4 class="text-center mb-4">System Overview</h4>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card text-center p-3">
+                    <div class="card-icon text-primary">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <h3 class="fw-bold">4</h3>
+                    <p class="text-muted mb-0">Active Events</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card text-center p-3">
+                    <div class="card-icon text-success">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <h3 class="fw-bold">16+</h3>
+                    <p class="text-muted mb-0">Teams</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card text-center p-3">
+                    <div class="card-icon text-warning">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                    <h3 class="fw-bold">3</h3>
+                    <p class="text-muted mb-0">Sports</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card stats-card text-center p-3">
+                    <div class="card-icon text-danger">
+                        <i class="bi bi-clock"></i>
+                    </div>
+                    <h3 class="fw-bold">8+</h3>
+                    <p class="text-muted mb-0">Games Scheduled</p>
+                </div>
+            </div>
+        </div> {% endcomment %}
+        
         <div class="row mb-4">
             <div class="col-md-12">
-                <div class="alert alert-info">
-                    <h5 class="mb-2">📌 API Documentation</h5>
-                    <p class="mb-0">For detailed API exploration, use the following resources:</p>
-                    <div class="d-flex gap-2 mt-2">
-                        <a href="/api/swagger/" class="btn btn-primary btn-sm">Swagger UI</a>
-                        <a href="/api/redoc/" class="btn btn-success btn-sm">ReDoc</a>
-                        <a href="/api/schema/" class="btn btn-secondary btn-sm">Schema</a>
+                <div class="alert alert-info shadow-sm">
+                    <div class="d-md-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-2">📌 API Documentation</h5>
+                            <p class="mb-md-0">For detailed API exploration, use the following resources:</p>
+                        </div>
+                        <div class="d-flex gap-2 mt-2 mt-md-0">
+                            <a href="/api/swagger/" class="btn btn-primary">Swagger UI</a>
+                            <a href="/api/redoc/" class="btn btn-success">ReDoc</a>
+                            <a href="/api/schema/" class="btn btn-secondary">Schema</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -58,21 +143,25 @@
         
         <div class="row">
             <!-- Authentication -->
-            <div class="col-md-4">
-                <div class="card api-card h-100">
+            <div class="col-md-4 mb-4">
+                <div class="card api-card">
                     <div class="card-header bg-primary text-white">
                         <h5 class="card-title mb-0">Authentication</h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">Manage tokens and authorization in the system</p>
+                        <p class="card-text">Manage JWT tokens and user authentication</p>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Get Token
-                                <a href="/api/token/" class="badge bg-primary badge-api text-decoration-none">POST</a>
+                                Obtain JWT Token
+                                <a href="/api/auth/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Authentication
-                                <a href="/api/auth/" class="badge bg-primary badge-api text-decoration-none">GET/POST</a>
+                                Refresh Token
+                                <a href="/api/auth/refresh/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Verify Token
+                                <a href="/api/auth/verify/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                         </ul>
                     </div>
@@ -80,8 +169,8 @@
             </div>
             
             <!-- Users -->
-            <div class="col-md-4">
-                <div class="card api-card h-100">
+            <div class="col-md-4 mb-4">
+                <div class="card api-card">
                     <div class="card-header bg-success text-white">
                         <h5 class="card-title mb-0">Users</h5>
                     </div>
@@ -89,16 +178,24 @@
                         <p class="card-text">Create and manage users with different roles</p>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                User List
-                                <a href="/api/users/" class="badge bg-success badge-api text-decoration-none">GET</a>
+                                User List (Admin only)
+                                <a href="/api/users/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Create User
-                                <a href="/api/users/" class="badge bg-success badge-api text-decoration-none">POST</a>
+                                <a href="/api/users/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                User Details
-                                <span class="badge bg-secondary badge-api">GET /:id</span>
+                                User Profile
+                                <a href="/api/users/profile/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Profile
+                                <span class="badge method-patch text-white badge-api">PATCH</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Change Password
+                                <a href="/api/users/change-password/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                         </ul>
                     </div>
@@ -106,8 +203,8 @@
             </div>
             
             <!-- Events -->
-            <div class="col-md-4">
-                <div class="card api-card h-100">
+            <div class="col-md-4 mb-4">
+                <div class="card api-card">
                     <div class="card-header bg-info text-white">
                         <h5 class="card-title mb-0">Events</h5>
                     </div>
@@ -116,15 +213,23 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Event List
-                                <a href="/api/events/" class="badge bg-info badge-api text-decoration-none">GET</a>
+                                <a href="/api/events/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Create Event
-                                <a href="/api/events/" class="badge bg-info badge-api text-decoration-none">POST</a>
+                                <a href="/api/events/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Event Details
-                                <span class="badge bg-secondary badge-api">GET /:id</span>
+                                <span class="badge method-get text-white badge-api">GET /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Event
+                                <span class="badge method-put badge-api">PUT /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Public Events
+                                <a href="/api/events/public/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                         </ul>
                     </div>
@@ -133,9 +238,47 @@
         </div>
         
         <div class="row">
+            <!-- Sport Events -->
+            <div class="col-md-4 mb-4">
+                <div class="card api-card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">Sport Events</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Manage sport-specific events within main events</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Sport Events List
+                                <a href="/api/events/sport-events/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Create Sport Event
+                                <a href="/api/events/sport-events/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Sport Event Details
+                                <span class="badge method-get text-white badge-api">GET /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Sport Event
+                                <span class="badge method-put badge-api">PUT /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Public Sport Events
+                                <a href="/api/events/sport-events/public/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Status
+                                <span class="badge method-patch text-white badge-api">PATCH /:id/update-status</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Teams -->
-            <div class="col-md-4">
-                <div class="card api-card h-100">
+            <div class="col-md-4 mb-4">
+                <div class="card api-card">
                     <div class="card-header bg-warning text-dark">
                         <h5 class="card-title mb-0">Teams</h5>
                     </div>
@@ -144,11 +287,27 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Team List
-                                <a href="/api/teams/" class="badge bg-warning text-dark badge-api text-decoration-none">GET</a>
+                                <a href="/api/teams/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Create Team
-                                <a href="/api/teams/" class="badge bg-warning text-dark badge-api text-decoration-none">POST</a>
+                                <a href="/api/teams/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Team Details
+                                <span class="badge method-get text-white badge-api">GET /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Team
+                                <span class="badge method-patch text-white badge-api">PATCH /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Team Members
+                                <span class="badge method-get text-white badge-api">GET /:id/members</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Add Team Member
+                                <span class="badge method-post text-white badge-api">POST /:id/members</span>
                             </li>
                         </ul>
                     </div>
@@ -156,8 +315,8 @@
             </div>
             
             <!-- Games -->
-            <div class="col-md-4">
-                <div class="card api-card h-100">
+            <div class="col-md-4 mb-4">
+                <div class="card api-card">
                     <div class="card-header bg-danger text-white">
                         <h5 class="card-title mb-0">Games</h5>
                     </div>
@@ -166,20 +325,38 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Game List
-                                <a href="/api/games/" class="badge bg-danger badge-api text-decoration-none">GET</a>
+                                <a href="/api/games/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Create Game
-                                <a href="/api/games/" class="badge bg-danger badge-api text-decoration-none">POST</a>
+                                <a href="/api/games/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Game Details
+                                <span class="badge method-get text-white badge-api">GET /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Game Status
+                                <span class="badge method-patch text-white badge-api">PATCH /:id/status</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Record Score
+                                <span class="badge method-post text-white badge-api">POST /:id/score</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Game Schedule
+                                <span class="badge method-get text-white badge-api">GET /schedule</span>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
-            
+        </div>
+        
+        <div class="row">
             <!-- Scores & Leaderboards -->
-            <div class="col-md-4">
-                <div class="card api-card h-100">
+            <div class="col-md-4 mb-4">
+                <div class="card api-card">
                     <div class="card-header bg-dark text-white">
                         <h5 class="card-title mb-0">Scores & Leaderboards</h5>
                     </div>
@@ -187,30 +364,198 @@
                         <p class="card-text">Track scores and view leaderboards</p>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Scores
-                                <a href="/api/scores/" class="badge bg-dark badge-api text-decoration-none">GET</a>
+                                Scores List
+                                <a href="/api/scores/" class="badge method-get text-white badge-api text-decoration-none">GET</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Record Score
-                                <a href="/api/scores/" class="badge bg-dark badge-api text-decoration-none">POST</a>
+                                <a href="/api/scores/" class="badge method-post text-white badge-api text-decoration-none">POST</a>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                Leaderboards
-                                <a href="/api/leaderboards/" class="badge bg-dark badge-api text-decoration-none">GET</a>
+                                Event Leaderboard
+                                <a href="/api/leaderboards/event/:id" class="badge method-get text-white badge-api text-decoration-none">GET</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Team Leaderboard
+                                <a href="/api/leaderboards/team/:id" class="badge method-get text-white badge-api text-decoration-none">GET</a>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Sport Type Leaderboard
+                                <a href="/api/leaderboards/sport/:type" class="badge method-get text-white badge-api text-decoration-none">GET</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Participants -->
+            <div class="col-md-4 mb-4">
+                <div class="card api-card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">Participants</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Manage event participants and registrations</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Participants List
+                                <span class="badge method-get text-white badge-api">GET</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Register Participant
+                                <span class="badge method-post text-white badge-api">POST</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Participant Details
+                                <span class="badge method-get text-white badge-api">GET /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Update Registration
+                                <span class="badge method-patch text-white badge-api">PATCH /:id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Cancel Registration
+                                <span class="badge method-delete text-white badge-api">DELETE /:id</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports -->
+            <div class="col-md-4 mb-4">
+                <div class="card api-card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">Reports</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Access sports event analytics and reports</p>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Event Summary
+                                <span class="badge method-get text-white badge-api">GET /events/:id/summary</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Participation Report
+                                <span class="badge method-get text-white badge-api">GET /participation</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Performance Metrics
+                                <span class="badge method-get text-white badge-api">GET /performance</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Sport Analysis
+                                <span class="badge method-get text-white badge-api">GET /sports/analysis</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Export Results
+                                <span class="badge method-get text-white badge-api">GET /export/:format</span>
                             </li>
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
+        
+        {% comment %} <!-- Featured Events Section -->
+        <div class="row mt-5 mb-4">
+            <div class="col-12">
+                <h3 class="text-center mb-4">Featured Events</h3>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Annual University Sports Festival 2025</h5>
+                        <p class="card-text text-muted">Feb 27 - Mar 15, 2025</p>
+                        <p class="card-text">A comprehensive multi-sport event featuring football, basketball, and volleyball competitions.</p>
+                        <div class="d-flex justify-content-between">
+                            <span class="badge bg-success">Registration Open</span>
+                            <span class="text-muted">3 sport events</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="/api/events/0363c408-2353-4c7d-a3ae-af53ba5c935a" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Corporate Games 2025</h5>
+                        <p class="card-text text-muted">Feb 27 - Mar 10, 2025</p>
+                        <p class="card-text">An exciting team-building sports event for companies and organizations.</p>
+                        <div class="d-flex justify-content-between">
+                            <span class="badge bg-secondary">Draft</span>
+                            <span class="text-muted">Coming soon</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="/api/events/7dc464d0-1b21-4bd0-92f2-ed19ec47710e" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Premier Football Tournament</h5>
+                        <p class="card-text text-muted">Mar 1 - Mar 15, 2025</p>
+                        <p class="card-text">Elite football competition featuring teams from various universities.</p>
+                        <div class="d-flex justify-content-between">
+                            <span class="badge bg-success">Registration Open</span>
+                            <span class="text-muted">16 teams max</span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="/api/events/sport-events/7075d735-ee2f-4d9d-b845-e92098a039da" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div> {% endcomment %}
     </div>
 
     <div class="footer">
-        <div class="container text-center">
-            <p class="mb-0">© 2025 Sports Event Management System. All rights reserved.</p>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>Sports Event Management</h5>
+                    <p class="text-muted">Professional API for creating and managing sports events of all kinds</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5>Resources</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="/api/swagger/" class="text-decoration-none">API Documentation</a></li>
+                        <li><a href="/api/redoc/" class="text-decoration-none">ReDoc</a></li>
+                        <li><a href="/api/schema/" class="text-decoration-none">Schema</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-decoration-none">Support</a></li>
+                        <li><a href="#" class="text-decoration-none">Feedback</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">© 2025 Sports Event Management System</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0">
+                        <a href="#" class="text-decoration-none me-3"><i class="bi bi-github"></i></a>
+                        <a href="#" class="text-decoration-none me-3"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-decoration-none"><i class="bi bi-linkedin"></i></a>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 </body>
 </html>
