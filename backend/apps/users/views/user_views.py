@@ -1,6 +1,16 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
+
 from ..models import User
-from ..serializers import UserSerializer, UserCreateSerializer, UserUpdateSerializer
+from ..serializers import (
+    UserSerializer, 
+    UserCreateSerializer, 
+    UserUpdateSerializer, 
+    ProfileSerializer, 
+    RoleSerializer
+    )
 from ..permissions import IsAdminUser, IsOwnerOrAdmin
 
 
@@ -20,6 +30,10 @@ class UserListView(generics.ListCreateAPIView):
             return UserCreateSerializer
         return UserSerializer
     
+    @extend_schema(
+        summary="List users",
+        description="Get a list of all users in the system. Admin only."
+    )
     def list(self, request, *args, **kwargs):
         """
         List all users in the system.
@@ -29,6 +43,10 @@ class UserListView(generics.ListCreateAPIView):
         """
         return super().list(request, *args, **kwargs)
     
+    @extend_schema(
+        summary="Create user",
+        description="Create a new user account."
+    )
     def create(self, request, *args, **kwargs):
         """
         Create a new user account.
@@ -37,6 +55,7 @@ class UserListView(generics.ListCreateAPIView):
         Requires authentication to access this endpoint.
         """
         return super().create(request, *args, **kwargs)
+   
    
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -51,6 +70,10 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
             return UserUpdateSerializer
         return UserSerializer
     
+    @extend_schema(
+        summary="Retrieve user",
+        description="Get information about a specific user."
+    )
     def retrieve(self, request, *args, **kwargs):
         """
         Retrieve details of a specific user.
@@ -60,6 +83,10 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         """
         return super().retrieve(request, *args, **kwargs)
     
+    @extend_schema(
+        summary="Full user update",
+        description="Completely update a specific user."
+    )
     def update(self, request, *args, **kwargs):
         """
         Completely update a specific user.
@@ -70,6 +97,10 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         """
         return super().update(request, *args, **kwargs)
     
+    @extend_schema(
+        summary="Partial user update",
+        description="Partially update a specific user."
+    )
     def partial_update(self, request, *args, **kwargs):
         """
         Partially update a specific user.
@@ -79,6 +110,10 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         """
         return super().partial_update(request, *args, **kwargs)
     
+    @extend_schema(
+        summary="Delete user",
+        description="Delete a specific user."
+    )
     def destroy(self, request, *args, **kwargs):
         """
         Delete a specific user.
@@ -88,13 +123,14 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         """
         return super().destroy(request, *args, **kwargs)
     
+
 class ProfileView(generics.RetrieveUpdateAPIView):
     """
     API endpoint for managing the current user's profile.
-    Requires authentication.
+    Authentication required.
     """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
     
     def get_object(self):
@@ -103,15 +139,23 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         """
         return self.request.user
     
+    @extend_schema(
+        summary="Get current user profile",
+        description="Returns complete profile information of the current authenticated user."
+    )
     def retrieve(self, request, *args, **kwargs):
         """
         Retrieve the current user's profile information.
         
         Returns complete profile information of the current authenticated user,
-        including ID, email, first name, last name, and role.
+        including ID, email, username, first name, last name, and role.
         """
         return super().retrieve(request, *args, **kwargs)
     
+    @extend_schema(
+        summary="Full profile update",
+        description="Updates all fields of the current user's profile."
+    )
     def update(self, request, *args, **kwargs):
         """
         Full update of the current user's profile.
@@ -120,6 +164,10 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         """
         return super().update(request, *args, **kwargs)
     
+    @extend_schema(
+        summary="Partial profile update",
+        description="Updates only the specified fields of the current user's profile."
+    )
     def partial_update(self, request, *args, **kwargs):
         """
         Partial update of the current user's profile.
@@ -127,3 +175,63 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         Allows updating individual profile fields without sending all data.
         """
         return super().partial_update(request, *args, **kwargs)
+    
+    
+
+
+class RolesListView(APIView):
+    """
+    API endpoint for listing all available user roles in the system.
+    Only administrators can access this endpoint.
+    """
+    permission_classes = [IsAdminUser]
+    
+    @extend_schema(
+        description="Returns all available user roles with descriptions. Only accessible by administrators.",
+        responses={
+            200: OpenApiResponse(
+                response=RoleSerializer(many=True),
+                description="List of roles with their descriptions"
+            ),
+            403: OpenApiResponse(
+                description="Permission denied. Only administrators can access this endpoint."
+            )
+        }
+    )
+    def get(self, request):
+        """
+        Get a list of all available user roles in the system.
+        
+        Returns detailed information about each role including:
+        - Role ID (used in API requests)
+        - Display name
+        - Description
+        
+        Note: Only administrators can access this endpoint.
+        """
+        # Get the role choices from the User model
+        role_choices = User.ROLE_CHOICES
+        
+        # Create a detailed role list
+        roles_info = []
+        for role_id, role_name in role_choices:
+            # Add descriptions for each role
+            description = ""
+            if role_id == "admin":
+                description = "Full system access with all permissions"
+            elif role_id == "team_captain":
+                description = "Leader of a team with team management abilities"
+            elif role_id == "scorekeeper":
+                description = "User responsible for recording scores and match results"
+            elif role_id == "public":
+                description = "Regular user with basic access to the system"
+            
+            roles_info.append({
+                "id": role_id,
+                "name": role_name,
+                "description": description
+            })
+        
+        # Serialize the roles
+        serializer = RoleSerializer(roles_info, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
