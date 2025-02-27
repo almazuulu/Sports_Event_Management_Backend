@@ -1,10 +1,11 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from events.views import EventViewSet, SportEventViewSet
 
-app_name = 'events'
+router = DefaultRouter()
+router.register(r'events', EventViewSet)
+router.register(r'sport-events', SportEventViewSet)
 
 urlpatterns = [
-    # Will contain event-related endpoints like:
-    # path('', views.EventListView.as_view(), name='event-list'),
-    # path('<int:pk>/', views.EventDetailView.as_view(), name='event-detail'),
+    path('', include(router.urls)),
 ]

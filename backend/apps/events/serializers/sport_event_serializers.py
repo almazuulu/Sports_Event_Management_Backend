@@ -72,10 +72,12 @@ class SportEventCreateUpdateSerializer(serializers.ModelSerializer):
         registration_deadline = data.get('registration_deadline')
         start_date = data.get('start_date')
         
-        if registration_deadline and start_date and registration_deadline > start_date:
-            raise serializers.ValidationError(
-                {"registration_deadline": "Registration deadline must be before the start date."}
-            )
+        if registration_deadline and start_date:
+            # Convert registration_deadline (datetime) to date for comparison
+            if registration_deadline.date() > start_date:
+                raise serializers.ValidationError(
+                    {"registration_deadline": "Registration deadline must be before the start date."}
+                )
             
         return data
     
@@ -121,6 +123,6 @@ class SportEventPublicSerializer(serializers.ModelSerializer):
         model = SportEvent
         fields = [
             'id', 'event', 'event_name', 'sport_type', 'sport_type_display',
-            'name', 'start_date', 'end_date', 'status', 'status_display'
+            'name', 'description', 'start_date', 'end_date', 'status', 'status_display'
         ]
         read_only_fields = fields

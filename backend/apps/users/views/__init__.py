@@ -1,4 +1,3 @@
-# users/views/__init__.py
 from .user_views import UserListView, UserDetailView, ProfileView, RolesListView
 from .auth_views import PasswordChangeView
 
