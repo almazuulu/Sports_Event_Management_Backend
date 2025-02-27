@@ -7,7 +7,7 @@ const SportsCards = () => {
       {/* My Single-Player Sports Card */}
       <div className="sports-card">
         <div className="card-header">
-          <h3>My Single-Player Sports</h3>
+          <h3>Upcoming Matches</h3>
           <span className="menu-icon">⋮</span>
         </div>
         <table>
@@ -27,7 +27,7 @@ const SportsCards = () => {
       {/* My Team-Player Sports Card */}
       <div className="sports-card">
         <div className="card-header">
-          <h3>My Team-Player Sports</h3>
+          <h3>Ongoing Matches</h3>
           <span className="menu-icon">⋮</span>
         </div>
         <table>
