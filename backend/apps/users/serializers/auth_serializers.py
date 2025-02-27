@@ -32,6 +32,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             })
        
         return super().validate(attrs)
+    
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
     Custom view to use the custom token obtain pair serializer
