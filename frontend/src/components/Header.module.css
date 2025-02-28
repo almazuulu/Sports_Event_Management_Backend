@@ -3,25 +3,18 @@
     align-items: center;
     gap: 10px;
     padding: 10px 20px;
-    background-color: #f8f9fa;
+    background-color: #fff;
     border-bottom: 1px solid #ddd;
-    }
-
-.backButton {
-    background: none;
-    border: 1px solid black;
-    border-radius: 0.25rem;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.backButton:hover {
-    background-color: black;
-    color: white;
+    border-radius: 0.5rem;
 }
 
 .title {
     font-size: 20px;
     font-weight: bold;
+}
+
+.section {
+    width: 100%;
+    text-align: center;
 }
   

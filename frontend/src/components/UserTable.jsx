@@ -4,6 +4,8 @@ import classes from "./UserTable.module.css";
 import { fetchWithAuth } from "../utils/FetchClient";
 import Modal from "./UI/Modal";
 import { toast } from "react-toastify";
+import DeleteButton from "./Button/DeleteButton";
+import CancelButton from "./Button/CancelButton";
 
 const ROLE_LABELS = {
   admin: "Administrator",
@@ -75,8 +77,6 @@ function UserTable() {
         <thead>
           <tr>
             <th className={classes.th}>No</th>
-            {/* <th className={classes.th}>First Name</th> */}
-            {/* <th className={classes.th}>Last Name</th> */}
             <th className={classes.th}>Full Name</th>
             <th className={classes.th}>Username</th>
             <th className={classes.th}>Email</th>
@@ -88,8 +88,6 @@ function UserTable() {
           {users.map((user, index) => (
             <tr key={user.id}>
               <td className={classes.td}>{index + 1}</td>
-              {/* <td className={classes.td}>{user.first_name}</td> */}
-              {/* <td className={classes.td}>{user.last_name}</td> */}
               <td
                 className={classes.td}
               >{`${user.first_name} ${user.last_name}`}</td>
@@ -116,10 +114,12 @@ function UserTable() {
                     onClose={() => setIsModalOpen(false)}
                   >
                     <p>Are you sure you want to delete this user?</p>
-                    <button onClick={confirmDelete}>Yes, Delete</button>
-                    <button onClick={() => setIsModalOpen(false)}>
+                    <DeleteButton onClick={confirmDelete}>
+                      Yes, Delete
+                    </DeleteButton>
+                    <CancelButton onClick={() => setIsModalOpen(false)}>
                       Cancel
-                    </button>
+                    </CancelButton>
                   </Modal>
                 </section>
               </td>

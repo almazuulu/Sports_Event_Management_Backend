@@ -1,20 +1,20 @@
 import { useState } from "react";
-import { toast } from "react-toastify";
-
-import Header from "../components/Header";
-import { fetchWithAuth } from "../utils/FetchClient";
-import classes from "./NewUser.module.css";
-import CreateUserForm from "../components/CreateUserForm";
 import { useNavigate } from "react-router-dom";
 
-function NewUserPage() {
+import CreateEventForm from "../components/CreateEventForm";
+import Header from "../components/Header";
+import { toast } from "react-toastify";
+import { fetchWithAuth } from "../utils/FetchClient";
+import classes from "./NewEvent.module.css";
+
+function NewEventPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const handleCreateUser = async (formData) => {
+  const handleCreateEvent = async (formData) => {
     setLoading(true);
     try {
-      const response = await fetchWithAuth("/api/users/", {
+      const response = await fetchWithAuth("/api/events/events/", {
         method: "POST",
         body: JSON.stringify(formData),
       });
@@ -38,7 +38,7 @@ function NewUserPage() {
 
       if (response.ok) {
         toast.success("New user created successfully!");
-        navigate("..");
+        // navigate("..");
       }
     } catch (error) {
       console.error(error);
@@ -49,10 +49,10 @@ function NewUserPage() {
 
   return (
     <div className={classes.container}>
-      <Header title={"Create New User"} />
-      <CreateUserForm onSubmit={handleCreateUser} loading={loading} />
+      <Header title="Create New Event" />
+      <CreateEventForm onSubmit={handleCreateEvent} loading={loading} />
     </div>
   );
 }
 
-export default NewUserPage;
+export default NewEventPage;

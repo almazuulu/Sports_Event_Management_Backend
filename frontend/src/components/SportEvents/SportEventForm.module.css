@@ -1,6 +1,6 @@
 .formContainer {
     width: 100%;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     padding: 1rem;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -21,7 +21,7 @@
     color: red;
   }
   
-  .input {
+  .input, .textarea {
     width: 100%;
     padding: 0.5rem;
     border: 1px solid #ccc;
@@ -39,5 +39,4 @@
     padding: 0.7rem 0 0 0;
     justify-self: center;
   }
-  
   

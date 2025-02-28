@@ -1,0 +1,22 @@
+/* CancelButton.module.css */
+.normalButton {
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #000;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .normalButton:hover {
+    background-color: #000;
+    color: #fff;
+  }
+  
+  .normalButton:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+  }
+  
