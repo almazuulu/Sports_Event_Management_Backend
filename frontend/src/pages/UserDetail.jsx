@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import Header from "../components/Header";
-import classes from "./UserDetail.module.css";
 import { fetchWithAuth } from "../utils/FetchClient";
 import UserForm from "../components/UserForm";
-import { toast } from "react-toastify";
+import classes from "./UserDetail.module.css";
 
 function UserDetailPage() {
   const { userId } = useParams();

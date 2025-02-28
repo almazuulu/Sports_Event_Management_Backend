@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-function ManageUsersLayout() {
+function PageRootLayout() {
   return (
     <>
       <Outlet />
@@ -8,4 +8,4 @@ function ManageUsersLayout() {
   );
 }
 
-export default ManageUsersLayout;
+export default PageRootLayout;
