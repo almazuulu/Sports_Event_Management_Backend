@@ -53,12 +53,12 @@ class EventViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
    
     @extend_schema(
-        summary="Public events listing",
-        description="Get a list of active and registration events with limited information. No authentication required.",
-        parameters=[
-            OpenApiParameter(name="date", description="Filter events ending after this date (YYYY-MM-DD)", required=False, type=str)
-        ],
-        responses={200: EventPublicSerializer(many=True)}
+    summary="Public events listing",
+    description="Get a list of active and registration events with limited information. No authentication required.",
+    parameters=[
+        OpenApiParameter(name="date", description="Filter events ending after this date (YYYY-MM-DD)", required=False, type=str)
+    ],
+    responses={200: EventPublicSerializer(many=True)}
     )
     @action(detail=False, methods=['get'], url_path='public', authentication_classes=[])
     def public(self, request):
@@ -67,16 +67,22 @@ class EventViewSet(viewsets.ModelViewSet):
         Does not require authentication.
         """
         # Only include active and completed events that haven't ended yet
-        queryset = Event.objects.filter(
-            Q(status='active') | Q(status='registration'),
-            end_date__gte=self.request.query_params.get('date', None)
-        ).order_by('start_date')
-       
+        status_filter = Q(status='active') | Q(status='registration')
+        queryset = Event.objects.filter(status_filter)
+        
+        # Apply date filter only if date parameter is provided
+        date_param = self.request.query_params.get('date')
+        if date_param:
+            queryset = queryset.filter(end_date__gte=date_param)
+        
+        # Apply final sorting
+        queryset = queryset.order_by('start_date')
+        
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-           
+            
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
    
