@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-import SportEventTable from "../components/SportEventTable";
 import Header from "../components/Header";
-import LoadingScreen from "../components/UI/LoadingScreen";
+import SportEventManageTable from "../components/SportEvents/SportEventManageTable";
 import { fetchWithAuth } from "../utils/FetchClient";
-import classes from "./SportEvents.module.css";
+import LoadingScreen from "../components/UI/LoadingScreen";
+import classes from "./SportEventsManage.module.css";
 
-function SportEventsPage() {
+function SportEventsManagePage() {
   const [sportEventList, setSportEventList] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -16,17 +16,14 @@ function SportEventsPage() {
       setLoading(true);
       const response = await fetchWithAuth("/api/events/sport-events/");
 
-      const data = await response.json();
-
       if (!response.ok) {
-        toast.error("Failed to fetch data");
+        toast.error("Failed to fetch sport events data");
       }
 
-      if (response.ok) {
-        setSportEventList(data.results);
-      }
+      const data = await response.json();
+      setSportEventList(data.results);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching sport events data:", error);
     } finally {
       setLoading(false);
     }
@@ -40,12 +37,15 @@ function SportEventsPage() {
 
   return (
     <div className={classes.container}>
-      <Header title={"All Sport Events"} />
+      <Header title={"Manage Sport Events"} />
       <div className={classes.card}>
-        <SportEventTable sportEventList={sportEventList}/>
+        <SportEventManageTable
+          data={sportEventList}
+          onRefresh={fetchSportEvents}
+        />
       </div>
     </div>
   );
 }
 
-export default SportEventsPage;
+export default SportEventsManagePage;

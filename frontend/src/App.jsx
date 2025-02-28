@@ -14,6 +14,7 @@ import NewEventPage from "./pages/NewEvent";
 import SportEventsPage from "./pages/SportEvents";
 import PageRootLayout from "./pages/PageRoot";
 import NewSportEventPage from "./pages/NewSportEvent";
+import SportEventDetailPage from "./pages/SportEventDetail";
 
 const router = createBrowserRouter([
   {
@@ -40,18 +41,29 @@ const router = createBrowserRouter([
                 path: "create-new",
                 element: <NewEventPage />,
               },
+            ],
+          },
+          {
+            path: "sport-events",
+            element: <PageRootLayout />,
+            children: [
+              {
+                element: <PageRootLayout />,
+                children: [
+                  {
+                    index: true,
+                    element: <SportEventsPage />,
+                  },
+                  {
+                    path: ":sportEventId",
+                    element: <SportEventDetailPage />,
+                  },
+                ],
+              },
               {
                 element: <ProtectedRoute allowedRoles={["admin"]} />,
                 children: [
-                  {
-                    path: "manage-sport-events",
-                    element: <PageRootLayout />,
-                    children: [
-                      { index: true, element: <SportEventsPage /> },
-                      { path: "create-new", element: <NewSportEventPage /> },
-                      // { path: ":sportEventId", element: <UserDetailPage /> },
-                    ],
-                  },
+                  { path: "create-new", element: <NewSportEventPage /> },
                 ],
               },
             ],

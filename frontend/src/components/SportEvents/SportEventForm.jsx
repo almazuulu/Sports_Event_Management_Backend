@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
-import { fetchWithAuth } from "../utils/FetchClient";
-import { getUserRole } from "../utils/Authentication";
-import { SPORT_EVENTS_STATUS, SPORTS_TYPE_OPTIONS } from "../lib/constant";
+import { SPORT_EVENTS_STATUS, SPORTS_TYPE_OPTIONS } from "../../lib/constant";
+import { getUserRole } from "../../utils/Authentication";
+import CreateButton from "../Button/CreateButton";
 import classes from "./SportEventForm.module.css";
 
-function SportEventForm({ onSubmit, loading }) {
+function SportEventForm({
+  initialData = null,
+  eventList = [],
+  onSubmit,
+  loading,
+  allowEdit,
+}) {
   const [formData, setFormData] = useState({
     event: "",
     sport_type: "",
@@ -21,7 +26,12 @@ function SportEventForm({ onSubmit, loading }) {
     status: "",
   });
 
-  const [eventList, setEventList] = useState([]);
+  const formattedDate = (dateString) => {
+    if (dateString === "") return;
+    const date = new Date(dateString);
+    date.setDate(date.getDate());
+    return date.toISOString().split("T")[0];
+  };
 
   const handleChange = (e) => {
     setFormData((prevData) => ({
@@ -35,25 +45,14 @@ function SportEventForm({ onSubmit, loading }) {
     onSubmit(formData);
   };
 
-  const fetchEventsList = async () => {
-    try {
-      const response = await fetchWithAuth("/api/events/events/");
-
-      const data = await response.json();
-
-      if (!response.ok) toast.error("Failed to fetch events!");
-
-      if (response.ok) {
-        setEventList(data.results);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
-    fetchEventsList();
-  }, []);
+    if (initialData) {
+      setFormData((prevData) => ({
+        ...prevData,
+        ...initialData,
+      }));
+    }
+  }, [initialData]);
 
   return (
     <div className={classes.formContainer}>
@@ -68,6 +67,7 @@ function SportEventForm({ onSubmit, loading }) {
             data={eventList}
             value={formData.event}
             onChange={handleChange}
+            allowedEdit={!allowEdit}
           />
         </div>
 
@@ -81,6 +81,7 @@ function SportEventForm({ onSubmit, loading }) {
             data={SPORTS_TYPE_OPTIONS}
             value={formData.sport_type}
             onChange={handleChange}
+            allowedEdit={!allowEdit}
           />
         </div>
 
@@ -94,6 +95,7 @@ function SportEventForm({ onSubmit, loading }) {
             value={formData.name}
             onChange={handleChange}
             className={classes.input}
+            disabled={!allowEdit}
           />
         </div>
 
@@ -107,6 +109,7 @@ function SportEventForm({ onSubmit, loading }) {
             value={formData.description}
             onChange={handleChange}
             className={classes.input}
+            disabled={!allowEdit}
           />
         </div>
 
@@ -120,6 +123,7 @@ function SportEventForm({ onSubmit, loading }) {
             value={formData.start_date}
             onChange={handleChange}
             className={classes.input}
+            disabled={!allowEdit}
           />
         </div>
 
@@ -133,6 +137,7 @@ function SportEventForm({ onSubmit, loading }) {
             value={formData.end_date}
             onChange={handleChange}
             className={classes.input}
+            disabled={!allowEdit}
           />
         </div>
 
@@ -146,6 +151,7 @@ function SportEventForm({ onSubmit, loading }) {
             value={formData.max_teams}
             onChange={handleChange}
             className={classes.input}
+            disabled={!allowEdit}
           />
         </div>
 
@@ -156,9 +162,10 @@ function SportEventForm({ onSubmit, loading }) {
           <input
             type="date"
             name="registration_deadline"
-            value={formData.registration_deadline}
+            value={formattedDate(formData.registration_deadline)}
             onChange={handleChange}
             className={classes.input}
+            disabled={!allowEdit}
           />
         </div>
 
@@ -171,6 +178,7 @@ function SportEventForm({ onSubmit, loading }) {
             value={formData.rules}
             onChange={handleChange}
             className={classes.textarea}
+            disabled={!allowEdit}
           />
         </div>
 
@@ -183,6 +191,7 @@ function SportEventForm({ onSubmit, loading }) {
             value={formData.scoring_system}
             onChange={handleChange}
             className={classes.textarea}
+            disabled={!allowEdit}
           />
         </div>
 
@@ -196,12 +205,21 @@ function SportEventForm({ onSubmit, loading }) {
             data={SPORT_EVENTS_STATUS}
             value={formData.status}
             onChange={handleChange}
+            allowedEdit={!allowEdit}
           />
         </div>
 
-        <button type="submit" className={classes.button} disabled={loading}>
-          {loading ? "Submitting..." : "Create Sport Event"}
-        </button>
+        <section className={classes.button}>
+          {allowEdit && (
+            <CreateButton type="submit" disabled={loading}>
+              {loading
+                ? "Submitting..."
+                : initialData
+                ? "Update"
+                : "Create New"}
+            </CreateButton>
+          )}
+        </section>
       </form>
     </div>
   );

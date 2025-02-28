@@ -46,11 +46,13 @@ function MainNavigation() {
           </div>
           {openSection === key && (
             <div className={classes.optionsContainer}>
-              {options.map(
-                ({ Icon, title, path, condition }) =>
-                  (!condition || userRole === condition) && (
-                    <Option key={title} Icon={Icon} title={title} path={path} />
-                  )
+              {options.map(({ Icon, title, path, condition }) =>
+                !condition ||
+                (Array.isArray(condition)
+                  ? condition.includes(userRole)
+                  : userRole === condition) ? (
+                  <Option key={title} Icon={Icon} title={title} path={path} />
+                ) : null
               )}
             </div>
           )}
@@ -80,10 +82,21 @@ const sections = [
         title: "Create New Event",
         path: "/events/create-new",
       },
+    ],
+  },
+  {
+    label: "SPORT EVENTS",
+    key: "sport-events",
+    options: [
       {
-        Icon: FiSettings,
-        title: "Manage Sport Events",
-        path: "/events/manage-sport-events",
+        Icon: TiPinOutline,
+        title: "All Sport Events",
+        path: "/sport-events",
+      },
+      {
+        Icon: FaRegCalendarAlt,
+        title: "Create New Sport Event",
+        path: "/sport-events/create-new",
       },
     ],
   },

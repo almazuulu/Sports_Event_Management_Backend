@@ -9,6 +9,7 @@ function Option({ Icon, title, path, notifs }) {
       className={({ isActive }) =>
         `${isActive ? classes.optionSelected : ""} ${classes.option}`
       }
+      end
     >
       <div className={classes.iconContainer}>
         <Icon />
