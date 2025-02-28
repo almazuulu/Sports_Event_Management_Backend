@@ -7,6 +7,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 import UserDetailPage from "./pages/UserDetail";
 import UsersPage from "./pages/Users";
+import EventsPage from "./pages/Events";
 import NewUserPage from "./pages/NewUser";
 import MyProfilePage from "./pages/MyProfile";
 import ChangePasswordPage from "./pages/ChangePassword";
@@ -34,7 +35,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: "view-events",
-                // element:  view events page,
+                 element: <EventsPage/>,
               },
               {
                 path: "create-new",
