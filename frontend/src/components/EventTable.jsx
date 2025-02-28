@@ -36,8 +36,6 @@ function EventTable() {
         <thead>
           <tr>
             <th className={classes.th}>No</th>
-            {/* <th className={classes.th}>First Name</th> */}
-            {/* <th className={classes.th}>Last Name</th> */}
             <th className={classes.th}>Name</th>
             <th className={classes.th}>Description</th>
             <th className={classes.th}>Location</th>
