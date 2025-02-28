@@ -3,9 +3,15 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import RootLayout from "./pages/RootLayout";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
-import DummyPage from "./pages/DummyPage";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
+import UserDetailPage from "./pages/UserDetail";
+import UsersPage from "./pages/Users";
+import NewUserPage from "./pages/NewUser";
+import MyProfilePage from "./pages/MyProfile";
+import ChangePasswordPage from "./pages/ChangePassword";
+import SettingsRootLayout from "./pages/SettingsRoot";
+import ManageUsersLayout from "./pages/ManageUsersLayout";
 
 const router = createBrowserRouter([
   {
@@ -13,14 +19,41 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       {
-        element: <PublicRoute />, 
+        element: <PublicRoute />,
         children: [{ index: true, element: <LoginPage /> }],
       },
       {
-        element: <ProtectedRoute />, 
+        element: <ProtectedRoute />,
         children: [
           { path: "dashboard", element: <DashboardPage /> },
-          { path: "dummy-1", element: <DummyPage /> },
+          {
+            path: "settings",
+            element: <SettingsRootLayout />,
+            children: [
+              {
+                path: "my-profile",
+                element: <MyProfilePage />,
+              },
+              {
+                path: "change-password",
+                element: <ChangePasswordPage />,
+              },
+              {
+                element: <ProtectedRoute allowedRoles={["admin"]} />,
+                children: [
+                  {
+                    path: "manage-users",
+                    element: <ManageUsersLayout />,
+                    children: [
+                      { index: true, element: <UsersPage /> },
+                      { path: "create-new", element: <NewUserPage /> },
+                      { path: ":userId", element: <UserDetailPage /> },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
         ],
       },
     ],
