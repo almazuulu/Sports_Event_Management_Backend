@@ -1,18 +1,16 @@
 import { useState } from "react";
 
-import RolesDropdown from "./RolesDropdown";
-import CreateButton from "./Button/CreateButton";
-import classes from "./CreateUserForm.module.css";
+import classes from "./CreateEventForm.module.css";
+import StatusEventDropdown from "./StatusEventDropdown";
 
-function CreateUserForm({ onSubmit, loading }) {
+function CreateEventForm({ onSubmit, loading }) {
   const [formData, setFormData] = useState({
-    username: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    password: "",
-    password_confirm: "",
-    role: "public",
+    name: "",
+    description: "",
+    start_date: "",
+    end_date: "",
+    location: "",
+    status: "draft",
   });
 
   const handleChange = (e) => {
@@ -32,12 +30,12 @@ function CreateUserForm({ onSubmit, loading }) {
       <form onSubmit={handleSubmit}>
         <div className={classes.formGroup}>
           <label className={classes.label}>
-            First Name <span>*</span>
+            Name <span>*</span>
           </label>
           <input
             type="text"
-            name="first_name"
-            value={formData.first_name}
+            name="name"
+            value={formData.name}
             onChange={handleChange}
             className={classes.input}
           />
@@ -45,12 +43,12 @@ function CreateUserForm({ onSubmit, loading }) {
 
         <div className={classes.formGroup}>
           <label className={classes.label}>
-            Last Name <span>*</span>
+            Description <span>*</span>
           </label>
           <input
             type="text"
-            name="last_name"
-            value={formData.last_name}
+            name="description"
+            value={formData.description}
             onChange={handleChange}
             className={classes.input}
           />
@@ -58,66 +56,51 @@ function CreateUserForm({ onSubmit, loading }) {
 
         <div className={classes.formGroup}>
           <label className={classes.label}>
-            Username <span>*</span>
+            Start Date <span>*</span>
+          </label>
+          <input
+            type="date"
+            name="start_date"
+            value={formData.start_date}
+            onChange={handleChange}
+            className={classes.input}
+          />
+        </div>
+
+        <div className={classes.formGroup}>
+          <label className={classes.label}>
+            End Date <span>*</span>
+          </label>
+          <input
+            type="date"
+            name="end_date"
+            value={formData.end_date}
+            onChange={handleChange}
+            className={classes.input}
+          />
+        </div>
+
+        <div className={classes.formGroup}>
+          <label className={classes.label}>
+            Location <span>*</span>
           </label>
           <input
             type="text"
-            name="username"
-            value={formData.username}
+            name="location"
+            value={formData.location}
             onChange={handleChange}
             className={classes.input}
           />
         </div>
 
-        <div className={classes.formGroup}>
-          <label className={classes.label}>
-            Email <span>*</span>
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={classes.input}
-          />
-        </div>
+        <StatusEventDropdown value={formData.status} onChange={handleChange}/>
 
-        <div className={classes.formGroup}>
-          <label className={classes.label}>
-            Password <span>*</span>
-          </label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className={classes.input}
-          />
-        </div>
-
-        <div className={classes.formGroup}>
-          <label className={classes.label}>
-            Confirm Password <span>*</span>
-          </label>
-          <input
-            type="password"
-            name="password_confirm"
-            value={formData.password_confirm}
-            onChange={handleChange}
-            className={classes.input}
-          />
-        </div>
-
-        <RolesDropdown value={formData.role} onChange={handleChange} />
-
-        <section className={classes.button}>
-          <CreateButton type="submit" disabled={loading}>
-            {loading ? "Submitting..." : "Create User"}
-          </CreateButton>
-        </section>
+        <button type="submit" className={classes.button} disabled={loading}>
+          {loading ? "Submitting..." : "Create Event"}
+        </button>
       </form>
     </div>
   );
 }
 
-export default CreateUserForm;
+export default CreateEventForm;

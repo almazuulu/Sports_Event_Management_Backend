@@ -11,10 +11,12 @@ import EventsPage from "./pages/Events";
 import NewUserPage from "./pages/NewUser";
 import MyProfilePage from "./pages/MyProfile";
 import ChangePasswordPage from "./pages/ChangePassword";
-import SettingsRootLayout from "./pages/SettingsRoot";
-import ManageUsersLayout from "./pages/ManageUsersLayout";
-import EventsRootLayout from "./pages/EventsRoot";
 import NewEventPage from "./pages/NewEvent";
+import SportEventsPage from "./pages/SportEvents";
+import PageRootLayout from "./pages/PageRoot";
+import NewSportEventPage from "./pages/NewSportEvent";
+import SportEventDetailPage from "./pages/SportEventDetail";
+import LogoutPage from "./pages/Logout";
 
 const router = createBrowserRouter([
   {
@@ -31,7 +33,7 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <DashboardPage /> },
           {
             path: "events",
-            element: <EventsRootLayout />,
+            element: <PageRootLayout />,
             children: [
               {
                 path: "view-events",
@@ -44,8 +46,48 @@ const router = createBrowserRouter([
             ],
           },
           {
+            path: "sport-events",
+            element: <PageRootLayout />,
+            children: [
+              {
+                element: <PageRootLayout />,
+                children: [
+                  {
+                    index: true,
+                    element: <SportEventsPage />,
+                  },
+                  {
+                    path: ":sportEventId",
+                    element: <SportEventDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <ProtectedRoute allowedRoles={["admin"]} />,
+                children: [
+                  { path: "create-new", element: <NewSportEventPage /> },
+                ],
+              },
+            ],
+          },
+          {
+            path: "admin-panel",
+            element: <ProtectedRoute allowedRoles={["admin"]} />,
+            children: [
+              {
+                path: "users",
+                element: <PageRootLayout />,
+                children: [
+                  { index: true, element: <UsersPage /> },
+                  { path: ":userId", element: <UserDetailPage /> },
+                  { path: "create-new", element: <NewUserPage /> },
+                ],
+              },
+            ],
+          },
+          {
             path: "settings",
-            element: <SettingsRootLayout />,
+            element: <PageRootLayout />,
             children: [
               {
                 path: "my-profile",
@@ -56,18 +98,8 @@ const router = createBrowserRouter([
                 element: <ChangePasswordPage />,
               },
               {
-                element: <ProtectedRoute allowedRoles={["admin"]} />,
-                children: [
-                  {
-                    path: "manage-users",
-                    element: <ManageUsersLayout />,
-                    children: [
-                      { index: true, element: <UsersPage /> },
-                      { path: "create-new", element: <NewUserPage /> },
-                      { path: ":userId", element: <UserDetailPage /> },
-                    ],
-                  },
-                ],
+                path: "logout",
+                element: <LogoutPage />,
               },
             ],
           },

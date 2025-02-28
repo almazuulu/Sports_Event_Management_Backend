@@ -49,7 +49,7 @@ function NewUserPage() {
 
   return (
     <div className={classes.container}>
-      <Header title={"Create New User"} enableBack />
+      <Header title={"Create New User"} />
       <CreateUserForm onSubmit={handleCreateUser} loading={loading} />
     </div>
   );
