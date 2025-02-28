@@ -27,6 +27,7 @@ const Dashboard = () => {
         </div>
         
         <div className={classes.events}>
+        <h3>Public Events</h3>
         <EventCard/>
         </div>
       </div>
