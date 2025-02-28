@@ -65,7 +65,7 @@ function SportEventForm({
             name={"event"}
             placeholder={"Please select an event"}
             data={eventList}
-            value={formData.event}
+            value={formData.event_name}
             onChange={handleChange}
             allowedEdit={!allowEdit}
           />
