@@ -1,20 +1,16 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import classes from "./LogoutButton.module.css";
-function LogoutButton() {
+
+function LogoutPage() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  useEffect(() => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("userRole");
 
     navigate("/", { replace: true });
-  };
-  return (
-    <button className={classes.button} onClick={handleLogout}>
-      Logout
-    </button>
-  );
+  });
 }
 
-export default LogoutButton;
+export default LogoutPage;

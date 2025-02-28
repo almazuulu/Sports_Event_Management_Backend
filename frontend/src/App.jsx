@@ -15,6 +15,7 @@ import SportEventsPage from "./pages/SportEvents";
 import PageRootLayout from "./pages/PageRoot";
 import NewSportEventPage from "./pages/NewSportEvent";
 import SportEventDetailPage from "./pages/SportEventDetail";
+import LogoutPage from "./pages/Logout";
 
 const router = createBrowserRouter([
   {
@@ -69,6 +70,21 @@ const router = createBrowserRouter([
             ],
           },
           {
+            path: "admin-panel",
+            element: <ProtectedRoute allowedRoles={["admin"]} />,
+            children: [
+              {
+                path: "users",
+                element: <PageRootLayout />,
+                children: [
+                  { index: true, element: <UsersPage /> },
+                  { path: ":userId", element: <UserDetailPage /> },
+                  { path: "create-new", element: <NewUserPage /> },
+                ],
+              },
+            ],
+          },
+          {
             path: "settings",
             element: <PageRootLayout />,
             children: [
@@ -81,18 +97,8 @@ const router = createBrowserRouter([
                 element: <ChangePasswordPage />,
               },
               {
-                element: <ProtectedRoute allowedRoles={["admin"]} />,
-                children: [
-                  {
-                    path: "manage-users",
-                    element: <PageRootLayout />,
-                    children: [
-                      { index: true, element: <UsersPage /> },
-                      { path: "create-new", element: <NewUserPage /> },
-                      { path: ":userId", element: <UserDetailPage /> },
-                    ],
-                  },
-                ],
+                path: "logout",
+                element: <LogoutPage />,
               },
             ],
           },

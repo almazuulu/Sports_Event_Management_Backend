@@ -1,7 +1,8 @@
 import { useState } from "react";
 
-import classes from "./CreateUserForm.module.css";
 import RolesDropdown from "./RolesDropdown";
+import CreateButton from "./Button/CreateButton";
+import classes from "./CreateUserForm.module.css";
 
 function CreateUserForm({ onSubmit, loading }) {
   const [formData, setFormData] = useState({
@@ -109,9 +110,11 @@ function CreateUserForm({ onSubmit, loading }) {
 
         <RolesDropdown value={formData.role} onChange={handleChange} />
 
-        <button type="submit" className={classes.button} disabled={loading}>
-          {loading ? "Submitting..." : "Create User"}
-        </button>
+        <section className={classes.button}>
+          <CreateButton type="submit" disabled={loading}>
+            {loading ? "Submitting..." : "Create User"}
+          </CreateButton>
+        </section>
       </form>
     </div>
   );
