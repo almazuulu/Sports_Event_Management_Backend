@@ -1,13 +1,14 @@
 import LoginForm from "../components/LoginForm";
 
-import classes from './LoginPage.module.css'
+import logo from "../assets/images/ust-black-logo.svg";
+import classes from "./LoginPage.module.css";
 
 function LoginPage() {
   return (
     <div className={classes.container}>
-      <h1>Welcome to Sport Event Management</h1>
-      <p>Organizing tournaments, handling team, games and more with ease.</p>
+      <img src={logo} alt="UST Logo" />
       <LoginForm />
+      <p>Developed by UST Development Team</p>
     </div>
   );
 }

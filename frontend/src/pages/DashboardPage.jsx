@@ -2,43 +2,36 @@
 import Card from "../components/Cardnew";
 import Table from "../components/Table";
 import classes from "../styles/Dashboard.module.css";
-import Navbar from "../components/Navbar";
-import  EventCard from "../components/EventCard";
+import Navbar from "../components/HeaderNavBar";
+import EventCard from "../components/EventCard";
 import SportsCard from "../components/Matches";
 
 const Dashboard = () => {
   return (
-   <div>
-     <Navbar/>
-  
-    <div className={classes.dashboard}>
-      
-      <h2></h2>
-
-      <div className={classes.dashboardCards}>
-       <Card/>
-
-      </div>
-
-      <div className={classes.dashboardContent}>
-        <div className={classes.tableContainer}>
-          <h3>My Teams</h3>
-          <Table />
+    <div>
+      <div className={classes.dashboard}>
+        <div className={classes.dashboardCards}>
+          <Card />
         </div>
-        
-        <div className={classes.events}>
-        <EventCard/>
-        </div>
-      </div>
 
-      <div className={classes.sportsInfo}>
-        <div className={classes.infoBox}>
-          <h3></h3>
-          <SportsCard/>
+        <div className={classes.dashboardContent}>
+          <div className={classes.tableContainer}>
+            <h3>My Teams</h3>
+            <Table />
+          </div>
+
+          <div className={classes.events}>
+            <EventCard />
+          </div>
         </div>
-       
+
+        <div className={classes.sportsInfo}>
+          <div className={classes.infoBox}>
+            <h3></h3>
+            <SportsCard />
+          </div>
+        </div>
       </div>
-    </div>
     </div>
   );
 };
