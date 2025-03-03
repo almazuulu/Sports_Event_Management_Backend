@@ -22,4 +22,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('public/teams/', PublicTeamListView.as_view(), name='public-team-list'),
     path('public/teams/<uuid:id>/', PublicTeamDetailView.as_view(), name='public-team-detail'),
+    path('my-teams/', TeamsViewSet.as_view({'get': 'list'}), name='my-teams')
 ]
