@@ -18,7 +18,7 @@ import { LuClipboardPenLine, LuTrophy } from "react-icons/lu";
 import { RxUpdate } from "react-icons/rx";
 import { FaKey } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
-import { RiLockPasswordLine } from "react-icons/ri";
+import { RiLockPasswordLine, RiTeamLine } from "react-icons/ri";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { CiLogout } from "react-icons/ci";
 import { MdEvent, MdOutlineSportsSoccer } from "react-icons/md";
@@ -102,18 +102,23 @@ const sections = [
       },
     ],
   },
-  // {
-  //   label: "TEAMS",
-  //   key: "teams",
-  //   options: [
-  //     {
-  //       Icon: LuClipboardPenLine,
-  //       title: "Register & Approve Teams",
-  //       path: "/",
-  //     },
-  //     { Icon: FaRegClipboard, title: "Manage Teams & Players", path: "/" },
-  //   ],
-  // },
+  {
+    label: "TEAMS",
+    key: "teams",
+    options: [
+      {
+        Icon: RiTeamLine,
+        title: "All Teams",
+        path: "/teams",
+      },
+      {
+        Icon: LuClipboardPenLine,
+        title: "My Teams",
+        path: "/teams/my-teams",
+        allowedRoles: "team_captain",
+      },
+    ],
+  },
   // {
   //   label: "MATCH SCHEDULING",
   //   key: "scheduling",
