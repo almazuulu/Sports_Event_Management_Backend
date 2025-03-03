@@ -5,10 +5,15 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_spectacular.utils import extend_schema
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
-from teams.permissions import IsRegistrationTeamCaptainOrAdmin
+from teams.permissions import IsRegistrationTeamCaptainOrAdmin, IsTeamOwnerOrAdmin
 
 from teams.models import TeamRegistration
 from teams.serializers.registration_serializers import (TeamRegistrationSerializer, TeamRegistrationCreateSerializer, TeamRegistrationApprovalSerializer)
+
+from teams.models import Team
+from rest_framework import status
+from events.models import SportEvent
+from django.utils import timezone
 
 class TeamRegistrationViewSet(viewsets.ModelViewSet):
     """
@@ -102,3 +107,66 @@ class TeamRegistrationViewSet(viewsets.ModelViewSet):
         Partially update the registration, such as updating the registration status or notes.
         """
         return super().partial_update(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Delete a team registration",
+        description="Delete a team registration. Only admins or the team captain can delete a registration.",
+        responses={204: "No content"}
+    )
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete a specific team registration.
+        Only admins or team captains can delete their team's registration.
+        """
+        # Retrieve the registration object to delete
+        registration = self.get_object()
+
+        # Perform the deletion
+        registration.delete()
+
+        # Return a successful response
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class SportEventRegistrationViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to list all team registrations for a specific sport event.
+    """
+    serializer_class = TeamRegistrationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Filter registrations by the sport event ID.
+        """
+        sport_event_id = self.kwargs['sport_event_id']
+        return TeamRegistration.objects.filter(sport_event__id=sport_event_id)
+
+class SportEventRegistrationCreateViewSet(viewsets.ViewSet):
+    """
+    API endpoint to register a team for a specific sport event.
+    """
+    permission_classes = [IsAuthenticated, IsRegistrationTeamCaptainOrAdmin]
+
+    def create(self, request, *args, **kwargs):
+        sport_event_id = kwargs['sport_event_id']
+        team_id = request.data.get('team')
+        team = Team.objects.get(id=team_id)
+        sport_event = SportEvent.objects.get(id=sport_event_id)
+        
+        # Check if the registration is open for this event
+        if sport_event.registration_deadline and sport_event.registration_deadline < timezone.now():
+            return Response({"detail": "Registration deadline has passed."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create a registration entry
+        registration_data = {
+            'team': team.id,
+            'sport_event': sport_event.id,
+            'notes': request.data.get('notes', ''),
+        }
+        
+        serializer = TeamRegistrationCreateSerializer(data=registration_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

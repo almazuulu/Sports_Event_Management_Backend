@@ -5,7 +5,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import IsAuthenticated
-from teams.permissions import IsPlayerTeamCaptainOrAdmin
+from teams.permissions import IsPlayerTeamCaptainOrAdmin, IsTeamOwnerOrAdmin
 
 from teams.models import Player
 from teams.serializers import PlayerSerializer, PlayerCreateSerializer, PlayerUpdateSerializer
@@ -115,3 +115,34 @@ class PlayersViewSet(viewsets.ModelViewSet):
         Partially update a player's information (e.g., jersey number, active status).
         """
         return super().partial_update(request, *args, **kwargs)
+
+class TeamPlayerViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint to list all players for a specific team.
+    """
+    serializer_class = PlayerSerializer
+    permission_classes = [IsAuthenticated, IsTeamOwnerOrAdmin]
+
+    def get_queryset(self):
+        """
+        Filter players by the team ID.
+        """
+        team_id = self.kwargs['team_id']
+        return Player.objects.filter(team__id=team_id)
+
+class TeamPlayerCreateViewSet(viewsets.ViewSet):
+    """
+    API endpoint to add a new player to a specific team.
+    """
+    permission_classes = [IsAuthenticated, IsTeamOwnerOrAdmin]
+
+    def create(self, request, *args, **kwargs):
+        team_id = kwargs['team_id']
+        data = request.data
+        data['team'] = team_id  # Set the team to which the player is being added
+        
+        serializer = PlayerSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
