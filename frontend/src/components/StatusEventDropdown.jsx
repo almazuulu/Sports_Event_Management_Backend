@@ -1,5 +1,3 @@
-import React, { useState } from "react";
-
 import { getUserRole } from "../utils/Authentication";
 import classes from "./StatusEventDropdown.module.css";
 
@@ -13,13 +11,10 @@ const STATUS_EVENTS = [
 
 function StatusEventDropdown({ value, onChange, allowedEdit = false }) {
   const role = getUserRole();
-  //   const [status, setStatus] = useState()
 
   return (
     <div className={classes.formGroup}>
-      <label className={classes.label}>
-        Status <span>*</span>
-      </label>
+      <label className={classes.label}>Status <span>*</span></label>
       {role === "admin" || role === "scorekeeper" ? (
         <select
           name="status"
@@ -28,6 +23,7 @@ function StatusEventDropdown({ value, onChange, allowedEdit = false }) {
           className={classes.select}
           disabled={allowedEdit}
         >
+          <option value={''} disabled>Status</option>
           {STATUS_EVENTS.map((status) => (
             <option key={status.id} value={status.id}>
               {status.name}

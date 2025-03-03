@@ -38,7 +38,7 @@ function NewEventPage() {
 
       if (response.ok) {
         toast.success("New user created successfully!");
-        // navigate("..");
+        navigate("..");
       }
     } catch (error) {
       console.error(error);

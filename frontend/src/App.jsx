@@ -11,7 +11,6 @@ import EventsPage from "./pages/Events";
 import NewUserPage from "./pages/NewUser";
 import MyProfilePage from "./pages/MyProfile";
 import ChangePasswordPage from "./pages/ChangePassword";
-import NewEventPage from "./pages/NewEvent";
 import SportEventsPage from "./pages/SportEvents";
 import PageRootLayout from "./pages/PageRoot";
 import NewSportEventPage from "./pages/NewSportEvent";
@@ -36,12 +35,8 @@ const router = createBrowserRouter([
             element: <PageRootLayout />,
             children: [
               {
-                path: "view-events",
-                 element: <EventsPage/>,
-              },
-              {
-                path: "create-new",
-                element: <NewEventPage />,
+                index: true,
+                element: <EventsPage />,
               },
             ],
           },

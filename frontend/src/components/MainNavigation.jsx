@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-import ustLogo from "../assets/images/ust-black-logo.svg";
+import ustLogo from "../assets/images/ust-white-logo.svg";
 import Option from "./Option";
 import { getUserRole } from "../utils/Authentication";
 import classes from "./MainNavigation.module.css";
 
 // icons
 import { FiHome, FiSettings } from "react-icons/fi";
-import { TiPinOutline, TiUserAddOutline } from "react-icons/ti";
+import { TiUserAddOutline } from "react-icons/ti";
 import {
   FaRegCalendarAlt,
   FaRegClipboard,
@@ -21,6 +21,7 @@ import { CgProfile } from "react-icons/cg";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { CiLogout } from "react-icons/ci";
+import { MdEvent, MdOutlineSportsSoccer  } from "react-icons/md";
 
 function MainNavigation() {
   const userRole = getUserRole();
@@ -34,8 +35,7 @@ function MainNavigation() {
     <nav className={classes.sidebar}>
       <div className={classes.titleSection}>
         <div className={classes.titleContent}>
-          <img src={ustLogo} alt="UST" className={classes.logo} />
-          <h1>sports</h1>
+          <img src={ustLogo} alt="UST Logo" className={classes.logo} />
         </div>
       </div>
       {sections
@@ -90,13 +90,13 @@ const sections = [
     label: "EVENTS",
     key: "events",
     options: [
-      { Icon: TiPinOutline, title: "View Events", path: "/events/view-events" },
-      {
-        Icon: FaRegCalendarAlt,
-        title: "Create New Event",
-        path: "/events/create-new",
-        allowedRoles: 'admin'
-      },
+      { Icon: MdEvent, title: "All Events", path: "/events" },
+      // {
+      //   Icon: FaRegCalendarAlt,
+      //   title: "Create New Event",
+      //   path: "/events/create-new",
+      //   allowedRoles: 'admin'
+      // },
     ],
   },
   {
@@ -104,7 +104,7 @@ const sections = [
     key: "sport-events",
     options: [
       {
-        Icon: TiPinOutline,
+        Icon: MdOutlineSportsSoccer,
         title: "All Sport Events",
         path: "/sport-events",
       },
@@ -112,7 +112,7 @@ const sections = [
         Icon: FaRegCalendarAlt,
         title: "Create New Sport Event",
         path: "/sport-events/create-new",
-        allowedRoles: 'admin'
+        allowedRoles: "admin",
       },
     ],
   },
