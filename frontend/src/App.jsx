@@ -5,15 +5,12 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
-import UserDetailPage from "./pages/UserDetail";
 import UsersPage from "./pages/Users";
 import EventsPage from "./pages/Events";
-import NewUserPage from "./pages/NewUser";
 import MyProfilePage from "./pages/MyProfile";
 import ChangePasswordPage from "./pages/ChangePassword";
 import SportEventsPage from "./pages/SportEvents";
 import PageRootLayout from "./pages/PageRoot";
-import NewSportEventPage from "./pages/NewSportEvent";
 import LogoutPage from "./pages/Logout";
 
 const router = createBrowserRouter([
@@ -44,19 +41,8 @@ const router = createBrowserRouter([
             element: <PageRootLayout />,
             children: [
               {
-                element: <PageRootLayout />,
-                children: [
-                  {
-                    index: true,
-                    element: <SportEventsPage />,
-                  },
-                ],
-              },
-              {
-                element: <ProtectedRoute allowedRoles={["admin"]} />,
-                children: [
-                  { path: "create-new", element: <NewSportEventPage /> },
-                ],
+                index: true,
+                element: <SportEventsPage />,
               },
             ],
           },
@@ -65,13 +51,8 @@ const router = createBrowserRouter([
             element: <ProtectedRoute allowedRoles={["admin"]} />,
             children: [
               {
-                path: "users",
-                element: <PageRootLayout />,
-                children: [
-                  { index: true, element: <UsersPage /> },
-                  { path: ":userId", element: <UserDetailPage /> },
-                  { path: "create-new", element: <NewUserPage /> },
-                ],
+                index: true,
+                element: <UsersPage />,
               },
             ],
           },

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import { SPORT_EVENTS_STATUS, SPORTS_TYPE_OPTIONS } from "../../constant";
 import { getUserRole } from "../../utils/Authentication";
-import CreateButton from "../Button/CreateButton";
 import classes from "./SportEventForm.module.css";
 
 // icons
@@ -71,7 +70,7 @@ function SportEventForm({
             name={"event"}
             placeholder={"Please select an event"}
             data={eventList}
-            value={formData.event_name}
+            value={formData.event}
             onChange={handleChange}
           />
         </div>

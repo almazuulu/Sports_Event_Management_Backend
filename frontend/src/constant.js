@@ -14,10 +14,17 @@ export const SPORTS_TYPE_OPTIONS = [
 
 // Sport Event Status
 export const SPORT_EVENTS_STATUS = [
-    { id: "scheduled", name: "Scheduled" },
-    { id: "registration", name: "Registration Open" },
-    { id: "registration_closed", name: "Registration Closed" },
-    { id: "ongoing", name: "Ongoing" },
-    { id: "completed", name: "Completed" },
-    { id: "cancelled", name: "Cancelled" },
+  { id: "scheduled", name: "Scheduled" },
+  { id: "registration", name: "Registration Open" },
+  { id: "registration_closed", name: "Registration Closed" },
+  { id: "ongoing", name: "Ongoing" },
+  { id: "completed", name: "Completed" },
+  { id: "cancelled", name: "Cancelled" },
 ];
+
+export const ROLE_LABELS = {
+  admin: "Administrator",
+  team_captain: "Team Captain",
+  scorekeeper: "Scorekeeper",
+  public: "Public User",
+};
