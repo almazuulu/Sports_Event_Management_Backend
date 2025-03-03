@@ -12,17 +12,19 @@ const Dashboard = () => {
           <Card />
         </div>
 
-      <div className={classes.dashboardContent}>
-        <div className={classes.tableContainer}>
-          <h3>My Teams</h3>
-          <Table />
+        <div className={classes.dashboardContent}>
+          <div className={classes.tableContainer}>
+            <h3>My Teams</h3>
+            <Table />
+          </div>
+
+          <div className={classes.events}>
+            <div className={classes.tableContainer}>
+              <h3>Public Events</h3>
+              <EventCard />
+            </div>
+          </div>
         </div>
-        
-        <div className={classes.events}>
-        <h3>Public Events</h3>
-        <EventCard/>
-        </div>
-      </div>
 
         <div className={classes.sportsInfo}>
           <div className={classes.infoBox}>

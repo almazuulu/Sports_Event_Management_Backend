@@ -21,7 +21,7 @@ import { CgProfile } from "react-icons/cg";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { CiLogout } from "react-icons/ci";
-import { MdEvent, MdOutlineSportsSoccer  } from "react-icons/md";
+import { MdEvent, MdOutlineSportsSoccer } from "react-icons/md";
 
 function MainNavigation() {
   const userRole = getUserRole();
@@ -89,15 +89,7 @@ const sections = [
   {
     label: "EVENTS",
     key: "events",
-    options: [
-      { Icon: MdEvent, title: "All Events", path: "/events" },
-      // {
-      //   Icon: FaRegCalendarAlt,
-      //   title: "Create New Event",
-      //   path: "/events/create-new",
-      //   allowedRoles: 'admin'
-      // },
-    ],
+    options: [{ Icon: MdEvent, title: "All Events", path: "/events" }],
   },
   {
     label: "SPORT EVENTS",
@@ -107,12 +99,6 @@ const sections = [
         Icon: MdOutlineSportsSoccer,
         title: "All Sport Events",
         path: "/sport-events",
-      },
-      {
-        Icon: FaRegCalendarAlt,
-        title: "Create New Sport Event",
-        path: "/sport-events/create-new",
-        allowedRoles: "admin",
       },
     ],
   },
@@ -152,13 +138,7 @@ const sections = [
       {
         Icon: FaUsers,
         title: "All Users",
-        path: "/admin-panel/users",
-        allowedRoles: "admin",
-      },
-      {
-        Icon: TiUserAddOutline,
-        title: "Create New User",
-        path: "/admin-panel/users/create-new",
+        path: "/admin-panel",
         allowedRoles: "admin",
       },
     ],

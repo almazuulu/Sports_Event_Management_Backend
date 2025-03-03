@@ -92,13 +92,12 @@ function EventsPage() {
         <div className={classes.card}>
           {role === "admin" && (
             <section className={classes.sectionButton}>
-              <CreateButton
-                title={"Create New Event"}
-                onClick={handleCreateNew}
-              />
+              <CreateButton onClick={handleCreateNew}>
+                Create New Event
+              </CreateButton>
             </section>
           )}
-          <EventTable eventList={eventList} onRefetchData={fetchEventsData}/>
+          <EventTable eventList={eventList} onRefetchData={fetchEventsData} />
         </div>
       </div>
 
