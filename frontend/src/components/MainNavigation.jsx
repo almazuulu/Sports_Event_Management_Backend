@@ -108,12 +108,6 @@ const sections = [
         title: "All Sport Events",
         path: "/sport-events",
       },
-      {
-        Icon: FaRegCalendarAlt,
-        title: "Create New Sport Event",
-        path: "/sport-events/create-new",
-        allowedRoles: "admin",
-      },
     ],
   },
   // {

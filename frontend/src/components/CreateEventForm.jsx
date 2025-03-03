@@ -79,7 +79,6 @@ function CreateEventForm({ initialData = null, onSubmit, loading, onClose }) {
               Start date <span>*</span>
             </label>
             <input
-              id="startDate"
               type="date"
               name="start_date"
               value={formData.start_date}

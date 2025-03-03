@@ -5,12 +5,15 @@ import { getUserRole } from "../../utils/Authentication";
 import CreateButton from "../Button/CreateButton";
 import classes from "./SportEventForm.module.css";
 
+// icons
+import { CgCloseO } from "react-icons/cg";
+
 function SportEventForm({
   initialData = null,
   eventList = [],
   onSubmit,
   loading,
-  allowEdit,
+  onClose,
 }) {
   const [formData, setFormData] = useState({
     event: "",
@@ -43,6 +46,7 @@ function SportEventForm({
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
+    onClose();
   };
 
   useEffect(() => {
@@ -56,8 +60,10 @@ function SportEventForm({
 
   return (
     <div className={classes.formContainer}>
+      <CgCloseO className={classes.closeIcon} onClick={onClose} />
+      <h1 className={classes.formHeader}>Create New Sport Event</h1>
       <form onSubmit={handleSubmit}>
-        <div className={classes.formGroup}>
+        <div>
           <label className={classes.label}>
             Event <span>*</span>
           </label>
@@ -67,11 +73,10 @@ function SportEventForm({
             data={eventList}
             value={formData.event_name}
             onChange={handleChange}
-            allowedEdit={!allowEdit}
           />
         </div>
 
-        <div className={classes.formGroup}>
+        <div>
           <label className={classes.label}>
             Sport type <span>*</span>
           </label>
@@ -81,11 +86,10 @@ function SportEventForm({
             data={SPORTS_TYPE_OPTIONS}
             value={formData.sport_type}
             onChange={handleChange}
-            allowedEdit={!allowEdit}
           />
         </div>
 
-        <div className={classes.formGroup}>
+        <div>
           <label className={classes.label}>
             Name <span>*</span>
           </label>
@@ -95,11 +99,12 @@ function SportEventForm({
             value={formData.name}
             onChange={handleChange}
             className={classes.input}
-            disabled={!allowEdit}
+            required
+            autoComplete="off"
           />
         </div>
 
-        <div className={classes.formGroup}>
+        <div>
           <label className={classes.label}>
             Description <span>*</span>
           </label>
@@ -109,39 +114,41 @@ function SportEventForm({
             value={formData.description}
             onChange={handleChange}
             className={classes.input}
-            disabled={!allowEdit}
+            required
+            autoComplete="off"
           />
         </div>
 
-        <div className={classes.formGroup}>
-          <label className={classes.label}>
-            Start Date <span>*</span>
-          </label>
-          <input
-            type="date"
-            name="start_date"
-            value={formData.start_date}
-            onChange={handleChange}
-            className={classes.input}
-            disabled={!allowEdit}
-          />
+        <div className={classes.dateInputWrapper}>
+          <section>
+            <label className={classes.label}>
+              Start Date <span>*</span>
+            </label>
+            <input
+              type="date"
+              name="start_date"
+              value={formData.start_date}
+              onChange={handleChange}
+              className={classes.input}
+              required
+            />
+          </section>
+          <section>
+            <label className={classes.label}>
+              End Date <span>*</span>
+            </label>
+            <input
+              type="date"
+              name="end_date"
+              value={formData.end_date}
+              onChange={handleChange}
+              className={classes.input}
+              required
+            />
+          </section>
         </div>
 
-        <div className={classes.formGroup}>
-          <label className={classes.label}>
-            End Date <span>*</span>
-          </label>
-          <input
-            type="date"
-            name="end_date"
-            value={formData.end_date}
-            onChange={handleChange}
-            className={classes.input}
-            disabled={!allowEdit}
-          />
-        </div>
-
-        <div className={classes.formGroup}>
+        <div>
           <label className={classes.label}>
             Max team <span>*</span>
           </label>
@@ -151,11 +158,11 @@ function SportEventForm({
             value={formData.max_teams}
             onChange={handleChange}
             className={classes.input}
-            disabled={!allowEdit}
+            required
           />
         </div>
 
-        <div className={classes.formGroup}>
+        <div>
           <label className={classes.label}>
             Registration deadline <span>*</span>
           </label>
@@ -165,11 +172,11 @@ function SportEventForm({
             value={formattedDate(formData.registration_deadline)}
             onChange={handleChange}
             className={classes.input}
-            disabled={!allowEdit}
+            required
           />
         </div>
 
-        <div className={classes.formGroup}>
+        <div>
           <label className={classes.label}>
             Rules <span>*</span>
           </label>
@@ -178,11 +185,12 @@ function SportEventForm({
             value={formData.rules}
             onChange={handleChange}
             className={classes.textarea}
-            disabled={!allowEdit}
+            required
+            autoComplete="off"
           />
         </div>
 
-        <div className={classes.formGroup}>
+        <div>
           <label className={classes.label}>
             Scoring system <span>*</span>
           </label>
@@ -191,11 +199,12 @@ function SportEventForm({
             value={formData.scoring_system}
             onChange={handleChange}
             className={classes.textarea}
-            disabled={!allowEdit}
+            required
+            autoComplete="off"
           />
         </div>
 
-        <div className={classes.formGroup}>
+        <div>
           <label className={classes.label}>
             Status <span>*</span>
           </label>
@@ -205,21 +214,12 @@ function SportEventForm({
             data={SPORT_EVENTS_STATUS}
             value={formData.status}
             onChange={handleChange}
-            allowedEdit={!allowEdit}
           />
         </div>
 
-        <section className={classes.button}>
-          {allowEdit && (
-            <CreateButton type="submit" disabled={loading}>
-              {loading
-                ? "Submitting..."
-                : initialData
-                ? "Update"
-                : "Create New"}
-            </CreateButton>
-          )}
-        </section>
+        <button type="submit" className={classes.button} disabled={loading}>
+          {loading ? "Submitting..." : "Submit"}
+        </button>
       </form>
     </div>
   );
@@ -246,6 +246,7 @@ const Dropdown = ({
           onChange={onChange}
           className={classes.select}
           disabled={allowedEdit}
+          required
         >
           <option value={""} disabled>
             {placeholder}

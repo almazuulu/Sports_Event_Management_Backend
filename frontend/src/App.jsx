@@ -14,7 +14,6 @@ import ChangePasswordPage from "./pages/ChangePassword";
 import SportEventsPage from "./pages/SportEvents";
 import PageRootLayout from "./pages/PageRoot";
 import NewSportEventPage from "./pages/NewSportEvent";
-import SportEventDetailPage from "./pages/SportEventDetail";
 import LogoutPage from "./pages/Logout";
 
 const router = createBrowserRouter([
@@ -50,10 +49,6 @@ const router = createBrowserRouter([
                   {
                     index: true,
                     element: <SportEventsPage />,
-                  },
-                  {
-                    path: ":sportEventId",
-                    element: <SportEventDetailPage />,
                   },
                 ],
               },
