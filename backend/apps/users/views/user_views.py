@@ -23,6 +23,8 @@ class UserListView(generics.ListCreateAPIView):
     def get_permissions(self):
         if self.request.method == 'GET':
             return [IsAdminUser()]
+        elif self.request.method == 'POST':
+            return []
         return [permissions.IsAuthenticated()]
    
     def get_serializer_class(self):
