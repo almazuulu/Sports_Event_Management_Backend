@@ -1,5 +1,4 @@
 .container {
-    min-height: 100%;
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
@@ -20,4 +19,8 @@
 .sectionButton {
     align-self: flex-end;
     margin-bottom: 1rem;
+}
+
+.modalContainer {
+    border-radius: 20px;
 }

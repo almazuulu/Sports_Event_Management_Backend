@@ -1,14 +1,12 @@
-// src/components/Dashboard.js
 import Card from "../components/Cardnew";
 import Table from "../components/Table";
 import classes from "../styles/Dashboard.module.css";
-import Navbar from "../components/HeaderNavBar";
 import EventCard from "../components/EventCard";
 import SportsCard from "../components/Matches";
 
 const Dashboard = () => {
   return (
-    <div>
+    <>
       <div className={classes.dashboard}>
         <div className={classes.dashboardCards}>
           <Card />
@@ -33,7 +31,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

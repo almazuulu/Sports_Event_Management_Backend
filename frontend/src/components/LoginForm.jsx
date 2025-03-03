@@ -69,7 +69,7 @@ function LoginForm() {
       <h1 className={classes.loginHeader}>Sport Event Management System</h1>
 
       <form onSubmit={formHandler}>
-        <div className={classes.inputGroup}>
+        <div>
           <input
             type="email"
             className={classes.input}
@@ -80,7 +80,7 @@ function LoginForm() {
             autoComplete="off"
           />
         </div>
-        <div className={classes.inputGroup}>
+        <div>
           <input
             type="password"
             className={classes.input}

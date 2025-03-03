@@ -1,6 +1,6 @@
-// src/components/EventCard.jsx
 import { useEffect, useState } from "react";
-import StatusChip from "./StatusChip"; // Import StatusChip
+
+import StatusChip from "./StatusChip";
 import classes from "../components/Table.module.css";
 
 function EventCard() {
@@ -21,7 +21,6 @@ function EventCard() {
       }
 
       const data = await response.json();
-      console.log(data);
       setEvents(data.results);
     } catch (error) {
       console.error("Error:", error);
@@ -36,7 +35,7 @@ function EventCard() {
 
   return (
     <div className={classes.tableWrapper}>
-      <table className={classes.modernTable}>
+      <table >
         <thead>
           <tr>
             <th>No</th>
@@ -44,7 +43,7 @@ function EventCard() {
             <th>Location</th>
             <th>Start Date</th>
             <th>End Date</th>
-            <th style={{ width: "120px" }}>Status</th> {/* Fixed width for Status column */}
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>

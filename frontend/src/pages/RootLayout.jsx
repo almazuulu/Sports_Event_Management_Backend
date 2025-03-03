@@ -13,8 +13,7 @@ function RootLayout() {
       <ToastContainer />
       {!isLoginPage && <MainNavigation />}
       <main style={{ width: "100%" }}>
-        <HeaderNavBar />
-
+        {!isLoginPage && <HeaderNavBar />}
         <Outlet />
       </main>
     </div>

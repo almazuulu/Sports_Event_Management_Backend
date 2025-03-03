@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { SPORT_EVENTS_STATUS, SPORTS_TYPE_OPTIONS } from "../../lib/constant.js";
+import { SPORT_EVENTS_STATUS, SPORTS_TYPE_OPTIONS } from "../../constant";
 import { getUserRole } from "../../utils/Authentication";
 import CreateButton from "../Button/CreateButton";
 import classes from "./SportEventForm.module.css";

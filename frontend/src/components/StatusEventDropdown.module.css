@@ -2,26 +2,17 @@
     margin-bottom: 1rem;
 }
 
-.label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
+.select, .input {
+    width: 100%;
+    font-size: 17px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid #000;
+    outline: none;
+    transition: .3s;
 }
 
-.label span {
+.label span{
     color: red;
-}
-
-.select {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
 }
