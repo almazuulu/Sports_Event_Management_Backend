@@ -1,0 +1,41 @@
+.card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    width: 380px; /* Increased card width */
+    height: 180px; /* Increased card height */
+    display: flex;
+    flex-direction: column;
+    
+    }
+  
+    .cardContainer {
+      display: flex;
+      gap: 26px; /* Spacing between cards */
+      flex-wrap: wrap; /* Allows wrapping if screen size is small */
+     
+    }
+    
+    .card:hover {
+      transform: scale(1.02);
+    }
+    
+    .cardTitle {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .cardValue {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+    
+    .cardSubtitle {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    
