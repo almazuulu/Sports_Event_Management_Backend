@@ -1,167 +1,120 @@
-/* General Styles */
-body {
-    font-family: "Arial", sans-serif;
-    background: #f4f7fc;
-    margin: 0;
-    padding: 0;
+/* 🌟 GLOBAL STYLES */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  font-family: 'Arial', sans-serif;
+  background: radial-gradient(circle at center, #121826, #0d141f);
+}
+
+.dashboard {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 15px;
+}
+
+/* 🌟 GRID LAYOUT */
+.gridContainer {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-columns: 2fr 1fr 2fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 15px;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+/* 🌟 BASE CARD STYLE */
+.card {
+  background: linear-gradient(145deg, #1a2333, #0d141f);
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 4px 6px 10px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* 🌟 ASYMMETRIC CARD SIZES */
+.largeHeader {
+  grid-column: span 4;
+  grid-row: span 1;
+}
+
+.wideCard {
+  grid-column: span 2;
+}
+
+.tallCard {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+/* 🌟 TABLE STYLES */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.table th, .table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+  color: white;
+}
+
+.table th {
+  background-color: rgba(255, 255, 255, 0.1);
+  font-weight: bold;
+}
+
+.table tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 🌟 ICONS */
+.icon {
+  font-size: 35px;
+  margin-bottom: 10px;
+  color: #4caf50;
+}
+
+/* 🌟 STATUS COLORS */
+.statusOngoing {
+  color: #ff9800;
+}
+
+/* 🌟 CIRCULAR PROGRESS */
+.progressContainer {
+  width: 80px;
+  height: 80px;
+  margin: 10px 0;
+}
+
+/* 🌟 RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+  .gridContainer {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  h2 {
-    color: #333;
-    margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .gridContainer {
+    grid-template-columns: repeat(1, 1fr);
   }
-  
-  /* Navbar */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    background: white;
-    padding: 20px 20px;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .navLeft {
-    display: flex;
-    align-items: center;
-  }
-  
-  .searchContainer {
-    position: relative;
-    display: flex;
-    align-items: center;
-    background: #f1f3f5;
-    border-radius: 8px;
-    padding: 10px 15px;
-    width: 250px;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .searchContainer:hover,
-  .searchContainer:focus-within {
-    background: #e9ecef;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .searchInput {
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 14px;
-    flex: 1;
-  }
-  
-  .searchInput::placeholder {
-    color: #6c757d;
-  }
-  
-  .searchIcon {
-    color: #6c757d;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  
-  .navRight .icon {
-    font-size: 22px;
-    margin-left: 15px;
-    cursor: pointer;
-  }
-  
-  .userIcon {
-    font-size: 22px;
-  }
-  
-  /* Dashboard */
-  .dashboard {
-    padding: 20px;
-  }
-  
-  .dashboardCards {
-    display: flex;
-    gap: 60px;
-    
-  }
-  
-  .card {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 300px;
-  }
-  
-  .card h2 {
-    color: #222;
-  }
-  
-  .dashboardContent {
-    display: flex;
-    margin-top: 20px;
-    gap: 20px;
-  }
-  
-  .tableContainer {
-    background: white;
-    padding: 10px;
-    border-radius: 8px;
-    flex: 1;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .events {
-    background: white;
-    padding: 10px;
-    border-radius: 8px;
-    flex: 0.7;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .tableContainer:hover {
-    transform: scale(1.02);
-  }
-  .events:hover {
-    transform: scale(1.02);
-  }
-  
-  .dashboardTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-  
-  .dashboardTable th, .dashboardTable td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .sportBadge {
-    background: gold;
-    padding: 2px 5px;
-    border-radius: 3px;
-  }
-  
-  /* Events */
-  .eventCard {
-    display: flex;
-    align-items: center;
-    background: #eef;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 10px;
-  }
-  
-  .eventDate {
-    background: blue;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    margin-right: 10px;
-  }
-  
-  .eventTitle {
-    font-weight: bold;
-  }
+}
