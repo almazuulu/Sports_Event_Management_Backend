@@ -54,7 +54,21 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'username', 'first_name', 'last_name', 'role']
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'role']  # Role cannot be changed through the profile
+
+    def validate_email(self, value):
+        # Check for unique email
+        users = User.objects.exclude(pk=self.instance.pk)
+        if users.filter(email=value).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
+
+    def validate_username(self, value):
+        # Check for unique username
+        users = User.objects.exclude(pk=self.instance.pk)
+        if users.filter(username=value).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
+        return value
 
 
 @extend_schema_serializer(
