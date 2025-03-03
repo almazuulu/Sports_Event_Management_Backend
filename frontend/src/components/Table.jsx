@@ -1,4 +1,6 @@
 import classes from "../components/Table.module.css";
+
+// icons
 import { FaUsers } from "react-icons/fa";
 
 const teams = [
@@ -47,7 +49,7 @@ const teams = [
 const Table = () => {
   return (
     <div className={classes.tableWrapper}>
-      <table className={classes.modernTable}>
+      <table>
         <thead>
           <tr>
             <th>Team Name</th>
@@ -65,7 +67,6 @@ const Table = () => {
                 <div className={classes.teamInfo}>
                   <div className={classes.teamIconWrapper}>
                     <FaUsers className={classes.teamIcon} />{" "}
-                    {/* Team icon inside a circle */}
                   </div>
                   <span>{team.name}</span>
                 </div>
