@@ -1,4 +1,3 @@
-# teams/views.py
 from rest_framework import viewsets, filters
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -42,6 +41,15 @@ class TeamsViewSet(viewsets.ModelViewSet):
         elif self.action == 'destroy':
             return [IsAuthenticated(), IsTeamOwnerOrAdmin()]
         return [IsAuthenticated(), IsTeamOwnerOrAdmin()]
+    
+    def get_queryset(self):
+        """
+        Filter teams based on the current user. If the action is 'list', it will return only teams created by the current user (team captain).
+        """
+        user = self.request.user
+        if self.action == 'list':
+            return Team.objects.filter(captain=user)
+        return Team.objects.all()
     
     @extend_schema(
         summary="List all teams",
