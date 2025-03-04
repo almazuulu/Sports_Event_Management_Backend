@@ -1,11 +1,11 @@
-from django.urls import path
-from . import views
+# games/urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import GameViewSet
 
-app_name = 'games'
+router = DefaultRouter()
+router.register(r'games', GameViewSet)
 
 urlpatterns = [
-    # Will contain game-related endpoints like:
-    # path('', views.GameListView.as_view(), name='game-list'),
-    # path('<int:pk>/', views.GameDetailView.as_view(), name='game-detail'),
-    # path('schedule/', views.ScheduleView.as_view(), name='schedule'),
+    path('', include(router.urls)),
 ]
