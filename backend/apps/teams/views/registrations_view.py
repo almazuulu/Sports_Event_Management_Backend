@@ -4,9 +4,10 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_spectacular.utils import extend_schema
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser
 from teams.permissions import IsRegistrationTeamCaptainOrAdmin, IsTeamOwnerOrAdmin
-
+from rest_framework import generics
 from teams.models import TeamRegistration
 from teams.serializers.registration_serializers import (TeamRegistrationSerializer, TeamRegistrationCreateSerializer, TeamRegistrationApprovalSerializer)
 
@@ -51,7 +52,7 @@ class TeamRegistrationViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="List team registrations",
-        description="Retrieve a list of team registrations for sport events. Can be filtered by team, sport event, and registration status.",
+        description="Retrieve a list of team registrations for sport events. Can be filtered by team, sport event, and registration status. Only administrator has access",
         responses={200: TeamRegistrationSerializer(many=True)}
     )
     def list(self, request, *args, **kwargs):
@@ -170,3 +171,15 @@ class SportEventRegistrationCreateViewSet(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AdminTeamRegistrationListView(generics.ListAPIView):
+    """
+    Endpoint for admins to list all team registrations across all sport events.
+    """
+    queryset = TeamRegistration.objects.all()  # Adjust if you need to filter in some way
+    serializer_class = TeamRegistrationSerializer
+    permission_classes = [IsAdminUser]  # Only admins can access this view
+
+    def get(self, request, *args, **kwargs):
+        # Optionally, you can handle any filtering or pagination here
+        return super().get(request, *args, **kwargs)

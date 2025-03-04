@@ -48,7 +48,7 @@ class PlayersViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="List all players",
-        description="Returns a list of all players in the system. Requires authentication.",
+        description="Returns a list of all players in the system. Requires authentication. Maximum item 10 per page",
         responses={200: PlayerSerializer(many=True)}
     )
     def list(self, request, *args, **kwargs):
