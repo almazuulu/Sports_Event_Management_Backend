@@ -148,7 +148,7 @@ function SportEventTable({ sportEventList = [], onRefetchData }) {
                 <td>{data.start_date}</td>
                 <td>{data.end_date}</td>
                 <td style={{ width: "200px" }}>
-                  <StatusChip status={data.status_display} />
+                  <StatusChip status={data.status} />
                 </td>
                 {role === "admin" && (
                   <td style={{ width: "200px" }}>

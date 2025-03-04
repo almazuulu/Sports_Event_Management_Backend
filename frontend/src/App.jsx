@@ -12,6 +12,11 @@ import ChangePasswordPage from "./pages/ChangePassword";
 import SportEventsPage from "./pages/SportEvents";
 import PageRootLayout from "./pages/PageRoot";
 import LogoutPage from "./pages/Logout";
+import TeamsPage from "./pages/Teams";
+import MyTeamsPage from "./pages/MyTeams";
+import TeamDetailsPage from "./pages/TeamDetails";
+import PlayersPage from "./pages/Players";
+import PlayerDetailsPage from "./pages/PlayerDetails";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +48,35 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element: <SportEventsPage />,
+              },
+            ],
+          },
+          {
+            path: "teams",
+            element: <PageRootLayout />,
+            children: [
+              {
+                index: true,
+                element: <TeamsPage />,
+              },
+              {
+                path: ":teamId",
+                element: <TeamDetailsPage />,
+              },
+              {
+                path: "players",
+                element: <PlayersPage />,
+              },
+              {
+                path: "my-teams",
+                element: <ProtectedRoute allowedRoles={["team_captain"]} />,
+                children: [
+                  { index: true, element: <MyTeamsPage /> },
+                  {
+                    path: ":teamId",
+                    element: <TeamDetailsPage />,
+                  },
+                ],
               },
             ],
           },

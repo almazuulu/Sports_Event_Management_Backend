@@ -1,4 +1,3 @@
-// Sport Type Options
 export const SPORTS_TYPE_OPTIONS = [
   { id: "football", name: "Football" },
   { id: "basketball", name: "Basketball" },
@@ -12,7 +11,6 @@ export const SPORTS_TYPE_OPTIONS = [
   { id: "other", name: "Other" },
 ];
 
-// Sport Event Status
 export const SPORT_EVENTS_STATUS = [
   { id: "scheduled", name: "Scheduled" },
   { id: "registration", name: "Registration Open" },
@@ -28,3 +26,9 @@ export const ROLE_LABELS = {
   scorekeeper: "Scorekeeper",
   public: "Public User",
 };
+
+export const TEAM_STATUS_OPTIONS = [
+  { id: 'active', name: 'Active'},
+  { id: 'inactive', name: 'Inactive'},
+  { id: 'suspended', name: 'Suspended'},
+]
