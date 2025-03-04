@@ -82,6 +82,7 @@ function PublicDashboard() {
                   <th style={{ textAlign: "center" }}>Location</th>
                   <th style={{ textAlign: "center" }}>Start Date</th>
                   <th style={{ textAlign: "center" }}>End Date</th>
+                  <th>Year</th>
                   <th style={{ textAlign: "center" }}>No. of sport events</th>
                   <th style={{ textAlign: "center" }}>Status</th>
                 </tr>
@@ -93,6 +94,7 @@ function PublicDashboard() {
                     <td style={{ textAlign: "center" }}>{event.location}</td>
                     <td style={{ textAlign: "center" }}>{event.start_date}</td>
                     <td style={{ textAlign: "center" }}>{event.end_date}</td>
+                    <td>2025</td>
                     <td style={{ textAlign: "center" }}>{event.sport_events_count}</td>
                     <td style={{ textAlign: "center" }}>
                       <StatusChip status={event.status_display} />
@@ -114,6 +116,7 @@ function PublicDashboard() {
                 <th>Date</th>
                 <th>Time</th>
                 <th>Match</th>
+                <th>Year</th>
                 <th>Location</th>
               </tr>
             </thead>
@@ -123,7 +126,9 @@ function PublicDashboard() {
                   <td>{match.date}</td>
                   <td>{match.time}</td>
                   <td>{match.teams}</td>
+                  <td>2025</td>
                   <td>{match.location}</td>
+              
                 </tr>
               ))}
             </tbody>
