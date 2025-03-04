@@ -94,7 +94,7 @@ function PublicDashboard () {
         {/* Live Scores with Circular Progress */}
         <div className={`${styles.card} ${styles.wideCard}`}>
           <FaClock className={styles.icon} />
-          <h3>Upcoming Matches</h3>
+          <h3>Real time scores and updates</h3>
           <table className={styles.table}>
             <thead>
               <tr>
@@ -138,19 +138,19 @@ function PublicDashboard () {
         {/* Sport Events */}
         <div className={`${styles.card} ${styles.smallCard}`}>
           <FaFutbol className={styles.icon} />
-          <h3>Sport Events</h3>
+          <h3>Live Score</h3>
           <p>Basketball | March 12 - 18</p>
         </div>
 
         {/* Team Information */}
         <div className={`${styles.card} ${styles.wideCard}`}>
           <FaUsers className={styles.icon} />
-          <h3>Team Info</h3>
+          <h2>Standings and final rankings</h2>
           <p>Warriors | Captain: John Doe</p>
         </div>
         <div className={`${styles.card} ${styles.wideCard}`}>
           <FaCalendarAlt className={styles.icon} />
-          <h2>National Sports Fest 2025</h2>
+          <h2>Upcoming Matches</h2>
         
         </div>
       </div>
