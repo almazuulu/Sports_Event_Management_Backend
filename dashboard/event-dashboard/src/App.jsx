@@ -1,10 +1,14 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import PublicDashboard from "../src/Pages/PublicDashboard";
 
 const router = createBrowserRouter([
   {
+    path: "/",
+    element: <Navigate to="/public-dashboard" replace />, // Redirect root to /public-dashboard
+  },
+  {
     path: "/public-dashboard",
-    element: <PublicDashboard />, // Directly set element
+    element: <PublicDashboard />,
   },
 ]);
 
