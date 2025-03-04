@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
-from apps.games.models import Game
+from games.models import Game
 
 
 @extend_schema_serializer(
@@ -414,7 +414,7 @@ class ScorekeeperGameSerializer(serializers.ModelSerializer):
                                 'player': '3fa85f64-5717-4562-b3fc-2c963f66afb0',
                                 'player_name': 'Mike Johnson',
                                 'jersey_number': 10,
-                                'is_captain_for_game': true,
+                                'is_captain_for_game': True,
                                 'position': 'Guard'
                             }
                         ]
