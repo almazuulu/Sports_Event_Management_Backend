@@ -46,7 +46,7 @@ function PlayerForm({
       position: "",
       date_of_birth: "",
       photo: null,
-      is_active: true,
+      is_active: "active",
       joined_date: "",
       notes: "",
     });
@@ -67,7 +67,7 @@ function PlayerForm({
       position: "",
       date_of_birth: "",
       photo: null,
-      is_active: true,
+      is_active: "active",
       joined_date: "",
       notes: "",
     });
@@ -217,7 +217,7 @@ function PlayerForm({
           <label className={classes.label}>Active</label>
           <select
             name={"is_active"}
-            value={formData.is_active}
+            value={formData.is_active ? "active" : "inactive"}
             onChange={handleChange}
             className={classes.select}
             disabled={!allowedEdit}
