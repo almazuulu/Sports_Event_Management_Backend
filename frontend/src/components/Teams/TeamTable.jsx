@@ -1,7 +1,8 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 import TeamStatusChip from "./TeamStatusChip";
 import ViewButton from "../Button/ViewButton";
-import { useNavigate } from "react-router-dom";
 
 function TeamTable({ teams = [], onRefetchData }) {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function TeamTable({ teams = [], onRefetchData }) {
             <tr>
               <th>No</th>
               <th>Team Name</th>
-              <th>Team Logo</th>
+              {/* <th>Team Logo</th> */}
               <th>Team Captain</th>
               <th>Contact Info</th>
               <th>Status</th>
@@ -30,15 +31,14 @@ function TeamTable({ teams = [], onRefetchData }) {
               <tr key={team.id}>
                 <td>{index + 1}</td>
                 <td>{team.name}</td>
-                <td>
-                  {" "}
+                {/* <td>
                   <img
-                    src={team.logo ? team.logo : "https://placehold.co/400"}
+                    src={team.logo ? team.logo : "https://placehold.co/50"}
                     alt="Team Logo"
                     width="50"
                     height="50"
                   />
-                </td>
+                </td> */}
                 <td>
                   {team.captain.first_name} {team.captain.last_name}
                 </td>

@@ -24,7 +24,7 @@
     color: red;
 }
 
-.input {
+.input, .select {
     width: 100%;
     font-size: 17px;
     padding: 10px;
@@ -62,15 +62,6 @@
     right: 0;
     font-size: 20px;
     cursor: pointer;
-}
-
-.imageGroup {
-    display: flex;
-    flex-direction: column;
-}
-
-.imageGroup img {
-    margin-bottom: 10px;
 }
 
 

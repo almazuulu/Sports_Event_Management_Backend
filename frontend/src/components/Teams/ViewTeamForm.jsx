@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import classes from "./ViewTeamForm.module.css";
 
-function ViewTeamForm({ initialData = null, allowEdit = false}) {
+function ViewTeamForm({ initialData = null, allowEdit = false }) {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -36,15 +36,15 @@ function ViewTeamForm({ initialData = null, allowEdit = false}) {
   return (
     <div className={classes.formContainer}>
       <form>
-        <div>
+        {/* <div>
           <label className={classes.label}>Team Logo</label>
           <img
-            src={formData.logo ?? "https://placehold.co/400"}
+            src={formData.logo ?? "https://placehold.co/100"}
             alt={formData.name}
             width="100"
             height="100"
           />
-        </div>
+        </div> */}
         <div>
           <label className={classes.label}>Team ID</label>
           <input
@@ -79,6 +79,7 @@ function ViewTeamForm({ initialData = null, allowEdit = false}) {
             disabled={!allowEdit}
           />
         </div>
+
         <div>
           <label className={classes.label}>Player Count</label>
           <input
@@ -99,23 +100,10 @@ function ViewTeamForm({ initialData = null, allowEdit = false}) {
             className={classes.input}
             onChange={handleChange}
             disabled={!allowEdit}
+            style={{ textTransform: 'capitalize'}}
           />
         </div>
 
-        {/* TEAM CAPTAIN'S INFORMATION */}
-        <br />
-        <label className={classes.label}>Captain Information</label>
-        <div>
-          <label className={classes.label}>Full Name</label>
-          <input
-            type="text"
-            name="description"
-            value={`${formData.captain.first_name} ${formData.captain.last_name}`}
-            className={classes.input}
-            onChange={handleChange}
-            disabled
-          />
-        </div>
         <div>
           <label className={classes.label}>Contact Email</label>
           <input
@@ -136,6 +124,32 @@ function ViewTeamForm({ initialData = null, allowEdit = false}) {
             className={classes.input}
             onChange={handleChange}
             disabled={!allowEdit}
+          />
+        </div>
+
+        {/* TEAM CAPTAIN'S INFORMATION */}
+        <hr />
+        <label className={classes.label}>Captain Information</label>
+        <div>
+          <label className={classes.label}>Full Name</label>
+          <input
+            type="text"
+            name="captain_name"
+            value={`${formData.captain.first_name} ${formData.captain.last_name}`}
+            className={classes.input}
+            onChange={handleChange}
+            disabled
+          />
+        </div>
+        <div>
+          <label className={classes.label}>Email</label>
+          <input
+            type="email"
+            name="captain_email"
+            value={formData.captain.email}
+            className={classes.input}
+            onChange={handleChange}
+            disabled
           />
         </div>
       </form>

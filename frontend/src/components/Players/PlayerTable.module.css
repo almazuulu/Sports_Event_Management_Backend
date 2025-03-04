@@ -1,0 +1,7 @@
+.modalContainer {
+    border-radius: 20px;
+}
+
+.modalContainer::-webkit-scrollbar {
+    display: none;
+}

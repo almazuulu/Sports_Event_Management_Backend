@@ -24,7 +24,7 @@
     color: red;
 }
 
-.input {
+.input, .select{
     width: 100%;
     font-size: 17px;
     padding: 10px;

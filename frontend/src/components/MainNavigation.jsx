@@ -7,7 +7,7 @@ import classes from "./MainNavigation.module.css";
 
 // icons
 import { FiHome, FiSettings } from "react-icons/fi";
-import { TiUserAddOutline } from "react-icons/ti";
+import { TiUserAddOutline, TiGroupOutline  } from "react-icons/ti";
 import {
   FaRegCalendarAlt,
   FaRegClipboard,
@@ -103,13 +103,18 @@ const sections = [
     ],
   },
   {
-    label: "TEAMS",
+    label: "TEAMS & PLAYERS",
     key: "teams",
     options: [
       {
-        Icon: RiTeamLine,
+        Icon: TiGroupOutline ,
         title: "All Teams",
         path: "/teams",
+      },
+      {
+        Icon: RiTeamLine,
+        title: "All Players",
+        path: "/teams/players",
       },
       {
         Icon: LuClipboardPenLine,

@@ -21,6 +21,15 @@ function MyTeamsPage() {
   };
 
   const handleSubmit = async (formData) => {
+    // const formDataToSend = new FormData();
+    // formDataToSend.append("logo", formData.logo); // Append file
+    // formDataToSend.append("name", formData.name);
+    // formDataToSend.append("description", formData.description);
+    // formDataToSend.append("contact_email", formData.contact_email);
+    // formDataToSend.append("contact_phone", formData.contact_phone);
+
+    // console.log("formDataToSend: ", formDataToSend);
+
     try {
       setIsSubmitting(true);
       const response = await fetchWithAuth("/api/teams/teams/", {
@@ -35,7 +44,7 @@ function MyTeamsPage() {
 
       if (response.ok) {
         toast.success("New team created successfully!");
-        fetchAllTeams();
+        fetchMyTeams();
       }
     } catch (error) {
       console.error(error);
@@ -44,10 +53,10 @@ function MyTeamsPage() {
     }
   };
 
-  const fetchAllTeams = async () => {
+  const fetchMyTeams = async () => {
     try {
       setIsFetchingTeams(true);
-      const response = await fetchWithAuth("/api/teams/teams/");
+      const response = await fetchWithAuth("/api/teams/my-teams/");
       const data = await response.json();
       if (!response.ok) return toast.error("Failed to fetch teams");
       if (response.ok) {
@@ -61,7 +70,7 @@ function MyTeamsPage() {
   };
 
   useEffect(() => {
-    fetchAllTeams();
+    fetchMyTeams();
   }, []);
 
   if (isFetchingTeams) return <LoadingScreen />;
@@ -80,7 +89,7 @@ function MyTeamsPage() {
             <p>No teams available. Please create a new team.</p>
           )}
 
-          {/* {teams.length > 0 && <TeamTable teams={teams} />} */}
+          {teams.length > 0 && <TeamTable teams={teams} />}
         </div>
       </div>
 
