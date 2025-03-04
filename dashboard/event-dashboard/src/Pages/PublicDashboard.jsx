@@ -136,7 +136,7 @@ console.log("formattedEvents",formattedEvents)
                   <td>{match.date}</td>
                   <td>{match.time}</td>
                   <td>{match.teams}</td>
-                  {/* <td>2025</td> */} 
+                  <td>2025</td>
                   <td>{match.location}</td>
               
                 </tr>
