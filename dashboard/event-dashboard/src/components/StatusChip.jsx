@@ -45,7 +45,7 @@ const StatusChip = ({ status }) => {
         display: "inline-flex",
         justifyContent: "center",
         alignItems: "center",
-        minWidth: "120px", // Ensures uniform width
+        minWidth: "80px", // Ensures uniform width
         textAlign: "center",
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
       }}
