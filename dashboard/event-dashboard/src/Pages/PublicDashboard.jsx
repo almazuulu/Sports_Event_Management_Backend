@@ -39,8 +39,9 @@ function PublicDashboard() {
         ...event,
         start_date: formatDate(event.start_date),
         end_date: formatDate(event.end_date),
+        year: getYear(event.start_date), 
       }));
-
+console.log("formattedEvents",formattedEvents)
       setEvents(formattedEvents);
     } catch (error) {
       console.error("Error:", error);
@@ -55,9 +56,18 @@ function PublicDashboard() {
 
   // Function to format the date from "YYYY-MM-DD" to "MMM DD"
   const formatDate = (dateString) => {
+    if (!dateString) return "";
+  
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" }); // Example: Mar 10
   };
+  
+  const getYear = (dateString) => {
+    if (!dateString) return "";
+  
+    return new Date(dateString).getFullYear(); // Example: 2025
+  };
+  
 
   const upcomingMatches = [
     { date: "Mar 10", time: "18:00", teams: "Team A vs Team B", location: "Berlin Stadium" },
@@ -82,7 +92,7 @@ function PublicDashboard() {
                   <th style={{ textAlign: "center" }}>Location</th>
                   <th style={{ textAlign: "center" }}>Start Date</th>
                   <th style={{ textAlign: "center" }}>End Date</th>
-                  <th>Year</th>
+                <th>Year</th>
                   <th style={{ textAlign: "center" }}>No. of sport events</th>
                   <th style={{ textAlign: "center" }}>Status</th>
                 </tr>
@@ -94,7 +104,7 @@ function PublicDashboard() {
                     <td style={{ textAlign: "center" }}>{event.location}</td>
                     <td style={{ textAlign: "center" }}>{event.start_date}</td>
                     <td style={{ textAlign: "center" }}>{event.end_date}</td>
-                    <td>2025</td>
+                  <td>{event.year}</td>
                     <td style={{ textAlign: "center" }}>{event.sport_events_count}</td>
                     <td style={{ textAlign: "center" }}>
                       <StatusChip status={event.status_display} />
