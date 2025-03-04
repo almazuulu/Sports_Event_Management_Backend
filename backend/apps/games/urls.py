@@ -1,11 +1,18 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
-app_name = 'games'
+from games.views import GameViewSet, GameTeamViewSet, GamePlayerViewSet
+
+router = DefaultRouter()
+router.register(r'games', GameViewSet, basename='game')
+router.register(r'game-teams', GameTeamViewSet, basename='game-team')
+router.register(r'game-players', GamePlayerViewSet, basename='game-player')
 
 urlpatterns = [
-    # Will contain game-related endpoints like:
-    # path('', views.GameListView.as_view(), name='game-list'),
-    # path('<int:pk>/', views.GameDetailView.as_view(), name='game-detail'),
-    # path('schedule/', views.ScheduleView.as_view(), name='schedule'),
+    path('', include(router.urls)),
+    
+    # Custom bulk create endpoint for game players
+    path('game-players/bulk-create/', 
+         GamePlayerViewSet.as_view({'post': 'bulk_create'}), 
+         name='game-player-bulk-create'),
 ]
