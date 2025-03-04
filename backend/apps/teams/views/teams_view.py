@@ -44,12 +44,21 @@ class TeamsViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """
-        Filter teams based on the current user. If the action is 'list', it will return only teams created by the current user (team captain).
+        Optionally restricts the returned teams by filtering the status or searching by name.
         """
-        user = self.request.user
-        if self.action == 'list':
-            return Team.objects.filter(captain=user)
-        return Team.objects.all()
+        queryset = Team.objects.all()
+        
+        # Filtering by team status
+        status = self.request.query_params.get('status', None)
+        if status:
+            queryset = queryset.filter(status=status)
+        
+        # Searching by team name
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+        
+        return queryset
     
     @extend_schema(
         summary="List all teams",
