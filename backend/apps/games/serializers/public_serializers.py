@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
-from apps.games.models import Game, GameTeam
+from games.models import Game
 
 
 @extend_schema_serializer(
