@@ -38,13 +38,28 @@ function MyTeamsPage() {
       });
 
       const data = await response.json();
+
       if (!response.ok) {
-        toast.error("Failed to create new team!");
+        toast.error(
+          <div>
+            <strong>Failed to submit form:</strong>
+            <ul>
+              {Object.entries(data).map(([field, messages]) => (
+                <li key={field}>
+                  <strong>{field}:</strong> {messages.join(", ")}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
       }
 
       if (response.ok) {
         toast.success("New team created successfully!");
         fetchMyTeams();
+        setIsModalOpen(false);
+
+        return { success: true, data };
       }
     } catch (error) {
       console.error(error);
@@ -60,6 +75,7 @@ function MyTeamsPage() {
       const data = await response.json();
       if (!response.ok) return toast.error("Failed to fetch teams");
       if (response.ok) {
+        console.log(data.results)
         setTeams(data.results);
       }
     } catch (error) {
@@ -73,24 +89,26 @@ function MyTeamsPage() {
     fetchMyTeams();
   }, []);
 
-  if (isFetchingTeams) return <LoadingScreen />;
-
   return (
     <>
       <div className={classes.container}>
         <Header title={"My Teams"} />
-        <div className={classes.card}>
-          <section className={classes.sectionButton}>
-            <CreateButton onClick={handleCreateNew}>
-              Create New Team
-            </CreateButton>
-          </section>
-          {teams.length === 0 && (
-            <p>No teams available. Please create a new team.</p>
-          )}
+        {isFetchingTeams ? (
+          <LoadingScreen />
+        ) : (
+          <div className={classes.card}>
+            <section className={classes.sectionButton}>
+              <CreateButton onClick={handleCreateNew}>
+                Create New Team
+              </CreateButton>
+            </section>
+            {teams.length === 0 && (
+              <p>No teams available. Please create a new team.</p>
+            )}
 
-          {teams.length > 0 && <TeamTable teams={teams} />}
-        </div>
+            {teams.length > 0 && <TeamTable teams={teams} />}
+          </div>
+        )}
       </div>
 
       <Modal

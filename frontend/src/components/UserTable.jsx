@@ -58,7 +58,7 @@ function UserTable({ userList = [], onRefetchData, roles = [] }) {
       setIsFetching(true);
       const response = await fetchWithAuth(`/api/users/${userId}/`);
       const data = await response.json();
-      if (!response.ok) toast.error("Failed to sport event");
+      if (!response.ok) toast.error("Failed to fetch user data!");
 
       if (response.ok) {
         setUserData(data);
@@ -78,14 +78,28 @@ function UserTable({ userList = [], onRefetchData, roles = [] }) {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
       if (!response.ok) {
-        toast.error("Failed to update user!");
+        toast.error(
+          <div>
+            <strong>Failed to submit form:</strong>
+            <ul>
+              {Object.entries(data).map(([field, messages]) => (
+                <li key={field}>
+                  <strong>{field}:</strong> {messages.join(", ")}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
       }
 
       if (response.ok) {
         toast.success("User updated successfully!");
         setIsEditing(false);
         onRefetchData();
+
+        return { success: true, data };
       }
     } catch (error) {
       console.error(error);

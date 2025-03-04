@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import StatusChip from "./StatusChip";
 import classes from "../components/Table.module.css";
+import { formatToShortDate } from "../utils/helpers";
 
 function EventCard() {
   const [events, setEvents] = useState([]);
@@ -9,12 +10,9 @@ function EventCard() {
 
   async function fetchData() {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/events/events/public/", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "http://127.0.0.1:8000/api/events/events/public/"
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -35,7 +33,7 @@ function EventCard() {
 
   return (
     <div className={classes.tableWrapper}>
-      <table >
+      <table>
         <thead>
           <tr>
             <th>No</th>
@@ -50,17 +48,11 @@ function EventCard() {
           {events.map((event, index) => (
             <tr key={event.id}>
               <td>{index + 1}</td>
-              <td>
-                <div className={classes.teamInfo}>
-                  <span>{event.name}</span>
-                </div>
-              </td>
-              <td>
-                <span>{event.location}</span>
-              </td>
-              <td>{event.start_date}</td>
-              <td>{event.end_date}</td>
-              <td style={{ textAlign: "center", width: "120px" }}> {/* Fixed width */}
+              <td>{event.name}</td>
+              <td>{event.location}</td>
+              <td>{formatToShortDate(event.start_date)}</td>
+              <td>{formatToShortDate(event.end_date)}</td>
+              <td style={{ textAlign: "center", width: "120px" }}>
                 <StatusChip status={event.status_display} />
               </td>
             </tr>

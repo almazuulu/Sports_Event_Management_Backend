@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-import { saveTokens } from "../utils/FetchClient";
 import { toast } from "react-toastify";
+
 import classes from "./LoginForm.module.css";
+import { saveTokens } from "../utils/FetchClient";
 
 function LoginForm() {
   const navigate = useNavigate();

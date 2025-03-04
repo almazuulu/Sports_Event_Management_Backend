@@ -35,27 +35,34 @@ function PlayerForm({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      userID: "",
-      first_name: "",
-      last_name: "",
-      jersey_number: "",
-      position: "",
-      date_of_birth: "",
-      photo: null,
-      is_active: "active",
-      joined_date: "",
-      notes: "",
-    });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-    setPreviewImage(null);
 
-    onClose();
+    try {
+      const res = await onSubmit(formData);
+
+      if (res.success) {
+        setFormData({
+          userID: "",
+          first_name: "",
+          last_name: "",
+          jersey_number: "",
+          position: "",
+          date_of_birth: "",
+          photo: null,
+          is_active: "active",
+          joined_date: "",
+          notes: "",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    // if (fileInputRef.current) {
+    //   fileInputRef.current.value = "";
+    // }
+    // setPreviewImage(null);
   };
 
   const handleClose = () => {
@@ -71,10 +78,10 @@ function PlayerForm({
       joined_date: "",
       notes: "",
     });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-    setPreviewImage(null);
+    // if (fileInputRef.current) {
+    //   fileInputRef.current.value = "";
+    // }
+    // setPreviewImage(null);
     onClose();
   };
 

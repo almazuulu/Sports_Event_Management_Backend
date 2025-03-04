@@ -43,29 +43,36 @@ function NewTeamForm({ initialData, onSubmit, loading, onClose }) {
       contact_email: "",
       contact_phone: "",
     });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-    setPreviewImage(null);
+    // if (fileInputRef.current) {
+    //   fileInputRef.current.value = "";
+    // }
+    // setPreviewImage(null);
     onClose();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      logo: null,
-      name: "",
-      description: "",
-      contact_email: "",
-      contact_phone: "",
-    });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-    setPreviewImage(null);
 
-    onClose();
+    try {
+      const res = await onSubmit(formData);
+
+      if (res.success) {
+        setFormData({
+          logo: null,
+          name: "",
+          description: "",
+          contact_email: "",
+          contact_phone: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error Response:", error);
+    }
+
+    // if (fileInputRef.current) {
+    //   fileInputRef.current.value = "";
+    // }
+    // setPreviewImage(null);
   };
 
   useEffect(() => {

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
+import classes from "./MainNavigation.module.css";
 import ustLogo from "../assets/images/ust-white-logo.svg";
 import Option from "./Option";
 import { getUserRole } from "../utils/Authentication";
-import classes from "./MainNavigation.module.css";
 
 // icons
 import { FiHome, FiSettings } from "react-icons/fi";
@@ -147,10 +147,28 @@ const sections = [
     options: [
       {
         Icon: FaUsers,
-        title: "All Users",
-        path: "/admin-panel",
+        title: "Manage Users",
+        path: "/admin-panel/manage-users",
         allowedRoles: "admin",
       },
+      {
+        Icon: MdEvent,
+        title: "Manage Events",
+        path: "/admin-panel/manage-events",
+        allowedRoles: "admin",
+      },
+      {
+        Icon: MdOutlineSportsSoccer,
+        title: "Manage Sport Events",
+        path: "/admin-panel/manage-sport-events",
+        allowedRoles: "admin",
+      },
+      // {
+      //   Icon: LuClipboardPenLine,
+      //   title: "Manage Team Registration",
+      //   path: "/admin-panel/manage-teams",
+      //   allowedRoles: "admin",
+      // },
     ],
   },
   {

@@ -28,7 +28,7 @@
 
   .input::placeholder {
     font-weight: 500;
-    color: #222;
+    /* color: #222; */
   }
 
   .inputSubmit {
