@@ -1,26 +1,42 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-# from teams.views import TeamsViewSet, PlayersViewSet,TeamRegistrationViewSet, PublicTeamListView, PublicTeamDetailView, TeamPlayerViewSet, TeamPlayerCreateViewSet, SportEventRegistrationViewSet, SportEventRegistrationCreateViewSet
-from . import views
+from rest_framework_nested.routers import NestedSimpleRouter
 
-app_name = 'teams'
+from teams.views import TeamsViewSet, PlayersViewSet,TeamRegistrationViewSet, PublicTeamListView, PublicTeamDetailView, TeamPlayerViewSet, TeamPlayerCreateViewSet, SportEventRegistrationViewSet, SportEventRegistrationCreateViewSet
 
-# router = DefaultRouter()
-# router.register(r'teams', TeamsViewSet, basename='team')
-# router.register(r'players', PlayersViewSet, basename='player')
-# router.register(r'registrations', TeamRegistrationViewSet, basename='registration')
-# router.register(r'teams/(?P<team_id>[^/.]+)/players', TeamPlayerViewSet, basename='team-players')
-# router.register(r'teams/(?P<team_id>[^/.]+)/registrations', TeamRegistrationViewSet, basename='team-registrations')
-# router.register(r'teams/(?P<team_id>[^/.]+)/add-player', TeamPlayerCreateViewSet, basename='add-team-player')
+# Create a router for teams
+router = DefaultRouter()
+router.register(r'', TeamsViewSet, basename='teams')
 
-# # Add new endpoints for sport event registration
-# router.register(r'sport-events/(?P<sport_event_id>[^/.]+)/registrations', SportEventRegistrationViewSet, basename='sport-event-registrations')
-# router.register(r'sport-events/(?P<sport_event_id>[^/.]+)/register', SportEventRegistrationCreateViewSet, basename='sport-event-register')
+# Create a nested router for team players
+team_players_router = NestedSimpleRouter(router, r'', lookup='team')
+team_players_router.register(r'players', TeamPlayerViewSet, basename='team-players')
+team_players_router.register(r'add-players', TeamPlayerCreateViewSet, basename='team-add-players')
 
+# Main level routers
+players_router = DefaultRouter()
+players_router.register(r'', PlayersViewSet, basename='players')
+
+registrations_router = DefaultRouter()
+registrations_router.register(r'', TeamRegistrationViewSet, basename='registrations')
+
+# Public endpoints
+public_urls = [
+    path('public/', PublicTeamListView.as_view(), name='public-teams-list'),
+    path('public/<uuid:pk>/', PublicTeamDetailView.as_view(), name='public-team-detail'),
+]
 
 urlpatterns = [
-    # path('', include(router.urls)),
-    # path('public/teams/', PublicTeamListView.as_view(), name='public-team-list'),
-    # path('public/teams/<uuid:id>/', PublicTeamDetailView.as_view(), name='public-team-detail'),
-    # path('my-teams/', TeamsViewSet.as_view({'get': 'list'}), name='my-teams')
+    # Teams endpoints
+    path('', include(router.urls)),
+    path('', include(team_players_router.urls)),
+    
+    # Players endpoints
+    path('players/', include(players_router.urls)),
+    
+    # Registration endpoints
+    path('registrations/', include(registrations_router.urls)),
+    
+    # Public endpoints
+    path('', include(public_urls)),
 ]
