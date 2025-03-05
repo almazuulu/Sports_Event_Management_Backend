@@ -13,11 +13,16 @@ from users.serializers import UserSerializer
                 'id': '3fa85f64-5717-4562-b3fc-2c963f66afa6',
                 'name': 'Thunderbolts',
                 'description': 'Local basketball team from New York',
-                'captain': {
+                'manager': {
                     'id': '3fa85f64-5717-4562-b3fc-2c963f66afa7',
-                    'email': 'captain@example.com',
+                    'email': 'manager@example.com',
                     'first_name': 'John',
                     'last_name': 'Smith'
+                },
+                'team_captain': {
+                    'id': '3fa85f64-5717-4562-b3fc-2c963f66afa8',
+                    'first_name': 'Michael',
+                    'last_name': 'Jordan',
                 },
                 'contact_email': 'team@example.com',
                 'contact_phone': '+1234567890',
@@ -33,17 +38,25 @@ class TeamSerializer(serializers.ModelSerializer):
     """
     Serializer for the Team model with detailed information.
     """
-    captain = UserSerializer(read_only=True)
+    manager = UserSerializer(read_only=True)
+    team_captain = serializers.SerializerMethodField()
     player_count = serializers.IntegerField(read_only=True)
     
     class Meta:
         model = Team
         fields = [
-            'id', 'name', 'logo', 'description', 'captain', 
-            'contact_email', 'contact_phone', 'status', 
+            'id', 'name', 'logo', 'description', 'manager',
+            'team_captain', 'contact_email', 'contact_phone', 'status', 
             'player_count', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+    
+    def get_team_captain(self, obj):
+        if obj.team_captain:
+            from ..serializers.player_serializers import PlayerSerializer
+            return PlayerSerializer(obj.team_captain).data
+        return None
+
 
 @extend_schema_serializer(
     examples=[
@@ -62,27 +75,28 @@ class TeamSerializer(serializers.ModelSerializer):
 class TeamCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating a new team.
-    The captain is automatically set to the current user.
+    The manager is automatically set to the current user.
     """
     class Meta:
         model = Team
         fields = ['name', 'logo', 'description', 'contact_email', 'contact_phone']
     
     def create(self, validated_data):
-        # Set the current user as the team captain
+        # Set the current user as the team manager
         user = self.context['request'].user
         
-        # Ensure the user has the team_captain role
-        if user.role != 'team_captain':
+        # Ensure the user has the team_manager role
+        if user.role != 'team_manager':
             raise serializers.ValidationError({
-                'captain': _('Only users with the Team Captain role can create teams.')
+                'manager': _('Only users with the Team Manager role can create teams.')
             })
         
         team = Team.objects.create(
-            captain=user,
+            manager=user,
             **validated_data
         )
         return team
+
 
 class TeamUpdateSerializer(serializers.ModelSerializer):
     """
@@ -94,11 +108,11 @@ class TeamUpdateSerializer(serializers.ModelSerializer):
         read_only_fields = []
         
     def validate(self, attrs):
-        # Ensure the current user is the team captain or an admin
+        # Ensure the current user is the team manager or an admin
         request_user = self.context['request'].user
-        if request_user.role != 'admin' and self.instance.captain.id != request_user.id:
+        if request_user.role != 'admin' and self.instance.manager.id != request_user.id:
             raise serializers.ValidationError({
-                'detail': _('Only the team captain or administrators can update this team.')
+                'detail': _('Only the team manager or administrators can update this team.')
             })
         
         return attrs
@@ -107,7 +121,8 @@ class TeamDetailSerializer(serializers.ModelSerializer):
     """
     Serializer for detailed team information including players and registrations.
     """
-    captain = UserSerializer(read_only=True)
+    manager = UserSerializer(read_only=True)
+    team_captain = serializers.SerializerMethodField()
     player_count = serializers.IntegerField(read_only=True)
     players = serializers.SerializerMethodField()
     registrations = serializers.SerializerMethodField()
@@ -115,12 +130,18 @@ class TeamDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = [
-            'id', 'name', 'logo', 'description', 'captain', 
-            'contact_email', 'contact_phone', 'status', 
+            'id', 'name', 'logo', 'description', 'manager',
+            'team_captain', 'contact_email', 'contact_phone', 'status', 
             'player_count', 'players', 'registrations',
             'created_at', 'updated_at'
         ]
         read_only_fields = fields
+    
+    def get_team_captain(self, obj):
+        if obj.team_captain:
+            from ..serializers.player_serializers import PlayerSerializer
+            return PlayerSerializer(obj.team_captain).data
+        return None
     
     def get_players(self, obj):
         # Import here to avoid circular imports

@@ -16,6 +16,7 @@ from ..models import Player, Team
                 'last_name': 'Johnson',
                 'jersey_number': 23,
                 'position': 'Forward',
+                'is_captain': False,
                 'date_of_birth': '1990-05-15',
                 'is_active': True,
                 'joined_date': '2024-01-10'
@@ -36,7 +37,7 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'team', 'team_name', 'user', 'user_email',
             'first_name', 'last_name', 'jersey_number', 
-            'position', 'date_of_birth', 'photo',
+            'position', 'is_captain', 'date_of_birth', 'photo',
             'is_active', 'joined_date', 'notes'
         ]
         read_only_fields = ['id']
@@ -51,6 +52,7 @@ class PlayerSerializer(serializers.ModelSerializer):
                 'last_name': 'Johnson',
                 'jersey_number': 23,
                 'position': 'Forward',
+                'is_captain': False,
                 'date_of_birth': '1990-05-15',
                 'joined_date': '2024-01-10',
                 'user': '3fa85f64-5717-4562-b3fc-2c963f66afa8'  # Optional
@@ -67,7 +69,7 @@ class PlayerCreateSerializer(serializers.ModelSerializer):
         model = Player
         fields = [
             'team', 'user', 'first_name', 'last_name', 
-            'jersey_number', 'position', 'date_of_birth', 
+            'jersey_number', 'position', 'is_captain', 'date_of_birth', 
             'photo', 'is_active', 'joined_date', 'notes'
         ]
     
@@ -81,11 +83,11 @@ class PlayerCreateSerializer(serializers.ModelSerializer):
                 'jersey_number': _('This jersey number is already in use by another player in this team.')
             })
         
-        # Ensure the current user is the team captain or an admin
+        # Ensure the current user is the team manager or an admin
         request_user = self.context['request'].user
-        if request_user.role != 'admin' and team.captain.id != request_user.id:
+        if request_user.role != 'admin' and team.manager.id != request_user.id:
             raise serializers.ValidationError({
-                'team': _('Only the team captain or administrators can add players to this team.')
+                'team': _('Only the team manager or administrators can add players to this team.')
             })
         
         return attrs
@@ -98,7 +100,7 @@ class PlayerUpdateSerializer(serializers.ModelSerializer):
         model = Player
         fields = [
             'first_name', 'last_name', 'jersey_number', 
-            'position', 'date_of_birth', 'photo',
+            'position', 'is_captain', 'date_of_birth', 'photo',
             'is_active', 'notes'
         ]
     
@@ -113,11 +115,18 @@ class PlayerUpdateSerializer(serializers.ModelSerializer):
                     'jersey_number': _('This jersey number is already in use by another player in this team.')
                 })
         
-        # Ensure the current user is the team captain or an admin
+        # Ensure the current user is the team manager or an admin
         request_user = self.context['request'].user
-        if request_user.role != 'admin' and self.instance.team.captain.id != request_user.id:
+        if request_user.role != 'admin' and self.instance.team.manager.id != request_user.id:
             raise serializers.ValidationError({
-                'detail': _('Only the team captain or administrators can update this player.')
+                'detail': _('Only the team manager or administrators can update this player.')
             })
+        
+        # Additional check: only the team manager or admin can designate the captain
+        if 'is_captain' in attrs and attrs['is_captain']:
+            if request_user.role != 'admin' and self.instance.team.manager.id != request_user.id:
+                raise serializers.ValidationError({
+                    'is_captain': _('Only the team manager or administrators can designate team captains.')
+                })
         
         return attrs

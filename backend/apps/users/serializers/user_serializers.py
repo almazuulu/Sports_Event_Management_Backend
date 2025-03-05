@@ -26,7 +26,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
                 'username': 'john_doe',
                 'first_name': 'John',
                 'last_name': 'Doe',
-                'role': 'user'
+                'role': 'team_manager'
             },
             response_only=True,
         ),
@@ -82,7 +82,7 @@ class ProfileSerializer(serializers.ModelSerializer):
                 'password_confirm': 'SecureP@ssw0rd',
                 'first_name': 'New',
                 'last_name': 'User',
-                'role': 'team_captain'  # Example with a valid role
+                'role': 'team_manager'  # Updated role example
             },
             request_only=True,
         ),
@@ -94,7 +94,7 @@ class ProfileSerializer(serializers.ModelSerializer):
                 'email': 'new@example.com',
                 'first_name': 'New',
                 'last_name': 'User',
-                'role': 'team_captain'
+                'role': 'team_manager'
             },
             response_only=True,
         )
@@ -108,7 +108,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     role = serializers.ChoiceField(
         choices=User.ROLE_CHOICES,
         default='public',
-        help_text='User role determines permissions in the system. Available options: admin, team_captain, scorekeeper, public'
+        help_text='User role determines permissions in the system. Available options: admin, team_manager, player, scorekeeper, public'
     )
    
     class Meta:
@@ -140,7 +140,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return user
     
 
-
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
@@ -152,9 +151,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
                     "description": "Full system access with all permissions"
                 },
                 {
-                    "id": "team_captain",
-                    "name": "Team Captain",
-                    "description": "Leader of a team with team management abilities"
+                    "id": "team_manager",
+                    "name": "Team Manager",
+                    "description": "Manager responsible for team operations and management"
+                },
+                {
+                    "id": "player",
+                    "name": "Player",
+                    "description": "Player registered in a team"
                 },
                 {
                     "id": "scorekeeper",

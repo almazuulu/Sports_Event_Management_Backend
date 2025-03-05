@@ -28,12 +28,21 @@ class Team(models.Model):
         blank=True
     )
     description = models.TextField(_('Description'), blank=True)
-    captain = models.ForeignKey(
+    manager = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='captained_teams',
+        related_name='managed_teams',
+        verbose_name=_('Team Manager'),
+        limit_choices_to={'role': 'team_manager'}
+    )
+    team_captain = models.ForeignKey(
+        'teams.Player',
+        on_delete=models.SET_NULL,
+        related_name='captain_of_team',
         verbose_name=_('Team Captain'),
-        limit_choices_to={'role': 'team_captain'}
+        null=True,
+        blank=True,
+        help_text=_('Player who is designated as the permanent team captain')
     )
     contact_email = models.EmailField(_('Contact Email'))
     contact_phone = models.CharField(_('Contact Phone'), max_length=20, blank=True)

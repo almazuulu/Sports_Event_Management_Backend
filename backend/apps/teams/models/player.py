@@ -33,11 +33,16 @@ class Player(models.Model):
     last_name = models.CharField(_('Last Name'), max_length=100)
     jersey_number = models.PositiveSmallIntegerField(_('Jersey Number'))
     position = models.CharField(_('Position'), max_length=50, blank=True)
+    is_captain = models.BooleanField(
+        _('Is Captain'),
+        default=False,
+        help_text=_('Designates whether this player is the team captain')
+    )
     date_of_birth = models.DateField(_('Date of Birth'))
     photo = models.ImageField(
-        _('Photo'), 
-        upload_to='player_photos/', 
-        null=True, 
+        _('Photo'),
+        upload_to='player_photos/',
+        null=True,
         blank=True
     )
     is_active = models.BooleanField(_('Is Active'), default=True)
@@ -45,7 +50,7 @@ class Player(models.Model):
     notes = models.TextField(_('Notes'), blank=True)
     created_at = models.DateTimeField(_('Created At'), auto_now_add=True)
     updated_at = models.DateTimeField(_('Updated At'), auto_now=True)
-
+    
     class Meta:
         verbose_name = _('Player')
         verbose_name_plural = _('Players')
@@ -56,9 +61,21 @@ class Player(models.Model):
                 name='unique_jersey_number_per_team'
             )
         ]
+    
+    def save(self, *args, **kwargs):
+        # If this player is being designated as captain, reset the captain status of other players
+        if self.is_captain:
+            # First, reset the captain status of all other players in the team
+            Player.objects.filter(team=self.team, is_captain=True).exclude(id=self.id).update(is_captain=False)
+            
+            # Update the team_captain field in the Team model
+            self.team.team_captain = self
+            self.team.save(update_fields=['team_captain'])
         
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.team.name})"
-        
+    
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"

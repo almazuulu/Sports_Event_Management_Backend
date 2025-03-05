@@ -20,7 +20,8 @@ class User(AbstractUser):
     
     ROLE_CHOICES = (
         ('admin', _('Administrator')),
-        ('team_captain', _('Team Captain')),
+        ('team_manager', _('Team Manager')), 
+        ('player', _('Player')),
         ('scorekeeper', _('Scorekeeper')),
         ('public', _('Public User')),
     )

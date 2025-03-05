@@ -40,19 +40,6 @@ class TeamRegistrationSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'registration_date', 'approved_by', 'approval_date']
 
-@extend_schema_serializer(
-    examples=[
-        OpenApiExample(
-            'Team Registration Create Example',
-            value={
-                'team': '3fa85f64-5717-4562-b3fc-2c963f66afa7',
-                'sport_event': '3fa85f64-5717-4562-b3fc-2c963f66afa8',
-                'notes': 'First time participating'
-            },
-            request_only=True,
-        )
-    ]
-)
 class TeamRegistrationCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating a new team registration for a sport event.
@@ -77,11 +64,11 @@ class TeamRegistrationCreateSerializer(serializers.ModelSerializer):
                 'sport_event': _('Registration deadline for this sport event has passed.')
             })
         
-        # Ensure the current user is the team captain
+        # Ensure the current user is the team manager
         request_user = self.context['request'].user
-        if team.captain.id != request_user.id:
+        if team.manager.id != request_user.id:
             raise serializers.ValidationError({
-                'team': _('Only the team captain can register a team for a sport event.')
+                'team': _('Only the team manager can register a team for a sport event.')
             })
         
         # Check if maximum teams limit has been reached

@@ -179,8 +179,6 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return super().partial_update(request, *args, **kwargs)
     
     
-
-
 class RolesListView(APIView):
     """
     API endpoint for listing all available user roles in the system.
@@ -221,8 +219,10 @@ class RolesListView(APIView):
             description = ""
             if role_id == "admin":
                 description = "Full system access with all permissions"
-            elif role_id == "team_captain":
-                description = "Leader of a team with team management abilities"
+            elif role_id == "team_manager":
+                description = "Manager responsible for team operations and management"
+            elif role_id == "player":
+                description = "Player registered in a team"
             elif role_id == "scorekeeper":
                 description = "User responsible for recording scores and match results"
             elif role_id == "public":
