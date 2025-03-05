@@ -1,9 +1,9 @@
 import styles from "./DeleteButton.module.css";
 
-function DeleteButton({ ...props }) {
+function DeleteButton({ children, ...props }) {
   return (
     <button className={styles.deleteButton} {...props}>
-      Delete
+      {children ?? 'Delete'}
     </button>
   );
 }

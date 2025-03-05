@@ -29,6 +29,16 @@ const StatusChip = ({ status }) => {
       color: "white",
       border: "1px solid #616161",
     },
+    approved: {
+      background: "linear-gradient(to right, #4CAF50, #66BB6A)",
+      color: "white",
+      border: "1px solid #388E3C",
+    },
+    rejected: {
+      background: "linear-gradient(to right, #E53935, #EF5350)",
+      color: "white",
+      border: "1px solid #B71C1C",
+    },
   };
 
   // Get the appropriate style or fallback to default

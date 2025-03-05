@@ -163,12 +163,12 @@ const sections = [
         path: "/admin-panel/manage-sport-events",
         allowedRoles: "admin",
       },
-      // {
-      //   Icon: LuClipboardPenLine,
-      //   title: "Manage Team Registration",
-      //   path: "/admin-panel/manage-teams",
-      //   allowedRoles: "admin",
-      // },
+      {
+        Icon: LuClipboardPenLine,
+        title: "Manage Team Registrations",
+        path: "/admin-panel/manage-team-registrations",
+        allowedRoles: "admin",
+      },
     ],
   },
   {

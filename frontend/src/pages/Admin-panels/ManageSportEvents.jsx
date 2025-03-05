@@ -99,8 +99,6 @@ function ManageSportEventsPage() {
     }
   };
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
     fetchEventsList();
     fetchSportEvents();
@@ -114,14 +112,12 @@ function ManageSportEventsPage() {
           <LoadingScreen />
         ) : (
           <div className={classes.card}>
-            {role === "admin" && (
-              <section className={classes.sectionButton}>
-                <CreateButton
-                  title={"Create New Sport Event"}
-                  onClick={handleCreateNew}
-                />
-              </section>
-            )}
+            <section className={classes.sectionButton}>
+              <CreateButton
+                title={"Create New Sport Event"}
+                onClick={handleCreateNew}
+              />
+            </section>
             <SportEventTable
               sportEventList={sportEventList}
               onRefetchData={fetchSportEvents}

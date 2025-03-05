@@ -19,6 +19,7 @@ import PlayerDetailsPage from "./pages/PlayerDetails";
 import DashboardPage from "./pages/Dashboard/Dashboard";
 import ManageEventsPage from "./pages/Admin-panels/ManageEvents";
 import ManageSportEventsPage from "./pages/Admin-panels/ManageSportEvents";
+import ManageTeamRegistrationsPage from "./pages/Admin-panels/ManageTeamRegistrations";
 
 const router = createBrowserRouter([
   {
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
               {
                 path: "manage-sport-events",
                 element: <ManageSportEventsPage />,
+              },
+              {
+                path: "manage-team-registrations",
+                element: <ManageTeamRegistrationsPage />,
               },
             ],
           },
