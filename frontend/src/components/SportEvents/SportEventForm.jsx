@@ -42,10 +42,30 @@ function SportEventForm({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    onClose();
+
+    try {
+      const res = await onSubmit(formData);
+
+      if (res.success) {
+        setFormData({
+          event: "",
+          sport_type: "",
+          name: "",
+          description: "",
+          start_date: "",
+          end_date: "",
+          max_teams: "",
+          registration_deadline: "",
+          rules: "",
+          scoring_system: "",
+          status: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error Response:", error);
+    }
   };
 
   useEffect(() => {
@@ -60,7 +80,9 @@ function SportEventForm({
   return (
     <div className={classes.formContainer}>
       <CgCloseO className={classes.closeIcon} onClick={onClose} />
-      <h1 className={classes.formHeader}>Create New Sport Event</h1>
+      <h1 className={classes.formHeader}>
+        {initialData ? "Update Sport Event" : "Create New Sport Event"}
+      </h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label className={classes.label}>

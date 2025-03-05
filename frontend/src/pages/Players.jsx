@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 import classes from "./Players.module.css";
 import Header from "../components/Header";
 import PlayerTable from "../components/Players/PlayerTable";
 import { fetchWithAuth } from "../utils/FetchClient";
-import { toast } from "react-toastify";
 import LoadingScreen from "../components/UI/LoadingScreen";
 
 function PlayersPage() {

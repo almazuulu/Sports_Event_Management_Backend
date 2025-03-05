@@ -14,11 +14,12 @@ function TeamsPage() {
   const fetchAllTeams = async () => {
     try {
       setIsFetchingTeams(true);
-      const response = await fetchWithAuth("/api/teams/teams/");
+      const response = await fetchWithAuth("/api/teams/public/teams/");
       const data = await response.json();
       if (!response.ok) return toast.error("Failed to fetch teams");
       if (response.ok) {
-        setTeams(data.results);
+        console.log(data)
+        setTeams(data);
       }
     } catch (error) {
       console.error(error);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import classes from "./RegisterSportEventForm.module.css";
 
@@ -33,16 +33,24 @@ function RegisterSportEventForm({
     onClose();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      team: "",
-      sport_event: "",
-      notes: "",
-    });
 
-    onClose();
+    try {
+      const res = await onSubmit(formData);
+
+      if (res.success) {
+        setFormData({
+          team: "",
+          sport_event: "",
+          notes: "",
+        });
+
+        onClose();
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

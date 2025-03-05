@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import classes from "./Users.module.css";
-import CreateButton from "../components/Button/CreateButton";
-import Header from "../components/Header";
-import UserTable from "../components/UserTable";
-import { fetchWithAuth } from "../utils/FetchClient";
-import Modal from "../components/UI/Modal";
-import CreateUserForm from "../components/CreateUserForm";
-import LoadingScreen from "../components/UI/LoadingScreen";
+import Header from "../../components/Header";
+import UserTable from "../../components/UserTable";
+import { fetchWithAuth } from "../../utils/FetchClient";
+import Modal from "../../components/UI/Modal";
+import CreateUserForm from "../../components/CreateUserForm";
+import LoadingScreen from "../../components/UI/LoadingScreen";
+import CreateButton from "../../components/Button/CreateButton";
 
 function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,10 +48,7 @@ function UsersPage() {
 
       if (response.ok) {
         toast.success("New user created successfully!");
-        setIsModalOpen(false);
         fetchUsersData();
-
-        return { success: true, data };
       }
     } catch (error) {
       console.error(error);
@@ -100,25 +97,23 @@ function UsersPage() {
     fetchUserRoles();
   }, []);
 
+  if (isFetching) return <LoadingScreen />;
+
   return (
     <>
       <div className={classes.container}>
-        <Header title={"All Users"} />
+        <Header title={"Mange Users"} />
         <div className={classes.card}>
           <section className={classes.sectionButton}>
             <CreateButton onClick={handleCreateNew}>
               Create New User
             </CreateButton>
           </section>
-          {isFetching ? (
-            <LoadingScreen />
-          ) : (
-            <UserTable
-              userList={users}
-              onRefetchData={fetchUsersData}
-              roles={roles}
-            />
-          )}
+          <UserTable
+            userList={users}
+            onRefetchData={fetchUsersData}
+            roles={roles}
+          />
         </div>
       </div>
 

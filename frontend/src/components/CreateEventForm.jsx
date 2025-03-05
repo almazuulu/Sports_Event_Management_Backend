@@ -23,10 +23,25 @@ function CreateEventForm({ initialData = null, onSubmit, loading, onClose }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    onClose();
+
+    try {
+      const res = await onSubmit(formData);
+
+      if (res.success) {
+        setFormData({
+          name: "",
+          description: "",
+          start_date: "",
+          end_date: "",
+          location: "",
+          status: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error Response:", error);
+    }
   };
 
   useEffect(() => {
@@ -41,7 +56,9 @@ function CreateEventForm({ initialData = null, onSubmit, loading, onClose }) {
   return (
     <section className={classes.formContainer}>
       <CgCloseO className={classes.closeIcon} onClick={onClose} />
-      <h1 className={classes.formHeader}>Create New Event</h1>
+      <h1 className={classes.formHeader}>
+        {initialData ? "Update Event" : "Create New Event"}
+      </h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label className={classes.label}>

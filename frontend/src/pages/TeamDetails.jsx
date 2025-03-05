@@ -117,13 +117,29 @@ function TeamDetailsPage() {
         body: JSON.stringify(formDataToSend),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        toast.error("Failed to add new player!");
+        toast.error(
+          <div>
+            <strong>Failed to submit form:</strong>
+            <ul>
+              {Object.entries(data).map(([field, messages]) => (
+                <li key={field}>
+                  <strong>{field}:</strong> {messages.join(", ")}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
       }
 
       if (response.ok) {
         toast.success("New player added successfully!");
+        setIsModalAddPlayerOpen(false);
         fetchPlayers();
+
+        return { success: true };
       }
     } catch (error) {
       console.error(error);
@@ -147,13 +163,28 @@ function TeamDetailsPage() {
         }
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
-        toast.error("Failed to register sport events!");
+        toast.error(
+          <div>
+            <strong>Failed to submit form:</strong>
+            <ul>
+              {Object.entries(data).map(([field, messages]) => (
+                <li key={field}>
+                  <strong>{field}:</strong> {messages.join(", ")}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
       }
 
       if (response.ok) {
         toast.success("Sport events registered successfully!");
         fetchSportEventsJoined();
+
+        return { success: true };
       }
     } catch (error) {
       console.error(error);
@@ -206,7 +237,7 @@ function TeamDetailsPage() {
     try {
       setIsFetchingJoinedSportEvents(true);
       const response = await fetchWithAuth(
-        `/api/teams/teams/${teamId}/registrations/`
+        `/api/teams/registrations/?team=${teamId}`
       );
       const data = await response.json();
 
