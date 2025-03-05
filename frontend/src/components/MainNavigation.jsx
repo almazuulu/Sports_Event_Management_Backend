@@ -84,7 +84,7 @@ const sections = [
   {
     label: "DASHBOARD",
     key: "dashboard",
-    options: [{ Icon: FiHome, title: "Dashboard", path: "/dashboard" }],
+    options: [{ Icon: FiHome, title: "Dashboard", path: "/" }],
   },
   {
     label: "EVENTS",

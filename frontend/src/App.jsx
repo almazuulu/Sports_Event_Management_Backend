@@ -20,6 +20,8 @@ import DashboardPage from "./pages/Dashboard/Dashboard";
 import ManageEventsPage from "./pages/Admin-panels/ManageEvents";
 import ManageSportEventsPage from "./pages/Admin-panels/ManageSportEvents";
 import ManageTeamRegistrationsPage from "./pages/Admin-panels/ManageTeamRegistrations";
+import { AuthProvider } from "./context/AuthContext";
+import { ToastContainer } from "react-toastify";
 
 const router = createBrowserRouter([
   {
@@ -28,12 +30,12 @@ const router = createBrowserRouter([
     children: [
       {
         element: <PublicRoute />,
-        children: [{ index: true, element: <LoginPage /> }],
+        children: [{ index: true, element: <DashboardPage /> }],
       },
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "dashboard", element: <DashboardPage /> },
+          // { path: "dashboard", element: <DashboardPage /> },
           {
             path: "events",
             element: <PageRootLayout />,
@@ -129,7 +131,12 @@ const router = createBrowserRouter([
   },
 ]);
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <ToastContainer />
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
 
 export default App;
