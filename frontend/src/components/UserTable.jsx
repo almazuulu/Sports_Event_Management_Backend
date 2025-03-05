@@ -1,33 +1,39 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { toast } from "react-toastify";
+
 import classes from "./UserTable.module.css";
 import { fetchWithAuth } from "../utils/FetchClient";
 import Modal from "./UI/Modal";
-import { toast } from "react-toastify";
-
-const ROLE_LABELS = {
-  admin: "Administrator",
-  team_captain: "Team Captain",
-  scorekeeper: "Scorekeeper",
-  public: "Public User",
-};
+import DeleteButton from "./Button/DeleteButton";
+import CancelButton from "./Button/CancelButton";
+import { ROLE_LABELS } from "../constant";
+import ViewButton from "./Button/ViewButton";
+import CreateUserForm from "./CreateUserForm";
 
 const getRoleLabel = (role) => ROLE_LABELS[role];
 
-function UserTable() {
-  const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+function UserTable({ userList = [], onRefetchData, roles = [] }) {
   const [selectedUserId, setSelectedUserId] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDeleteUser = (userId) => {
+  const handleEdit = (userId) => {
+    setIsEditing(true);
+    fetchUserData(userId);
     setSelectedUserId(userId);
-    setIsModalOpen(true);
+  };
+
+  const handleDelete = (userId) => {
+    setIsDeleting(true);
+    setSelectedUserId(userId);
   };
 
   const confirmDelete = async () => {
     try {
+      setIsDeleting(true);
       const response = await fetchWithAuth(`/api/users/${selectedUserId}/`, {
         method: "DELETE",
       });
@@ -38,96 +44,138 @@ function UserTable() {
 
       if (response.ok) {
         toast.success("User deleted successfully!");
-        fetchUsersData();
+        onRefetchData();
       }
     } catch (error) {
       console.error("Error deleting user:", error);
     } finally {
-      setIsModalOpen(false);
+      setIsDeleting(false);
     }
   };
 
-  const fetchUsersData = async () => {
+  const fetchUserData = async (userId) => {
     try {
-      setIsLoading(true);
-      const response = await fetchWithAuth("/api/users/?page=1");
+      setIsFetching(true);
+      const response = await fetchWithAuth(`/api/users/${userId}/`);
+      const data = await response.json();
+      if (!response.ok) toast.error("Failed to fetch user data!");
 
-      if (!response.ok) {
-        toast.error("Failed to fetch users data");
+      if (response.ok) {
+        setUserData(data);
       }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
+  const handleSubmitEdit = async (formData) => {
+    try {
+      setIsSubmitting(true);
+      const response = await fetchWithAuth(`/api/users/${selectedUserId}/`, {
+        method: "PUT",
+        body: JSON.stringify(formData),
+      });
 
       const data = await response.json();
-      setUsers(data.results);
+      if (!response.ok) {
+        toast.error(
+          <div>
+            <strong>Failed to submit form:</strong>
+            <ul>
+              {Object.entries(data).map(([field, messages]) => (
+                <li key={field}>
+                  <strong>{field}:</strong> {messages.join(", ")}
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      }
+
+      if (response.ok) {
+        toast.success("User updated successfully!");
+        setIsEditing(false);
+        onRefetchData();
+
+        return { success: true, data };
+      }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error(error);
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  useEffect(() => {
-    fetchUsersData();
-  }, []);
-
   return (
-    <div>
-      <table className={classes.table}>
-        <thead>
-          <tr>
-            <th className={classes.th}>No</th>
-            {/* <th className={classes.th}>First Name</th> */}
-            {/* <th className={classes.th}>Last Name</th> */}
-            <th className={classes.th}>Full Name</th>
-            <th className={classes.th}>Username</th>
-            <th className={classes.th}>Email</th>
-            <th className={classes.th}>Role</th>
-            <th className={classes.th}>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user, index) => (
-            <tr key={user.id}>
-              <td className={classes.td}>{index + 1}</td>
-              {/* <td className={classes.td}>{user.first_name}</td> */}
-              {/* <td className={classes.td}>{user.last_name}</td> */}
-              <td
-                className={classes.td}
-              >{`${user.first_name} ${user.last_name}`}</td>
-              <td className={classes.td}>{user.username}</td>
-              <td className={classes.td}>{user.email}</td>
-              <td className={classes.td}>{getRoleLabel(user.role)}</td>
-              <td className={classes.td}>
-                <section className={classes.actionsButton}>
-                  <button
-                    className={classes.editButton}
-                    onClick={() => navigate(`${user.id}`)}
-                  >
-                    View
-                  </button>
-                  <button
-                    className={classes.deleteButton}
-                    onClick={() => handleDeleteUser(user.id)}
-                  >
-                    Delete
-                  </button>
-
-                  <Modal
-                    open={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                  >
-                    <p>Are you sure you want to delete this user?</p>
-                    <button onClick={confirmDelete}>Yes, Delete</button>
-                    <button onClick={() => setIsModalOpen(false)}>
-                      Cancel
-                    </button>
-                  </Modal>
-                </section>
-              </td>
+    <>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Full Name</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {userList.map((user, index) => (
+              <tr key={user.id}>
+                <td>{index + 1}</td>
+                <td>{`${user.first_name} ${user.last_name}`}</td>
+                <td>{user.username}</td>
+                <td>{user.email}</td>
+                <td>{getRoleLabel(user.role)}</td>
+                <td style={{ width: "200px" }}>
+                  <ViewButton
+                    style={{ marginRight: "10px" }}
+                    onClick={() => handleEdit(`${user.id}`)}
+                  >
+                    Edit
+                  </ViewButton>
+                  <DeleteButton onClick={() => handleDelete(user.id)}>
+                    Delete
+                  </DeleteButton>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* View Modal */}
+      <Modal
+        className={classes.modalContainer}
+        open={isEditing}
+        onClose={() => setIsEditing(false)}
+      >
+        <CreateUserForm
+          initialData={userData}
+          onClose={() => setIsEditing(false)}
+          loading={isFetching}
+          roles={roles}
+          isEdit={true}
+          onSubmit={handleSubmitEdit}
+        />
+      </Modal>
+
+      {/* Delete Modal */}
+      <Modal
+        className={classes.modalContainer}
+        open={isDeleting}
+        onClose={() => setIsDeleting(false)}
+      >
+        <p>Are you sure you want to delete this user?</p>
+        <DeleteButton style={{ marginRight: "10px" }} onClick={confirmDelete}>
+          Yes, Delete
+        </DeleteButton>
+        <CancelButton onClick={() => setIsDeleting(false)}>Cancel</CancelButton>
+      </Modal>
+    </>
   );
 }
 

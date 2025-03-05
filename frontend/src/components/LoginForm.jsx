@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import classes from "./LoginForm.module.css";
 import { saveTokens } from "../utils/FetchClient";
-import { toast } from "react-toastify";
 
 function LoginForm() {
   const navigate = useNavigate();
@@ -65,42 +65,38 @@ function LoginForm() {
     }
   };
   return (
-    <div className={classes.container}>
-      <div className={classes.card}>
-        <h2 className={classes.title}>Sign In</h2>
-        <form onSubmit={formHandler}>
-          <div className={classes.inputGroup}>
-            <label htmlFor="email" className={classes.label}>
-              Email:
-            </label>
-            <input
-              id="email"
-              type="email"
-              name="email"
-              onChange={emailChange}
-              value={userEmail}
-              className={classes.input}
-              required
-            />
-          </div>
-          <div className={classes.inputGroup}>
-            <label htmlFor="password" className={classes.label}>
-              Password:
-            </label>
-            <input
-              id="password"
-              type="password"
-              name="password"
-              onChange={passwordChange}
-              value={userPassword}
-              className={classes.input}
-              required
-            />
-          </div>
-          <button className={classes.button}>Sign In</button>
-        </form>
-      </div>
-    </div>
+    <section className={classes.container}>
+      <h1 className={classes.loginHeader}>Sport Event Management System</h1>
+
+      <form onSubmit={formHandler}>
+        <div>
+          <input
+            type="email"
+            className={classes.input}
+            placeholder="Email"
+            onChange={emailChange}
+            value={userEmail}
+            required
+            autoComplete="off"
+          />
+        </div>
+        <div>
+          <input
+            type="password"
+            className={classes.input}
+            placeholder="Password"
+            onChange={passwordChange}
+            value={userPassword}
+            required
+            autoComplete="off"
+          />
+        </div>
+        <div className={classes.inputSubmit}>
+          <button className={classes.button}></button>
+          <label>Sign In</label>
+        </div>
+      </form>
+    </section>
   );
 }
 

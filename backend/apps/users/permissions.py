@@ -10,14 +10,18 @@ class IsAdminUser(permissions.BasePermission):
 
 class IsOwnerOrAdmin(permissions.BasePermission):
     """
-    Custom permission to only allow owners of an object or admins to access it.
+    Custom permission to only allow object owners or admins to access it.
     """
+    def has_permission(self, request, view):
+        # Check basic authentication
+        return request.user and request.user.is_authenticated
+    
     def has_object_permission(self, request, view, obj):
-        # Allow admin to access any user
+        # Allow administrators to access any user
         if request.user.is_authenticated and request.user.role == 'admin':
             return True
         
-        # Allow users to access their own resources
+        # Users can only access their own resources
         return obj == request.user
 
 class IsTeamCaptain(permissions.BasePermission):

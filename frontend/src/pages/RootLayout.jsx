@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 
 import MainNavigation from "../components/MainNavigation";
+import HeaderNavBar from "../components/HeaderNavBar";
 
 function RootLayout() {
   const location = useLocation();
@@ -11,7 +12,8 @@ function RootLayout() {
     <div style={{ display: "flex" }}>
       <ToastContainer />
       {!isLoginPage && <MainNavigation />}
-      <main style={{ width: "100%", backgroundColor: "#f3f3f3" }}>
+      <main style={{ width: "100%" }}>
+        {!isLoginPage && <HeaderNavBar />}
         <Outlet />
       </main>
     </div>

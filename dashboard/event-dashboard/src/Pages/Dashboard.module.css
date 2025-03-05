@@ -1,0 +1,121 @@
+/* 🌟 GLOBAL STYLES */
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  font-family: 'Arial', sans-serif;
+  background: radial-gradient(circle at center, #121826, #0d141f);
+}
+
+.dashboard {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding: 15px;
+}
+
+/* 🌟 GRID LAYOUT */
+.gridContainer {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-columns: 2fr 1fr 2fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 15px;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+/* 🌟 BASE CARD STYLE */
+.card {
+  background: linear-gradient(145deg, #1a2333, #0d141f);
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 4px 6px 10px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* 🌟 ASYMMETRIC CARD SIZES */
+.largeHeader {
+  grid-column: span 4;
+  grid-row: span 1;
+}
+
+.wideCard {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+
+.tallCard {
+  grid-column: span 2;
+  grid-row: span 1;
+}
+
+/* 🌟 TABLE STYLES */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.table th, .table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: left;
+  color: white;
+}
+
+.table th {
+  background-color: rgba(255, 255, 255, 0.1);
+  font-weight: bold;
+}
+
+.table tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 🌟 ICONS */
+.icon {
+  font-size: 35px;
+  margin-bottom: 10px;
+  color: #4caf50;
+}
+
+/* 🌟 STATUS COLORS */
+.statusOngoing {
+  color: #ff9800;
+}
+
+/* 🌟 CIRCULAR PROGRESS */
+.progressContainer {
+  width: 80px;
+  height: 80px;
+  margin: 10px 0;
+}
+
+/* 🌟 RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+  .gridContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .gridContainer {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

@@ -11,15 +11,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 from datetime import timedelta
 import dotenv
+
+
 
 dotenv.load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -105,6 +108,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Default database settings
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -115,6 +119,40 @@ DATABASES = {
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
+
+# Settings for pytest-django
+if 'pytest' in sys.modules:
+    # Use fast in-memory SQLite database for tests
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+    
+    # Disable caching for tests
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+    
+    # Speed up tests by using fast password hasher
+    PASSWORD_HASHERS = [
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+    ]
+    
+    # Disable CSRF protection for API tests
+    MIDDLEWARE = [m for m in MIDDLEWARE if 'CsrfViewMiddleware' not in m]
+    
+    # Define temporary media root for tests
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'test_media')
+    
+    # Disable debug toolbar for tests
+    if 'debug_toolbar' in INSTALLED_APPS:
+        INSTALLED_APPS.remove('debug_toolbar')
+    if 'debug_toolbar.middleware.DebugToolbarMiddleware' in MIDDLEWARE:
+        MIDDLEWARE.remove('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 
 # Password validation
@@ -265,4 +303,3 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
-    

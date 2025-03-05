@@ -66,6 +66,18 @@ const fetchWithAuth = async (url, options = {}) => {
     Authorization: `Bearer ${accessToken}`,
   };
 
+  if (!options.headers && options.method !== "DELETE") {
+    headers["Content-Type"] = "application/json";
+  }
+
+  return fetch(`${API_URL}${url}`, { ...options, headers });
+};
+
+const fetchWithoutAuth = async (url, options = {}) => {
+  const headers = {
+    ...options.headers,
+  };
+
   if (options.method !== "DELETE") {
     headers["Content-Type"] = "application/json";
   }
@@ -73,4 +85,4 @@ const fetchWithAuth = async (url, options = {}) => {
   return fetch(`${API_URL}${url}`, { ...options, headers });
 };
 
-export { fetchWithAuth, saveTokens };
+export { fetchWithAuth, fetchWithoutAuth, saveTokens };

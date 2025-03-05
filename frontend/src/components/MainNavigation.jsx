@@ -1,21 +1,27 @@
 import { useState } from "react";
 
-import ustLogo from "../assets/images/ust-black-logo.svg";
-import Option from "./Option";
-import LogoutButton from "./LogoutButton";
-import { getUserRole } from "../utils/Authentication";
 import classes from "./MainNavigation.module.css";
+import ustLogo from "../assets/images/ust-white-logo.svg";
+import Option from "./Option";
+import { getUserRole } from "../utils/Authentication";
 
 // icons
 import { FiHome, FiSettings } from "react-icons/fi";
-import { TiPinOutline } from "react-icons/ti";
-import { FaRegCalendarAlt, FaRegClipboard, FaPlus } from "react-icons/fa";
+import { TiUserAddOutline, TiGroupOutline  } from "react-icons/ti";
+import {
+  FaRegCalendarAlt,
+  FaRegClipboard,
+  FaPlus,
+  FaUsers,
+} from "react-icons/fa";
 import { LuClipboardPenLine, LuTrophy } from "react-icons/lu";
 import { RxUpdate } from "react-icons/rx";
 import { FaKey } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
-import { RiLockPasswordLine } from "react-icons/ri";
+import { RiLockPasswordLine, RiTeamLine } from "react-icons/ri";
 import { IoMdArrowDropdown } from "react-icons/io";
+import { CiLogout } from "react-icons/ci";
+import { MdEvent, MdOutlineSportsSoccer } from "react-icons/md";
 
 function MainNavigation() {
   const userRole = getUserRole();
@@ -29,35 +35,45 @@ function MainNavigation() {
     <nav className={classes.sidebar}>
       <div className={classes.titleSection}>
         <div className={classes.titleContent}>
-          <img src={ustLogo} alt="UST" className={classes.logo} />
-          <h1>sports</h1>
+          <img src={ustLogo} alt="UST Logo" className={classes.logo} />
         </div>
       </div>
-      {sections.map(({ label, options, key }) => (
-        <section key={key} className={classes.navigationSection}>
-          <div
-            className={classes.labelContainer}
-            onClick={() => toggleSection(key)}
-          >
-            <label className={classes.label}>{label}</label>
-            <span>
-              <IoMdArrowDropdown />
-            </span>
-          </div>
-          {openSection === key && (
-            <div className={classes.optionsContainer}>
-              {options.map(
-                ({ Icon, title, path, condition }) =>
-                  (!condition || userRole === condition) && (
-                    <Option key={title} Icon={Icon} title={title} path={path} />
-                  )
-              )}
+      {sections
+        .filter(
+          ({ allowedRoles }) =>
+            !allowedRoles ||
+            (Array.isArray(allowedRoles)
+              ? allowedRoles.includes(userRole)
+              : userRole === allowedRoles)
+        )
+        .map(({ label, options, key }) => (
+          <section key={key} className={classes.navigationSection}>
+            <div
+              className={classes.labelContainer}
+              onClick={() => toggleSection(key)}
+            >
+              <label className={classes.label}>{label}</label>
+              <span>
+                <IoMdArrowDropdown />
+              </span>
             </div>
-          )}
-        </section>
-      ))}
-
-      <LogoutButton />
+            {openSection === key && (
+              <div className={classes.optionsContainer}>
+                {options
+                  .filter(
+                    ({ allowedRoles }) =>
+                      !allowedRoles ||
+                      (Array.isArray(allowedRoles)
+                        ? allowedRoles.includes(userRole)
+                        : userRole === allowedRoles)
+                  )
+                  .map(({ Icon, title, path }) => (
+                    <Option key={title} Icon={Icon} title={title} path={path} />
+                  ))}
+              </div>
+            )}
+          </section>
+        ))}
     </nav>
   );
 }
@@ -73,38 +89,86 @@ const sections = [
   {
     label: "EVENTS",
     key: "events",
+    options: [{ Icon: MdEvent, title: "All Events", path: "/events" }],
+  },
+  {
+    label: "SPORT EVENTS",
+    key: "sport-events",
     options: [
-      { Icon: TiPinOutline, title: "View Events", path: "/" },
-      { Icon: FaRegCalendarAlt, title: "Create New Event", path: "/" },
-      { Icon: FiSettings, title: "Manage Event Settings", path: "/" },
+      {
+        Icon: MdOutlineSportsSoccer,
+        title: "All Sport Events",
+        path: "/sport-events",
+      },
     ],
   },
   {
-    label: "TEAMS",
+    label: "TEAMS & PLAYERS",
     key: "teams",
     options: [
       {
-        Icon: LuClipboardPenLine,
-        title: "Register & Approve Teams",
-        path: "/",
+        Icon: TiGroupOutline ,
+        title: "All Teams",
+        path: "/teams",
       },
-      { Icon: FaRegClipboard, title: "Manage Teams & Players", path: "/" },
+      {
+        Icon: RiTeamLine,
+        title: "All Players",
+        path: "/teams/players",
+      },
+      {
+        Icon: LuClipboardPenLine,
+        title: "My Teams",
+        path: "/teams/my-teams",
+        allowedRoles: "team_captain",
+      },
     ],
   },
+  // {
+  //   label: "MATCH SCHEDULING",
+  //   key: "scheduling",
+  //   options: [
+  //     { Icon: FaRegCalendarAlt, title: "View Scheduled Matches", path: "/" },
+  //     { Icon: FaPlus, title: "Schedule New Match", path: "/" },
+  //   ],
+  // },
+  // {
+  //   label: "RESULTS & STANDINGS",
+  //   key: "results",
+  //   options: [
+  //     { Icon: LuTrophy, title: "View Team Standings", path: "/" },
+  //     { Icon: RxUpdate, title: "Update Match Results", path: "/" },
+  //   ],
+  // },
   {
-    label: "MATCH SCHEDULING",
-    key: "scheduling",
+    label: "ADMIN PANEL",
+    key: "admin-panel",
+    allowedRoles: "admin",
     options: [
-      { Icon: FaRegCalendarAlt, title: "View Scheduled Matches", path: "/" },
-      { Icon: FaPlus, title: "Schedule New Match", path: "/" },
-    ],
-  },
-  {
-    label: "RESULTS & STANDINGS",
-    key: "results",
-    options: [
-      { Icon: LuTrophy, title: "View Team Standings", path: "/" },
-      { Icon: RxUpdate, title: "Update Match Results", path: "/" },
+      {
+        Icon: FaUsers,
+        title: "Manage Users",
+        path: "/admin-panel/manage-users",
+        allowedRoles: "admin",
+      },
+      {
+        Icon: MdEvent,
+        title: "Manage Events",
+        path: "/admin-panel/manage-events",
+        allowedRoles: "admin",
+      },
+      {
+        Icon: MdOutlineSportsSoccer,
+        title: "Manage Sport Events",
+        path: "/admin-panel/manage-sport-events",
+        allowedRoles: "admin",
+      },
+      // {
+      //   Icon: LuClipboardPenLine,
+      //   title: "Manage Team Registration",
+      //   path: "/admin-panel/manage-teams",
+      //   allowedRoles: "admin",
+      // },
     ],
   },
   {
@@ -118,10 +182,9 @@ const sections = [
         path: "/settings/change-password",
       },
       {
-        Icon: FaKey,
-        title: "Manage Users",
-        path: "/settings/manage-users",
-        condition: "admin",
+        Icon: CiLogout,
+        title: "Logout",
+        path: "/settings/logout",
       },
     ],
   },
