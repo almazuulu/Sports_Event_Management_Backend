@@ -11,10 +11,12 @@ import {
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import styles from "../Pages/Dashboard.module.css";
-import StatusChip from "../components/StatusChip"; 
+import StatusChip from "../components/StatusChip";
 
 function PublicDashboard() {
   const [events, setEvents] = useState([]);
+  const [sportevents, setSportevents] = useState([]);
+  const [team, setTeam] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   async function fetchData() {
@@ -32,17 +34,77 @@ function PublicDashboard() {
       }
 
       const data = await response.json();
-      console.log(data);
+
 
       // Format the dates in the event list
       const formattedEvents = data.results.map(event => ({
         ...event,
         start_date: formatDate(event.start_date),
         end_date: formatDate(event.end_date),
-        year: getYear(event.start_date), 
+        year: getYear(event.start_date),
       }));
-console.log("formattedEvents",formattedEvents)
+
       setEvents(formattedEvents);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+
+  async function fetchsportData() {
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://127.0.0.1:8000/api/events/sport-events/public/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+
+      // Format the dates in the event list
+      const formattedsportEvents = data.results.map(event => ({
+        ...event,
+        start_date: formatDate(event.start_date),
+        end_date: formatDate(event.end_date),
+        year: getYear(event.start_date),
+      }));
+
+      setSportevents(formattedsportEvents);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function TeamData() {
+    try {
+      setIsLoading(true);
+      const response = await fetch("http://127.0.0.1:8000/api/teams/public/teams/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+
+
+      setTeam(data);
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -52,22 +114,24 @@ console.log("formattedEvents",formattedEvents)
 
   useEffect(() => {
     fetchData();
+    fetchsportData();
+    TeamData();
   }, []);
 
   // Function to format the date from "YYYY-MM-DD" to "MMM DD"
   const formatDate = (dateString) => {
     if (!dateString) return "";
-  
+
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" }); // Example: Mar 10
   };
-  
+
   const getYear = (dateString) => {
     if (!dateString) return "";
-  
+
     return new Date(dateString).getFullYear(); // Example: 2025
   };
-  
+
 
   const upcomingMatches = [
     { date: "Mar 10", time: "18:00", teams: "Team A vs Team B", location: "Berlin Stadium" },
@@ -88,25 +152,25 @@ console.log("formattedEvents",formattedEvents)
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th style={{ textAlign: "center" }}>Name</th>
-                  <th style={{ textAlign: "center" }}>Location</th>
-                  <th style={{ textAlign: "center" }}>Start Date</th>
-                  <th style={{ textAlign: "center" }}>End Date</th>
-                <th>Year</th>
-                  <th style={{ textAlign: "center" }}>No. of sport events</th>
-                  <th style={{ textAlign: "center" }}>Status</th>
+                  <th>Name</th>
+                  <th>Location</th>
+                  <th >Start Date</th>
+                  <th >End Date</th>
+                  <th>Year</th>
+                  <th >No. of sport events</th>
+                  <th >Status</th>
                 </tr>
               </thead>
               <tbody>
                 {events.map((event, index) => (
                   <tr key={index}>
-                    <td style={{ textAlign: "center" }}>{event.name}</td>
-                    <td style={{ textAlign: "center" }}>{event.location}</td>
-                    <td style={{ textAlign: "center" }}>{event.start_date}</td>
-                    <td style={{ textAlign: "center" }}>{event.end_date}</td>
-                  <td>{event.year}</td>
-                    <td style={{ textAlign: "center" }}>{event.sport_events_count}</td>
-                    <td style={{ textAlign: "center" }}>
+                    <td>{event.name}</td>
+                    <td >{event.location}</td>
+                    <td >{event.start_date}</td>
+                    <td >{event.end_date}</td>
+                    <td>{event.year}</td>
+                    <td>{event.sport_events_count}</td>
+                    <td>
                       <StatusChip status={event.status_display} />
                     </td>
                   </tr>
@@ -119,26 +183,30 @@ console.log("formattedEvents",formattedEvents)
         {/* Live Scores with Circular Progress */}
         <div className={`${styles.card} ${styles.wideCard}`}>
           <FaClock className={styles.icon} />
-          <h3>Real-time scores and updates</h3>
+          <h3>Sport Events</h3>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Match</th>
+                <th>Sport Name</th>
+                <th>Type</th>
+                <th>Event Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
                 <th>Year</th>
-                <th>Location</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {upcomingMatches.map((match, index) => (
+              {sportevents.map((match, index) => (
                 <tr key={index}>
-                  <td>{match.date}</td>
-                  <td>{match.time}</td>
-                  <td>{match.teams}</td>
-                  <td>2025</td>
-                  <td>{match.location}</td>
-              
+                  <td>{match.name}</td>
+                  <td>{match.sport_type}</td>
+                  <td>{match.event_name}</td>
+                  <td>{match.start_date}</td>
+                  <td>{match.end_date}</td>
+                  <td>{match.year}</td>
+                  <td> <StatusChip status={match.status} /></td>
+
                 </tr>
               ))}
             </tbody>
@@ -167,10 +235,35 @@ console.log("formattedEvents",formattedEvents)
         </div>
 
         {/* Standings and Rankings */}
-        <div className={`${styles.card} ${styles.wideCard}`}>
+        <div className={`${styles.card} ${styles.tallCard}`}>
           <FaUsers className={styles.icon} />
-          <h2>Standings and final rankings</h2>
-          <p>Warriors | Captain: John Doe</p>
+          <h2>Team</h2>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Team</th>
+                <th>Caption</th>
+                <th >Logo</th>
+
+              </tr>
+            </thead>
+            <tbody>
+              {team.map((t, index) => (
+                <tr key={index}>
+                  <td>{t.name}</td>
+                  <td >{t.captain_name}</td>
+                  <td>
+                    {/* <div className={styles.teamLogoContainer}> */}
+                    <FaUsers className={styles.teamIcon} />
+                    {t.logo}
+                    {/* </div> */}
+                  </td>
+
+
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Upcoming Matches Section */}

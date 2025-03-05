@@ -16,7 +16,7 @@ html, body {
   justify-content: center;
   align-items: center;
   color: white;
-  padding: 15px;
+  padding: 5px;
 }
 
 /* 🌟 GRID LAYOUT */
@@ -26,15 +26,15 @@ html, body {
   height: 100%;
   grid-template-columns: 2fr 1fr 2fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
-  gap: 15px;
-  padding: 15px;
+  gap: 10px;
+  padding: 10px;
   box-sizing: border-box;
 }
 
 /* 🌟 BASE CARD STYLE */
 .card {
   background: linear-gradient(145deg, #1a2333, #0d141f);
-  padding: 20px;
+  padding: 5px;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -57,8 +57,9 @@ html, body {
 
 .wideCard {
   grid-column: span 2;
-  grid-row: span 1;
+
 }
+
 
 .tallCard {
   grid-column: span 2;
@@ -69,13 +70,13 @@ html, body {
 .table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .table th, .table td {
   padding: 8px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  text-align: left;
+  text-align: center;
   color: white;
 }
 
@@ -90,8 +91,9 @@ html, body {
 
 /* 🌟 ICONS */
 .icon {
-  font-size: 35px;
-  margin-bottom: 10px;
+  font-size: 25px;
+  margin-bottom: 2px;
+  margin-top: 1px;
   color: #4caf50;
 }
 
@@ -106,6 +108,10 @@ html, body {
   height: 80px;
   margin: 10px 0;
 }
+.smallCard {
+  grid-column: span 1;
+  grid-row: span 1;
+}
 
 /* 🌟 RESPONSIVE DESIGN */
 @media (max-width: 1200px) {
@@ -118,4 +124,10 @@ html, body {
   .gridContainer {
     grid-template-columns: repeat(1, 1fr);
   }
+}
+
+.teamLogoContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between icon and logo */
 }
