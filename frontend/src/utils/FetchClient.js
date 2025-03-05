@@ -66,7 +66,7 @@ const fetchWithAuth = async (url, options = {}) => {
     Authorization: `Bearer ${accessToken}`,
   };
 
-  if (options.method !== "DELETE") {
+  if (!options.headers && options.method !== "DELETE") {
     headers["Content-Type"] = "application/json";
   }
 

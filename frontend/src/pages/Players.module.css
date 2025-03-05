@@ -4,6 +4,7 @@
     padding: 1.5rem;
 }
 
+
 .card {
     background: white;
     margin-top: 1.5rem;
@@ -14,4 +15,17 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+}
+
+.sectionButton {
+    align-self: flex-end;
+    margin-bottom: 1rem;
+}
+
+.modalContainer {
+    border-radius: 20px;
+}
+
+.modalContainer::-webkit-scrollbar {
+    display: none;
 }

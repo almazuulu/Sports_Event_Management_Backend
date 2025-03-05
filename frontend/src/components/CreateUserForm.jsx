@@ -32,19 +32,25 @@ function CreateUserForm({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
-    onClose();
-    setFormData({
-      username: "",
-      first_name: "",
-      last_name: "",
-      email: "",
-      password: "",
-      password_confirm: "",
-      role: "public",
-    });
+    try {
+      const res = await onSubmit(formData);
+
+      if (res.success) {
+        setFormData({
+          username: "",
+          first_name: "",
+          last_name: "",
+          email: "",
+          password: "",
+          password_confirm: "",
+          role: "public",
+        });
+      }
+    } catch (error) {
+      console.error("Error Response:", error);
+    }
   };
 
   useEffect(() => {
@@ -59,7 +65,9 @@ function CreateUserForm({
   return (
     <div className={classes.formContainer}>
       <CgCloseO className={classes.closeIcon} onClick={onClose} />
-      <h1 className={classes.formHeader}>Create New User</h1>
+      <h1 className={classes.formHeader}>
+        {initialData ? "Update User" : "Create New User"}
+      </h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label className={classes.label}>

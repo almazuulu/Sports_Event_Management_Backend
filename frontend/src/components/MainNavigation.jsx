@@ -1,13 +1,13 @@
 import { useState } from "react";
 
+import classes from "./MainNavigation.module.css";
 import ustLogo from "../assets/images/ust-white-logo.svg";
 import Option from "./Option";
 import { getUserRole } from "../utils/Authentication";
-import classes from "./MainNavigation.module.css";
 
 // icons
 import { FiHome, FiSettings } from "react-icons/fi";
-import { TiUserAddOutline } from "react-icons/ti";
+import { TiUserAddOutline, TiGroupOutline  } from "react-icons/ti";
 import {
   FaRegCalendarAlt,
   FaRegClipboard,
@@ -18,7 +18,7 @@ import { LuClipboardPenLine, LuTrophy } from "react-icons/lu";
 import { RxUpdate } from "react-icons/rx";
 import { FaKey } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
-import { RiLockPasswordLine } from "react-icons/ri";
+import { RiLockPasswordLine, RiTeamLine } from "react-icons/ri";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { CiLogout } from "react-icons/ci";
 import { MdEvent, MdOutlineSportsSoccer } from "react-icons/md";
@@ -102,18 +102,28 @@ const sections = [
       },
     ],
   },
-  // {
-  //   label: "TEAMS",
-  //   key: "teams",
-  //   options: [
-  //     {
-  //       Icon: LuClipboardPenLine,
-  //       title: "Register & Approve Teams",
-  //       path: "/",
-  //     },
-  //     { Icon: FaRegClipboard, title: "Manage Teams & Players", path: "/" },
-  //   ],
-  // },
+  {
+    label: "TEAMS & PLAYERS",
+    key: "teams",
+    options: [
+      {
+        Icon: TiGroupOutline ,
+        title: "All Teams",
+        path: "/teams",
+      },
+      {
+        Icon: RiTeamLine,
+        title: "All Players",
+        path: "/teams/players",
+      },
+      {
+        Icon: LuClipboardPenLine,
+        title: "My Teams",
+        path: "/teams/my-teams",
+        allowedRoles: "team_captain",
+      },
+    ],
+  },
   // {
   //   label: "MATCH SCHEDULING",
   //   key: "scheduling",
@@ -137,10 +147,28 @@ const sections = [
     options: [
       {
         Icon: FaUsers,
-        title: "All Users",
-        path: "/admin-panel",
+        title: "Manage Users",
+        path: "/admin-panel/manage-users",
         allowedRoles: "admin",
       },
+      {
+        Icon: MdEvent,
+        title: "Manage Events",
+        path: "/admin-panel/manage-events",
+        allowedRoles: "admin",
+      },
+      {
+        Icon: MdOutlineSportsSoccer,
+        title: "Manage Sport Events",
+        path: "/admin-panel/manage-sport-events",
+        allowedRoles: "admin",
+      },
+      // {
+      //   Icon: LuClipboardPenLine,
+      //   title: "Manage Team Registration",
+      //   path: "/admin-panel/manage-teams",
+      //   allowedRoles: "admin",
+      // },
     ],
   },
   {
