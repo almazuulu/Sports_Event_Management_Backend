@@ -64,8 +64,15 @@ class TeamRegistrationCreateSerializer(serializers.ModelSerializer):
                 'sport_event': _('Registration deadline for this sport event has passed.')
             })
         
-        # Ensure the current user is the team manager
-        request_user = self.context['request'].user
+        # Check if request exists and user is authenticated
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            raise serializers.ValidationError({
+                'detail': _('Authentication required to register a team.')
+            })
+        
+        # Ensure the current user is the team manager (only after confirming user is authenticated)
+        request_user = request.user
         if team.manager.id != request_user.id:
             raise serializers.ValidationError({
                 'team': _('Only the team manager can register a team for a sport event.')
@@ -112,9 +119,16 @@ class TeamRegistrationApprovalSerializer(serializers.ModelSerializer):
         return value
     
     def update(self, instance, validated_data):
+        # Check if request exists and user is authenticated
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            raise serializers.ValidationError({
+                'detail': _('Authentication required to approve or reject registrations.')
+            })
+        
         # Only admins can approve/reject registrations
-        request_user = self.context['request'].user
-        if request_user.role != 'admin':
+        request_user = request.user
+        if not hasattr(request_user, 'role') or request_user.role != 'admin':
             raise serializers.ValidationError({
                 'detail': _('Only administrators can approve or reject team registrations.')
             })

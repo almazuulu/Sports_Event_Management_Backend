@@ -88,11 +88,18 @@ class TeamCreateSerializer(serializers.ModelSerializer):
         fields = ['name', 'logo', 'description', 'contact_email', 'contact_phone']
     
     def create(self, validated_data):
+        # Check if request exists and user is authenticated
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            raise serializers.ValidationError({
+                'detail': _('Authentication required to create a team.')
+            })
+        
         # Set the current user as the team manager
-        user = self.context['request'].user
+        user = request.user
         
         # Ensure the user has the team_manager role
-        if user.role != 'team_manager':
+        if not hasattr(user, 'role') or user.role != 'team_manager':
             raise serializers.ValidationError({
                 'manager': _('Only users with the Team Manager role can create teams.')
             })
@@ -114,9 +121,16 @@ class TeamUpdateSerializer(serializers.ModelSerializer):
         read_only_fields = []
         
     def validate(self, attrs):
+        # Check if request exists and user is authenticated
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            raise serializers.ValidationError({
+                'detail': _('Authentication required to update a team.')
+            })
+        
         # Ensure the current user is the team manager or an admin
-        request_user = self.context['request'].user
-        if request_user.role != 'admin' and self.instance.manager.id != request_user.id:
+        request_user = request.user
+        if not hasattr(request_user, 'role') or (request_user.role != 'admin' and self.instance.manager.id != request_user.id):
             raise serializers.ValidationError({
                 'detail': _('Only the team manager or administrators can update this team.')
             })

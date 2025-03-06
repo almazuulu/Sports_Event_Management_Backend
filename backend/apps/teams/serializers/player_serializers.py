@@ -104,15 +104,22 @@ class PlayerCreateSerializer(serializers.ModelSerializer):
                 'user': _('This user is already registered as a player in this team.')
             })
         
-        # Check access rights
-        request_user = self.context['request'].user
-        if request_user.role != 'admin' and team.manager.id != request_user.id:
+        # Check if request exists and user is authenticated
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            raise serializers.ValidationError({
+                'detail': _('Authentication required to create a player.')
+            })
+        
+        # Check access rights (only after confirming user is authenticated)
+        request_user = request.user
+        if not hasattr(request_user, 'role') or (request_user.role != 'admin' and team.manager.id != request_user.id):
             raise serializers.ValidationError({
                 'team': _('Only the team manager or administrators can add players to this team.')
             })
         
         return attrs
-    
+
     def create(self, validated_data):
         user = validated_data.get('user')
         validated_data['first_name'] = user.first_name
@@ -144,16 +151,23 @@ class PlayerUpdateSerializer(serializers.ModelSerializer):
                     'jersey_number': _('This jersey number is already in use by another player in this team.')
                 })
         
-        # Ensure the current user is the team manager or an admin
-        request_user = self.context['request'].user
-        if request_user.role != 'admin' and self.instance.team.manager.id != request_user.id:
+        # Check if request exists and user is authenticated
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            raise serializers.ValidationError({
+                'detail': _('Authentication required to update a player.')
+            })
+        
+        # Ensure the current user is the team manager or an admin (only after confirming user is authenticated)
+        request_user = request.user
+        if not hasattr(request_user, 'role') or (request_user.role != 'admin' and self.instance.team.manager.id != request_user.id):
             raise serializers.ValidationError({
                 'detail': _('Only the team manager or administrators can update this player.')
             })
         
         # Additional check: only the team manager or admin can designate the captain
         if 'is_captain' in attrs and attrs['is_captain']:
-            if request_user.role != 'admin' and self.instance.team.manager.id != request_user.id:
+            if not hasattr(request_user, 'role') or (request_user.role != 'admin' and self.instance.team.manager.id != request_user.id):
                 raise serializers.ValidationError({
                     'is_captain': _('Only the team manager or administrators can designate team captains.')
                 })

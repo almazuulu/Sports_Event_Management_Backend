@@ -185,7 +185,7 @@ class TeamsViewSet(viewsets.ModelViewSet):
     
     @extend_schema(
         summary="List team players",
-        description="Retrieve all players for a specific team.",
+        description="Retrieve all players for a specific team.CHECKKK",
         parameters=[
             OpenApiParameter(name="id", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
             OpenApiParameter(name="is_active", description="Filter by active status (true/false)", required=False, type=bool),

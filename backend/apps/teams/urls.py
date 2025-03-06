@@ -3,9 +3,9 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_nested.routers import NestedSimpleRouter
 
 from teams.views import (
-    TeamsViewSet, PlayersViewSet, TeamRegistrationViewSet, TeamPlayerViewSet,
-    TeamPlayerCreateViewSet, SportEventRegistrationViewSet,
-    SportEventRegistrationCreateViewSet
+    TeamsViewSet, PlayersViewSet, 
+    TeamRegistrationViewSet,
+    SportEventRegistrationViewSet
 )
 
 # Main routers
@@ -20,22 +20,15 @@ registrations_router.register(r'registrations', TeamRegistrationViewSet, basenam
 
 # Nested routers
 team_players_router = NestedSimpleRouter(teams_router, r'teams', lookup='team')
-team_players_router.register(r'players', TeamPlayerViewSet, basename='team-players')
-team_players_router.register(r'add-players', TeamPlayerCreateViewSet, basename='team-add-players')
 
 sport_event_registration_router = DefaultRouter()
 sport_event_registration_router.register(
-    r'events/(?P<sport_event_pk>[^/.]+)/registrations',
+    r'events/(?P<sport_event_id>[^/.]+)/registrations',
     SportEventRegistrationViewSet,
     basename='sport-event-registrations'
 )
 
 sport_event_registration_create_router = DefaultRouter()
-sport_event_registration_create_router.register(
-    r'events/(?P<sport_event_pk>[^/.]+)/register',
-    SportEventRegistrationCreateViewSet,
-    basename='sport-event-registration-create'
-)
 
 
 urlpatterns = [

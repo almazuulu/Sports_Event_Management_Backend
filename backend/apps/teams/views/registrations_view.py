@@ -229,7 +229,7 @@ class SportEventRegistrationViewSet(viewsets.ReadOnlyModelViewSet):
         """
         Filter registrations by sport event ID from URL and user role.
         """
-        sport_event_id = self.kwargs['sport_event_pk']
+        sport_event_id = self.kwargs['sport_event_id']
         user = self.request.user
         
         # Admins can see all registrations for the event
@@ -250,7 +250,7 @@ class SportEventRegistrationViewSet(viewsets.ReadOnlyModelViewSet):
         summary="List sport event registrations",
         description="List team registrations for a specific sport event based on user role.",
         parameters=[
-            OpenApiParameter(name="sport_event_pk", location=OpenApiParameter.PATH, description="Sport Event ID (UUID)", required=True, type=str),
+            OpenApiParameter(name="sport_event_id", location=OpenApiParameter.PATH, description="Sport Event ID (UUID)", required=True, type=str),
             OpenApiParameter(name="ordering", description="Order results by field (e.g., registration_date, status)", required=False, type=str),
         ],
         responses={
@@ -274,8 +274,20 @@ class SportEventRegistrationViewSet(viewsets.ReadOnlyModelViewSet):
         summary="Retrieve sport event registration",
         description="Get details of a specific team registration for a sport event.",
         parameters=[
-            OpenApiParameter(name="sport_event_pk", location=OpenApiParameter.PATH, description="Sport Event ID (UUID)", required=True, type=str),
-            OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Registration ID (UUID)", required=True, type=str),
+            OpenApiParameter(
+                name="sport_event_id", 
+                location=OpenApiParameter.PATH, 
+                description="Sport Event ID (UUID)", 
+                required=True, 
+                type=str
+            ),
+            OpenApiParameter(
+                name="id", 
+                location=OpenApiParameter.PATH, 
+                description="Registration ID", 
+                required=True, 
+                type=str
+            ),
         ],
         responses={
             200: TeamRegistrationSerializer,
@@ -287,67 +299,8 @@ class SportEventRegistrationViewSet(viewsets.ReadOnlyModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         """
         Retrieve details of a specific team registration for a sport event.
-        
+    
         Returns detailed information about a team's registration for the specified sport event.
         Accessible by the team manager of the registered team or admins.
         """
         return super().retrieve(request, *args, **kwargs)
-
-
-class SportEventRegistrationCreateViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for registering a team for a specific sport event.
-    """
-    http_method_names = ['post']
-    permission_classes = [IsTeamManagerOrAdmin]
-    
-    def get_serializer_class(self):
-        return TeamRegistrationCreateSerializer
-    
-    def get_queryset(self):
-        """
-        Filter registrations by sport event ID from URL.
-        """
-        sport_event_id = self.kwargs['sport_event_pk']
-        return TeamRegistration.objects.filter(sport_event__id=sport_event_id)
-    
-    @extend_schema(
-        summary="Register team for sport event",
-        description="Register a team for a specific sport event. Only team managers can register their teams.",
-        parameters=[
-            OpenApiParameter(name="sport_event_pk", location=OpenApiParameter.PATH, description="Sport Event ID (UUID)", required=True, type=str),
-        ],
-        request=TeamRegistrationCreateSerializer,
-        responses={
-            201: TeamRegistrationSerializer,
-            400: OpenApiResponse(description="Invalid input data or team already registered"),
-            401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - not team manager or admin"),
-            404: OpenApiResponse(description="Sport event not found")
-        }
-    )
-    def create(self, request, *args, **kwargs):
-        """
-        Register a team for a specific sport event.
-        
-        Creates a new team registration for the specified sport event.
-        The sport event is automatically determined from the URL.
-        Only the team manager can register their team for an event.
-        Validates that the team hasn't already registered and that the registration deadline hasn't passed.
-        """
-        sport_event_id = self.kwargs['sport_event_pk']
-        
-        # Set the sport event in the request data
-        mutable_data = request.data.copy()
-        mutable_data['sport_event'] = sport_event_id
-        
-        serializer = self.get_serializer(data=mutable_data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, 
-            status=status.HTTP_201_CREATED, 
-            headers=headers
-        )

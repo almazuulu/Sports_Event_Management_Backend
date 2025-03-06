@@ -209,263 +209,211 @@ class PlayersViewSet(viewsets.ModelViewSet):
         Only the team manager or administrators can delete a player.
         """
         return super().destroy(request, *args, **kwargs)
-    
-    @extend_schema(
-        summary="Set player as team captain",
-        description="Designate a player as the team captain. Only team managers and admins can do this.",
-        parameters=[
-            OpenApiParameter(name="id", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
-        ],
-        request=TeamCaptainSerializer,
-        responses={
-            200: PlayerSerializer,
-            400: OpenApiResponse(description="Bad request - player is not active"),
-            401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Forbidden - insufficient permissions"),
-            404: OpenApiResponse(description="Player not found")
-        }
-    )
-    @action(detail=True, methods=['patch'], url_path='set-as-captain',
-            permission_classes=[IsPlayerTeamManagerOrAdmin])
-    def set_as_captain(self, request, pk=None):
-        """
-        Designate a player as the team captain.
-        
-        This action sets the player as the captain of their team, which automatically
-        removes captain status from any other player in the same team.
-        Only active players can be designated as team captains.
-        Only the team manager or administrators can set team captains.
-        """
-        player = self.get_object()
-        
-        # Check if player is active
-        if not player.is_active:
-            return Response(
-                {"detail": _("Only active players can be designated as team captain.")},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Get the team
-        team = player.team
-        
-        # Reset captain status for all other players in the team
-        Player.objects.filter(team=team, is_captain=True).exclude(id=player.id).update(is_captain=False)
-        
-        # Set this player as captain
-        player.is_captain = True
-        player.save()
-        
-        # Update team_captain field in Team model
-        team.team_captain = player
-        team.save()
-        
-        serializer = PlayerSerializer(player)
-        return Response(serializer.data)
 
 
-class TeamPlayerViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint for listing players of a specific team.
-    Read-only viewset that provides 'list' and 'retrieve' actions.
-    """
-    serializer_class = PlayerSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['first_name', 'last_name', 'position']
-    ordering_fields = ['last_name', 'first_name', 'jersey_number']
-    permission_classes = [permissions.AllowAny]
+# class TeamPlayerViewSet(viewsets.ReadOnlyModelViewSet):
+#     """
+#     API endpoint for listing players of a specific team.
+#     Read-only viewset that provides 'list' and 'retrieve' actions.
+#     """
+#     serializer_class = PlayerSerializer
+#     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+#     search_fields = ['first_name', 'last_name', 'position']
+#     ordering_fields = ['last_name', 'first_name', 'jersey_number']
+#     permission_classes = [permissions.AllowAny]
     
-    def get_queryset(self):
-        """
-        Filter players by team ID from URL.
-        """
-        team_id = self.kwargs['team_pk']
-        return Player.objects.filter(team__id=team_id)
+#     def get_queryset(self):
+#         """
+#         Filter players by team ID from URL.
+#         """
+#         team_id = self.kwargs['team_pk']
+#         return Player.objects.filter(team__id=team_id)
     
-    @extend_schema(
-        summary="List team players",
-        description="Retrieve all players for a specific team.",
-        parameters=[
-            OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
-            OpenApiParameter(name="search", description="Search by name or position", required=False, type=str),
-            OpenApiParameter(name="ordering", description="Order results by field (e.g., last_name, jersey_number)", required=False, type=str),
-        ],
-        responses={
-            200: PlayerSerializer(many=True),
-            401: OpenApiResponse(description="Authentication credentials were not provided"),
-            404: OpenApiResponse(description="Team not found")
-        }
-    )
-    def list(self, request, *args, **kwargs):
-        """
-        Retrieve a list of all players for a specific team.
+#     @extend_schema(
+#         summary="List team players",
+#         description="Retrieve all players for a specific team. LLOOOOL",
+#         parameters=[
+#             OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
+#             OpenApiParameter(name="search", description="Search by name or position", required=False, type=str),
+#             OpenApiParameter(name="ordering", description="Order results by field (e.g., last_name, jersey_number)", required=False, type=str),
+#         ],
+#         responses={
+#             200: PlayerSerializer(many=True),
+#             401: OpenApiResponse(description="Authentication credentials were not provided"),
+#             404: OpenApiResponse(description="Team not found")
+#         }
+#     )
+#     def list(self, request, *args, **kwargs):
+#         """
+#         Retrieve a list of all players for a specific team. LLOLLLLLL
         
-        Returns a paginated list of players that belong to the specified team.
-        """
-        return super().list(request, *args, **kwargs)
+#         Returns a paginated list of players that belong to the specified team.
+#         """
+#         return super().list(request, *args, **kwargs)
 
-    @extend_schema(
-        summary="Retrieve team player",
-        description="Get detailed information about a specific player in a team.",
-        parameters=[
-            OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
-            OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
-        ],
-        responses={
-            200: PlayerSerializer,
-            401: OpenApiResponse(description="Authentication credentials were not provided"),
-            404: OpenApiResponse(description="Player not found in team")
-        }
-    )
-    def retrieve(self, request, *args, **kwargs):
-        """
-        Retrieve detailed information about a specific player in a team.
+#     @extend_schema(
+#         summary="Retrieve team player",
+#         description="Get detailed information about a specific player in a team.",
+#         parameters=[
+#             OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
+#             OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
+#         ],
+#         responses={
+#             200: PlayerSerializer,
+#             401: OpenApiResponse(description="Authentication credentials were not provided"),
+#             404: OpenApiResponse(description="Player not found in team")
+#         }
+#     )
+#     def retrieve(self, request, *args, **kwargs):
+#         """
+#         Retrieve detailed information about a specific player in a team.
         
-        Returns complete player information for a player that belongs to the specified team.
-        """
-        return super().retrieve(request, *args, **kwargs)
+#         Returns complete player information for a player that belongs to the specified team.
+#         """
+#         return super().retrieve(request, *args, **kwargs)
 
 
-class TeamPlayerCreateViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for adding, updating, and removing players for a specific team.
-    """
-    http_method_names = ['post', 'put', 'patch', 'delete']
-    permission_classes = [IsTeamOwnerOrAdmin]
+# class TeamPlayerCreateViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint for adding, updating, and removing players for a specific team.
+#     """
+#     http_method_names = ['post', 'put', 'patch', 'delete']
+#     permission_classes = [IsTeamOwnerOrAdmin]
     
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return PlayerCreateSerializer
-        elif self.action in ['update', 'partial_update']:
-            return PlayerUpdateSerializer
-        return PlayerSerializer
+#     def get_serializer_class(self):
+#         if self.action == 'create':
+#             return PlayerCreateSerializer
+#         elif self.action in ['update', 'partial_update']:
+#             return PlayerUpdateSerializer
+#         return PlayerSerializer
     
-    def get_queryset(self):
-        """
-        Filter players by team ID from URL.
-        """
-        team_id = self.kwargs['team_pk']
-        return Player.objects.filter(team__id=team_id)
+#     def get_queryset(self):
+#         """
+#         Filter players by team ID from URL.
+#         """
+#         team_id = self.kwargs['team_pk']
+#         return Player.objects.filter(team__id=team_id)
     
-    def perform_create(self, serializer):
-        team_id = self.kwargs['team_pk']
-        team = Team.objects.get(id=team_id)
-        serializer.save(team=team)
+#     def perform_create(self, serializer):
+#         team_id = self.kwargs['team_pk']
+#         team = Team.objects.get(id=team_id)
+#         serializer.save(team=team)
     
-    @extend_schema(
-        summary="Create team player",
-        description="Add a new player to a specific team with mandatory user association.",
-        parameters=[
-            OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
-        ],
-        request=PlayerCreateSerializer,
-        responses={
-            201: PlayerSerializer,
-            400: OpenApiResponse(description="Invalid input data"),
-            401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - not team manager or admin"),
-            404: OpenApiResponse(description="Team not found")
-        }
-    )
-    def create(self, request, *args, **kwargs):
-        """
-        Create a new player for the team.
+#     @extend_schema(
+#         summary="Create team player",
+#         description="Add a new player to a specific team with mandatory user association.",
+#         parameters=[
+#             OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
+#         ],
+#         request=PlayerCreateSerializer,
+#         responses={
+#             201: PlayerSerializer,
+#             400: OpenApiResponse(description="Invalid input data"),
+#             401: OpenApiResponse(description="Authentication credentials were not provided"),
+#             403: OpenApiResponse(description="Permission denied - not team manager or admin"),
+#             404: OpenApiResponse(description="Team not found")
+#         }
+#     )
+#     def create(self, request, *args, **kwargs):
+#         """
+#         Create a new player for the team.
         
-        Adds a player to the specified team with mandatory association to an existing user with role 'player'.
-        The team is automatically set from the URL.
-        The player's name and surname will be automatically taken from the user's account.
+#         Adds a player to the specified team with mandatory association to an existing user with role 'player'.
+#         The team is automatically set from the URL.
+#         The player's name and surname will be automatically taken from the user's account.
         
-        Required fields:
-        - user: The user ID (must have role 'player')
-        - jersey_number: Unique number within the team
-        - date_of_birth: Player's date of birth
-        - joined_date: When the player joined the team
+#         Required fields:
+#         - user: The user ID (must have role 'player')
+#         - jersey_number: Unique number within the team
+#         - date_of_birth: Player's date of birth
+#         - joined_date: When the player joined the team
         
-        Only the team manager or administrators can add players to a team.
-        """
-        team_id = self.kwargs['team_pk']
+#         Only the team manager or administrators can add players to a team.
+#         """
+#         team_id = self.kwargs['team_pk']
         
-        # Set the team in the request data
-        mutable_data = request.data.copy()
-        mutable_data['team'] = team_id
+#         # Set the team in the request data
+#         mutable_data = request.data.copy()
+#         mutable_data['team'] = team_id
         
-        serializer = self.get_serializer(data=mutable_data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
+#         serializer = self.get_serializer(data=mutable_data)
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_create(serializer)
         
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data, 
-            status=status.HTTP_201_CREATED, 
-            headers=headers
-        )
+#         headers = self.get_success_headers(serializer.data)
+#         return Response(
+#             serializer.data, 
+#             status=status.HTTP_201_CREATED, 
+#             headers=headers
+#         )
     
-    @extend_schema(
-        summary="Update team player",
-        description="Fully update a player in a specific team. Only team managers and admins can do this.",
-        parameters=[
-            OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
-            OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
-        ],
-        request=PlayerUpdateSerializer,
-        responses={
-            200: PlayerSerializer,
-            400: OpenApiResponse(description="Invalid input data"),
-            401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - not team manager or admin"),
-            404: OpenApiResponse(description="Player not found in team")
-        }
-    )
-    def update(self, request, *args, **kwargs):
-        """
-        Completely update a player in a specific team.
+#     @extend_schema(
+#         summary="Update team player",
+#         description="Fully update a player in a specific team. Only team managers and admins can do this.",
+#         parameters=[
+#             OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
+#             OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
+#         ],
+#         request=PlayerUpdateSerializer,
+#         responses={
+#             200: PlayerSerializer,
+#             400: OpenApiResponse(description="Invalid input data"),
+#             401: OpenApiResponse(description="Authentication credentials were not provided"),
+#             403: OpenApiResponse(description="Permission denied - not team manager or admin"),
+#             404: OpenApiResponse(description="Player not found in team")
+#         }
+#     )
+#     def update(self, request, *args, **kwargs):
+#         """
+#         Completely update a player in a specific team.
         
-        Requires all mandatory fields. Only the team manager or administrators can update a player.
-        """
-        return super().update(request, *args, **kwargs)
+#         Requires all mandatory fields. Only the team manager or administrators can update a player.
+#         """
+#         return super().update(request, *args, **kwargs)
 
-    @extend_schema(
-        summary="Partial update team player",
-        description="Partially update a player in a specific team. Only team managers and admins can do this.",
-        parameters=[
-            OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
-            OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
-        ],
-        request=PlayerUpdateSerializer,
-        responses={
-            200: PlayerSerializer,
-            400: OpenApiResponse(description="Invalid input data"),
-            401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - not team manager or admin"),
-            404: OpenApiResponse(description="Player not found in team")
-        }
-    )
-    def partial_update(self, request, *args, **kwargs):
-        """
-        Partially update a player in a specific team.
+#     @extend_schema(
+#         summary="Partial update team player",
+#         description="Partially update a player in a specific team. Only team managers and admins can do this.",
+#         parameters=[
+#             OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
+#             OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
+#         ],
+#         request=PlayerUpdateSerializer,
+#         responses={
+#             200: PlayerSerializer,
+#             400: OpenApiResponse(description="Invalid input data"),
+#             401: OpenApiResponse(description="Authentication credentials were not provided"),
+#             403: OpenApiResponse(description="Permission denied - not team manager or admin"),
+#             404: OpenApiResponse(description="Player not found in team")
+#         }
+#     )
+#     def partial_update(self, request, *args, **kwargs):
+#         """
+#         Partially update a player in a specific team.
         
-        Update only specified fields. Only the team manager or administrators can update a player.
-        """
-        return super().partial_update(request, *args, **kwargs)
+#         Update only specified fields. Only the team manager or administrators can update a player.
+#         """
+#         return super().partial_update(request, *args, **kwargs)
 
-    @extend_schema(
-        summary="Delete team player",
-        description="Remove a player from a specific team. Only team managers and admins can do this.",
-        parameters=[
-            OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
-            OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
-        ],
-        responses={
-            204: OpenApiResponse(description="Player successfully deleted"),
-            401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - not team manager or admin"),
-            404: OpenApiResponse(description="Player not found in team")
-        }
-    )
-    def destroy(self, request, *args, **kwargs):
-        """
-        Delete a player from a specific team.
+#     @extend_schema(
+#         summary="Delete team player",
+#         description="Remove a player from a specific team. Only team managers and admins can do this.",
+#         parameters=[
+#             OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
+#             OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
+#         ],
+#         responses={
+#             204: OpenApiResponse(description="Player successfully deleted"),
+#             401: OpenApiResponse(description="Authentication credentials were not provided"),
+#             403: OpenApiResponse(description="Permission denied - not team manager or admin"),
+#             404: OpenApiResponse(description="Player not found in team")
+#         }
+#     )
+#     def destroy(self, request, *args, **kwargs):
+#         """
+#         Delete a player from a specific team.
         
-        This operation permanently removes the player from the system.
-        Only the team manager or administrators can delete a player.
-        """
-        return super().destroy(request, *args, **kwargs)
+#         This operation permanently removes the player from the system.
+#         Only the team manager or administrators can delete a player.
+#         """
+#         return super().destroy(request, *args, **kwargs)
