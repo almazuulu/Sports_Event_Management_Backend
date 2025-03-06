@@ -2,20 +2,20 @@ from .team_serializers import (
     TeamSerializer, 
     TeamCreateSerializer, 
     TeamUpdateSerializer, 
-    TeamDetailSerializer
+    TeamDetailSerializer,
+    SetTeamCaptainSerializer
 )
 from .player_serializers import (
     PlayerSerializer, 
     PlayerCreateSerializer, 
-    PlayerUpdateSerializer
+    PlayerUpdateSerializer,
+    TeamCaptainSerializer
 )
 from .registration_serializers import (
     TeamRegistrationSerializer, 
     TeamRegistrationCreateSerializer, 
     TeamRegistrationApprovalSerializer
 )
-
-from .public_serializers import PublicTeamSerializer
 
 __all__ = [
     'TeamSerializer',
@@ -28,5 +28,6 @@ __all__ = [
     'TeamRegistrationSerializer',
     'TeamRegistrationCreateSerializer',
     'TeamRegistrationApprovalSerializer',
-    'PublicTeamSerializer'
+    'SetTeamCaptainSerializer',
+    'TeamCaptainSerializer'
 ]

@@ -1,8 +1,14 @@
-from rest_framework import serializers
+from rest_framework import serializers, status
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
-from ..models import Team
+
 from users.serializers import UserSerializer
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
+
+from teams.models import Player, Team
+from teams.permissions import IsTeamOwnerOrAdmin
 
 
 @extend_schema_serializer(
@@ -152,3 +158,11 @@ class TeamDetailSerializer(serializers.ModelSerializer):
         # Import here to avoid circular imports
         from ..serializers.registration_serializers import TeamRegistrationSerializer
         return TeamRegistrationSerializer(obj.event_registrations.all(), many=True).data
+    
+    
+class SetTeamCaptainSerializer(serializers.Serializer):
+    """
+    Serializer for setting a player as team captain.
+    Requires only the player_id field.
+    """
+    player_id = serializers.UUIDField(required=True)

@@ -1,4 +1,4 @@
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
@@ -7,7 +7,10 @@ from django.utils.translation import gettext_lazy as _
 
 from teams.models import Player, Team
 from teams.serializers import (
-    PlayerSerializer, PlayerCreateSerializer, PlayerUpdateSerializer
+    PlayerSerializer,
+    PlayerCreateSerializer,
+    PlayerUpdateSerializer,
+    TeamCaptainSerializer
 )
 from teams.permissions import (
     IsPlayerTeamManagerOrAdmin, IsTeamOwnerOrAdmin
@@ -21,21 +24,42 @@ class PlayersViewSet(viewsets.ModelViewSet):
     Team managers can manage their own team's players.
     Admins can manage all players.
     """
-    queryset = Player.objects.all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['team', 'is_active', 'is_captain']
     search_fields = ['first_name', 'last_name', 'position']
     ordering_fields = ['team', 'last_name', 'first_name', 'jersey_number']
     
+    def get_queryset(self):
+        """
+        Filter players based on user role:
+        - Admins see all players
+        - Team managers see only their team's players
+        """
+        user = self.request.user
+        if user.role == 'admin':
+            return Player.objects.all()
+        elif user.role == 'team_manager':
+            return Player.objects.filter(team__manager=user)
+        return Player.objects.none()
+    
     def get_serializer_class(self):
-        if self.action in ['update', 'partial_update']:
+        if self.action == 'create':
+            return PlayerCreateSerializer
+        elif self.action in ['update', 'partial_update']:
             return PlayerUpdateSerializer
+        elif self.action == 'set_as_captain':
+            return TeamCaptainSerializer
         return PlayerSerializer
     
     def get_permissions(self):
-        if self.action in ['update', 'partial_update', 'destroy']:
-            return [IsPlayerTeamManagerOrAdmin()]
-        return [IsTeamOwnerOrAdmin()]
+        if self.action in ['list', 'retrieve']:
+            # Public access for GET methods of listing players and retrieving a specific player
+            permission_classes = [permissions.AllowAny]
+        elif self.action in ['update', 'partial_update', 'destroy', 'set_as_captain']:
+            permission_classes = [IsPlayerTeamManagerOrAdmin()]
+        else:
+            permission_classes = [IsTeamOwnerOrAdmin()]
+        return permission_classes
     
     @extend_schema(
         summary="List players",
@@ -82,23 +106,39 @@ class PlayersViewSet(viewsets.ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
     
     @extend_schema(
-        summary="Create player",
-        description="Create a new player for any team. Only team managers can create players for their teams.",
-        request=PlayerCreateSerializer,
-        responses={
-            201: PlayerSerializer,
-            400: OpenApiResponse(description="Invalid input data"),
-            401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - not team manager or admin"),
-        }
+    summary="Create player",
+    description="Create a new player for any team with mandatory user association.",
+    request=PlayerCreateSerializer,
+    responses={
+        201: PlayerSerializer,
+        400: OpenApiResponse(description="Invalid input data"),
+        401: OpenApiResponse(description="Authentication credentials were not provided"),
+        403: OpenApiResponse(description="Permission denied - not team manager or admin"),
+    }
     )
     def create(self, request, *args, **kwargs):
         """
         Create a new player.
         
-        Creates a player for a specified team. The team must be included in the request data.
+        Creates a player for a specified team with mandatory association to an existing user with role 'player'.
+        The team must be included in the request data.
+        The player's name and surname will be automatically taken from the user's account.
+        
+        Required fields:
+        - team: The team ID this player belongs to
+        - user: The user ID (must have role 'player')
+        - jersey_number: Unique number within the team
+        - date_of_birth: Player's date of birth
+        - joined_date: When the player joined the team
+        
+        Optional fields:
+        - position: Player's position
+        - is_active: Whether the player is active
+        - notes: Additional notes about the player
+        
         Only the team manager of the specified team or administrators can create players.
         Jersey numbers must be unique within each team.
+        A user can only be associated with one player per team.
         """
         return super().create(request, *args, **kwargs)
 
@@ -176,6 +216,7 @@ class PlayersViewSet(viewsets.ModelViewSet):
         parameters=[
             OpenApiParameter(name="id", location=OpenApiParameter.PATH, description="Player ID (UUID)", required=True, type=str),
         ],
+        request=TeamCaptainSerializer,
         responses={
             200: PlayerSerializer,
             400: OpenApiResponse(description="Bad request - player is not active"),
@@ -204,11 +245,21 @@ class PlayersViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Set as captain
+        # Get the team
+        team = player.team
+        
+        # Reset captain status for all other players in the team
+        Player.objects.filter(team=team, is_captain=True).exclude(id=player.id).update(is_captain=False)
+        
+        # Set this player as captain
         player.is_captain = True
         player.save()
         
-        serializer = self.get_serializer(player)
+        # Update team_captain field in Team model
+        team.team_captain = player
+        team.save()
+        
+        serializer = PlayerSerializer(player)
         return Response(serializer.data)
 
 
@@ -221,6 +272,7 @@ class TeamPlayerViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['first_name', 'last_name', 'position']
     ordering_fields = ['last_name', 'first_name', 'jersey_number']
+    permission_classes = [permissions.AllowAny]
     
     def get_queryset(self):
         """
@@ -277,14 +329,15 @@ class TeamPlayerCreateViewSet(viewsets.ModelViewSet):
     """
     API endpoint for adding, updating, and removing players for a specific team.
     """
-    serializer_class = PlayerCreateSerializer
     http_method_names = ['post', 'put', 'patch', 'delete']
     permission_classes = [IsTeamOwnerOrAdmin]
     
     def get_serializer_class(self):
-        if self.action in ['update', 'partial_update']:
+        if self.action == 'create':
+            return PlayerCreateSerializer
+        elif self.action in ['update', 'partial_update']:
             return PlayerUpdateSerializer
-        return PlayerCreateSerializer
+        return PlayerSerializer
     
     def get_queryset(self):
         """
@@ -300,7 +353,7 @@ class TeamPlayerCreateViewSet(viewsets.ModelViewSet):
     
     @extend_schema(
         summary="Create team player",
-        description="Add a new player to a specific team. Only team managers and admins can do this.",
+        description="Add a new player to a specific team with mandatory user association.",
         parameters=[
             OpenApiParameter(name="team_pk", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
         ],
@@ -317,7 +370,16 @@ class TeamPlayerCreateViewSet(viewsets.ModelViewSet):
         """
         Create a new player for the team.
         
-        Adds a player to the specified team. The team is automatically set from the URL.
+        Adds a player to the specified team with mandatory association to an existing user with role 'player'.
+        The team is automatically set from the URL.
+        The player's name and surname will be automatically taken from the user's account.
+        
+        Required fields:
+        - user: The user ID (must have role 'player')
+        - jersey_number: Unique number within the team
+        - date_of_birth: Player's date of birth
+        - joined_date: When the player joined the team
+        
         Only the team manager or administrators can add players to a team.
         """
         team_id = self.kwargs['team_pk']

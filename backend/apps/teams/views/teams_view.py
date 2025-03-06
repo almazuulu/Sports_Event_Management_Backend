@@ -8,7 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from teams.models import Team, Player, TeamRegistration
 from teams.serializers import (
     TeamSerializer, TeamCreateSerializer, TeamUpdateSerializer, 
-    TeamDetailSerializer, PlayerSerializer, TeamRegistrationSerializer
+    TeamDetailSerializer, PlayerSerializer, TeamRegistrationSerializer,
+    SetTeamCaptainSerializer
 )
 from teams.permissions import (
     IsTeamManagerOrAdmin, IsTeamOwnerOrAdmin, IsPlayerTeamManagerOrAdmin,
@@ -39,12 +40,13 @@ class TeamsViewSet(viewsets.ModelViewSet):
         return TeamSerializer
     
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action in ['list', 'retrieve', 'team_players']:
+            # Public access for GET methods of main resources
+            permission_classes = [permissions.AllowAny]
+        elif self.action == 'create':
             permission_classes = [permissions.IsAuthenticated, IsTeamManagerOrAdmin]
         elif self.action in ['update', 'partial_update', 'destroy']:
             permission_classes = [IsTeamOwnerOrAdmin]
-        elif self.action in ['list', 'retrieve']:
-            permission_classes = [permissions.IsAuthenticated]
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -246,4 +248,66 @@ class TeamsViewSet(viewsets.ModelViewSet):
             registrations = registrations.filter(status=status_filter)
         
         serializer = TeamRegistrationSerializer(registrations, many=True)
+        return Response(serializer.data)
+    
+    @extend_schema(
+    summary="Set team captain",
+    description="Set a player as the captain of a team. Only team managers and admins can do this.",
+    parameters=[
+        OpenApiParameter(name="id", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
+        ],
+        request=SetTeamCaptainSerializer,
+        responses={
+            200: TeamSerializer,
+            400: OpenApiResponse(description="Bad request - player not found or not active"),
+            401: OpenApiResponse(description="Authentication credentials were not provided"),
+            403: OpenApiResponse(description="Forbidden - insufficient permissions"),
+            404: OpenApiResponse(description="Team not found")
+        }
+    )
+    @action(detail=True, methods=['patch'], url_path='set-captain',
+            permission_classes=[IsTeamOwnerOrAdmin])
+    def set_captain(self, request, pk=None):
+        """
+        Set a player as the captain of a team.
+        
+        Takes a player_id in the request and sets that player as the team captain.
+        Automatically removes captain status from any other player in the team.
+        Only active players can be designated as team captains.
+        Only the team manager or administrators can set team captains.
+        """
+        team = self.get_object()
+        serializer = SetTeamCaptainSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        player_id = serializer.validated_data['player_id']
+        
+        try:
+            player = Player.objects.get(id=player_id, team=team)
+        except Player.DoesNotExist:
+            return Response(
+                {"detail": _("Player not found in this team.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if player is active
+        if not player.is_active:
+            return Response(
+                {"detail": _("Only active players can be designated as team captain.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Reset captain status for all other players in the team
+        Player.objects.filter(team=team, is_captain=True).exclude(id=player.id).update(is_captain=False)
+        
+        # Set this player as captain
+        player.is_captain = True
+        player.save()
+        
+        # Update team_captain field in Team model
+        team.team_captain = player
+        team.save()
+        
+        # Return updated team information
+        serializer = self.get_serializer(team)
         return Response(serializer.data)

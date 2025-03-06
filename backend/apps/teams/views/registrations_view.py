@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from events.models import SportEvent
 from teams.models import TeamRegistration, Team
@@ -15,7 +16,6 @@ from teams.permissions import (
     IsTeamManagerOrAdmin, IsRegistrationTeamManagerOrAdmin, 
     CanManageRegistration, IsAdminUser
 )
-from users.permissions import IsAdminUser
 
 
 class TeamRegistrationViewSet(viewsets.ModelViewSet):
@@ -23,30 +23,47 @@ class TeamRegistrationViewSet(viewsets.ModelViewSet):
     API endpoint for managing team registrations across all sport events.
     
     Admins can view and manage all registrations.
-    Team managers can view their own team's registrations.
+    Team managers can view and manage their own team's registrations.
     """
-    queryset = TeamRegistration.objects.all()
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['team', 'sport_event', 'status']
     ordering_fields = ['registration_date', 'status']
     
     def get_serializer_class(self):
-        if self.action in ['update', 'partial_update']:
+        if self.action == 'create':
+            return TeamRegistrationCreateSerializer
+        elif self.action in ['update', 'partial_update']:
             return TeamRegistrationApprovalSerializer
         return TeamRegistrationSerializer
     
+    def get_queryset(self):
+        user = self.request.user
+        
+        # Admin can see all registrations
+        if user.role == 'admin':
+            return TeamRegistration.objects.all()
+        
+        # Team managers can see their own team's registrations
+        if user.role == 'team_manager':
+            return TeamRegistration.objects.filter(team__manager=user)
+        
+        # Other users don't have access
+        return TeamRegistration.objects.none()
+    
     def get_permissions(self):
         if self.action == 'list':
-            return [IsAdminUser()]
+            return [IsTeamManagerOrAdmin()]
         elif self.action in ['retrieve', 'destroy']:
             return [IsRegistrationTeamManagerOrAdmin()]
         elif self.action in ['update', 'partial_update']:
             return [IsAdminUser()]
+        elif self.action == 'create':
+            return [IsTeamManagerOrAdmin()]
         return [IsTeamManagerOrAdmin()]
     
     @extend_schema(
         summary="List team registrations",
-        description="List all team registrations across sport events. Admin access only.",
+        description="List team registrations. Admins see all, team managers see only their team's registrations.",
         parameters=[
             OpenApiParameter(name="team", description="Filter by team ID", required=False, type=str),
             OpenApiParameter(name="sport_event", description="Filter by sport event ID", required=False, type=str),
@@ -56,15 +73,16 @@ class TeamRegistrationViewSet(viewsets.ModelViewSet):
         responses={
             200: TeamRegistrationSerializer(many=True),
             401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - admin access required")
+            403: OpenApiResponse(description="Permission denied")
         }
     )
     def list(self, request, *args, **kwargs):
         """
-        List all team registrations across sport events.
+        List team registrations.
         
-        Returns a paginated list of all team registrations.
-        Note: Only administrators can access this endpoint.
+        Returns a paginated list of team registrations.
+        - Admins can see all registrations
+        - Team managers can only see their own team's registrations
         """
         return super().list(request, *args, **kwargs)
 
@@ -115,7 +133,6 @@ class TeamRegistrationViewSet(viewsets.ModelViewSet):
         - The event hasn't reached its maximum team capacity
         """
         return super().create(request, *args, **kwargs)
-    
     
     @extend_schema(
         summary="Approve or reject registration",
@@ -202,23 +219,36 @@ class SportEventRegistrationViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint for listing team registrations for a specific sport event.
     Read-only viewset that provides 'list' and 'retrieve' actions.
-    Only accessible by administrators.
+    Admin and team managers can access relevant registrations.
     """
     serializer_class = TeamRegistrationSerializer
-    permission_classes = [IsAdminUser]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['registration_date', 'status']
     
     def get_queryset(self):
         """
-        Filter registrations by sport event ID from URL.
+        Filter registrations by sport event ID from URL and user role.
         """
         sport_event_id = self.kwargs['sport_event_pk']
-        return TeamRegistration.objects.filter(sport_event__id=sport_event_id)
+        user = self.request.user
+        
+        # Admins can see all registrations for the event
+        if user.role == 'admin':
+            return TeamRegistration.objects.filter(sport_event__id=sport_event_id)
+        
+        # Team managers can see their team's registrations for the event
+        elif user.role == 'team_manager':
+            return TeamRegistration.objects.filter(
+                sport_event__id=sport_event_id,
+                team__manager=user
+            )
+        
+        # Other users don't have access
+        return TeamRegistration.objects.none()
     
     @extend_schema(
         summary="List sport event registrations",
-        description="List all team registrations for a specific sport event. Admin access only.",
+        description="List team registrations for a specific sport event based on user role.",
         parameters=[
             OpenApiParameter(name="sport_event_pk", location=OpenApiParameter.PATH, description="Sport Event ID (UUID)", required=True, type=str),
             OpenApiParameter(name="ordering", description="Order results by field (e.g., registration_date, status)", required=False, type=str),
@@ -226,22 +256,23 @@ class SportEventRegistrationViewSet(viewsets.ReadOnlyModelViewSet):
         responses={
             200: TeamRegistrationSerializer(many=True),
             401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - admin access required"),
+            403: OpenApiResponse(description="Permission denied"),
             404: OpenApiResponse(description="Sport event not found")
         }
     )
     def list(self, request, *args, **kwargs):
         """
-        List all team registrations for a specific sport event.
+        List team registrations for a specific sport event.
         
         Returns a paginated list of team registrations for the specified sport event.
-        Note: Only administrators can access this endpoint.
+        - Admins can see all registrations for the event
+        - Team managers can only see their team's registrations for the event
         """
         return super().list(request, *args, **kwargs)
     
     @extend_schema(
         summary="Retrieve sport event registration",
-        description="Get details of a specific team registration for a sport event. Admin access only.",
+        description="Get details of a specific team registration for a sport event.",
         parameters=[
             OpenApiParameter(name="sport_event_pk", location=OpenApiParameter.PATH, description="Sport Event ID (UUID)", required=True, type=str),
             OpenApiParameter(name="pk", location=OpenApiParameter.PATH, description="Registration ID (UUID)", required=True, type=str),
@@ -249,7 +280,7 @@ class SportEventRegistrationViewSet(viewsets.ReadOnlyModelViewSet):
         responses={
             200: TeamRegistrationSerializer,
             401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - admin access required"),
+            403: OpenApiResponse(description="Permission denied"),
             404: OpenApiResponse(description="Registration not found")
         }
     )
@@ -258,7 +289,7 @@ class SportEventRegistrationViewSet(viewsets.ReadOnlyModelViewSet):
         Retrieve details of a specific team registration for a sport event.
         
         Returns detailed information about a team's registration for the specified sport event.
-        Note: Only administrators can access this endpoint.
+        Accessible by the team manager of the registered team or admins.
         """
         return super().retrieve(request, *args, **kwargs)
 
@@ -267,9 +298,11 @@ class SportEventRegistrationCreateViewSet(viewsets.ModelViewSet):
     """
     API endpoint for registering a team for a specific sport event.
     """
-    serializer_class = TeamRegistrationCreateSerializer
     http_method_names = ['post']
     permission_classes = [IsTeamManagerOrAdmin]
+    
+    def get_serializer_class(self):
+        return TeamRegistrationCreateSerializer
     
     def get_queryset(self):
         """
