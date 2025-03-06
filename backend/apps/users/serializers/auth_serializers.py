@@ -6,29 +6,59 @@ from ..models.user import User
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
-    Custom serializer to support login with either username or email
+    Custom serializer to support login with either username or email.
+    Uses security-enhanced error messages that don't reveal specific details.
     """
-    login = serializers.CharField(write_only=True)
-    def init(self, args, **kwargs):
-        super().init(args, **kwargs)
-        # Remove default username field
-        self.fields.pop('username', None)
-        # Add custom login field
-        self.fields['login'] = serializers.CharField(required=True)
+    email = serializers.EmailField(required=False)
+    username = serializers.CharField(required=False)
+    password = serializers.CharField(style={'input_type': 'password'})
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make username optional
+        self.fields['username'].required = False
+        # Add email field
+        self.fields['email'] = serializers.EmailField(required=False)
+    
     def validate(self, attrs):
-        # Get login credentials
-        login = attrs.pop('login')
-       
+        # Extract credentials from attrs
+        email = attrs.get('email')
+        username = attrs.get('username')
+        password = attrs.get('password')
+        
+        # Generic error message for security
+        GENERIC_ERROR_MESSAGE = "Username, email, or password is incorrect."
+        
+        # We need at least one identifier field
+        if not any([email, username]):
+            raise serializers.ValidationError({
+                "error": "Please provide either email or username."
+            })
+        
+        # Determine which identifier was provided
+        identifier = email if email else username
+        
         # Try to find user by email or username
         try:
             user = User.objects.get(
-                Q(email=login) | Q(username=login)
+                Q(email=identifier) | Q(username=identifier)
             )
-            # Set username for SimpleJWT validation
-            attrs['username'] = user.username
+                
+            # Check the password but use a generic error message
+            if not user.check_password(password):
+                raise serializers.ValidationError({
+                    "error": GENERIC_ERROR_MESSAGE
+                })
+                
+            # User exists and password is correct
+            # Make sure the USERNAME_FIELD is properly set for SimpleJWT
+            if self.username_field not in attrs:
+                attrs[self.username_field] = user.email  # Use the user's actual email
+                
         except User.DoesNotExist:
+            # Use the same generic error for non-existent users
             raise serializers.ValidationError({
-                "login": "Invalid login credentials"
+                "error": GENERIC_ERROR_MESSAGE
             })
        
         return super().validate(attrs)
