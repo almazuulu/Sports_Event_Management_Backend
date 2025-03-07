@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
-from ..models import TeamRegistration, Team
+from ..models import TeamRegistration
 
 
 @extend_schema_serializer(
@@ -55,27 +55,27 @@ class TeamRegistrationCreateSerializer(serializers.ModelSerializer):
         
         if TeamRegistration.objects.filter(team=team, sport_event=sport_event).exists():
             raise serializers.ValidationError({
-                'sport_event': _('This team is already registered for this sport event.')
+                'error': _('This team is already registered for this sport event.')
             })
         
         # Check if registration is still open for this sport event
         if sport_event.registration_deadline and sport_event.registration_deadline < timezone.now():
             raise serializers.ValidationError({
-                'sport_event': _('Registration deadline for this sport event has passed.')
+                'error': _('Registration deadline for this sport event has passed.')
             })
         
         # Check if request exists and user is authenticated
         request = self.context.get('request')
         if not request or not request.user or not request.user.is_authenticated:
             raise serializers.ValidationError({
-                'detail': _('Authentication required to register a team.')
+                'error': _('Authentication required to register a team.')
             })
         
         # Ensure the current user is the team manager (only after confirming user is authenticated)
         request_user = request.user
         if team.manager.id != request_user.id:
             raise serializers.ValidationError({
-                'team': _('Only the team manager can register a team for a sport event.')
+                'error': _('Only the team manager can register a team for a sport event.')
             })
         
         # Check if maximum teams limit has been reached
@@ -87,7 +87,7 @@ class TeamRegistrationCreateSerializer(serializers.ModelSerializer):
             
             if current_team_count >= sport_event.max_teams:
                 raise serializers.ValidationError({
-                    'sport_event': _('This sport event has reached its maximum team capacity.')
+                    'error': _('This sport event has reached its maximum team capacity.')
                 })
         
         return attrs
@@ -123,14 +123,14 @@ class TeamRegistrationApprovalSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request or not request.user or not request.user.is_authenticated:
             raise serializers.ValidationError({
-                'detail': _('Authentication required to approve or reject registrations.')
+                'error': _('Authentication required to approve or reject registrations.')
             })
         
         # Only admins can approve/reject registrations
         request_user = request.user
         if not hasattr(request_user, 'role') or request_user.role != 'admin':
             raise serializers.ValidationError({
-                'detail': _('Only administrators can approve or reject team registrations.')
+                'error': _('Only administrators can approve or reject team registrations.')
             })
         
         # Set approval information

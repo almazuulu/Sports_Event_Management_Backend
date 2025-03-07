@@ -5,15 +5,16 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from django.utils.translation import gettext_lazy as _
 
-from teams.models import Team, Player, TeamRegistration
+from teams.models import Team, Player
 from teams.serializers import (
     TeamSerializer, TeamCreateSerializer, TeamUpdateSerializer, 
     TeamDetailSerializer, PlayerSerializer, TeamRegistrationSerializer,
     SetTeamCaptainSerializer
 )
 from teams.permissions import (
-    IsTeamManagerOrAdmin, IsTeamOwnerOrAdmin, IsPlayerTeamManagerOrAdmin,
-    IsTeamCaptain, IsTeamManagerOrCaptain, PublicReadOnly
+    IsTeamManagerOrAdmin,
+    IsTeamOwnerOrAdmin,
+    IsAdminUser
 )
 
 
@@ -46,7 +47,7 @@ class TeamsViewSet(viewsets.ModelViewSet):
         elif self.action == 'create':
             permission_classes = [permissions.IsAuthenticated, IsTeamManagerOrAdmin]
         elif self.action in ['update', 'partial_update', 'destroy']:
-            permission_classes = [IsTeamOwnerOrAdmin]
+            permission_classes = [permissions.IsAuthenticated, IsTeamOwnerOrAdmin]
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -75,6 +76,68 @@ class TeamsViewSet(viewsets.ModelViewSet):
         """
         return super().list(request, *args, **kwargs)
 
+
+    @extend_schema(
+        summary="List teams by manager",
+        description="Returns a list of teams grouped by team manager.",
+        parameters=[
+            OpenApiParameter(name="manager_id", description="Filter by specific manager ID (optional)", required=False, type=str),
+        ],
+        responses={
+            200: OpenApiResponse(description="List of team managers with their teams"),
+            401: OpenApiResponse(description="Authentication credentials were not provided"),
+            403: OpenApiResponse(description="Permission denied - admin access required")
+        }
+    )
+    @action(detail=False, methods=['get'], url_path='by-manager', permission_classes=[IsAdminUser])
+    def list_teams_by_manager(self, request):
+        """
+        Get a list of teams grouped by team manager.
+        
+        Returns a list of managers with their managed teams.
+        Optional filtering by specific manager ID.
+        Admin access only.
+        """
+        from django.db.models import Prefetch
+        from users.models import User
+        from users.serializers import UserSerializer
+        
+        # Check if specific manager ID is provided
+        manager_id = request.query_params.get('manager_id')
+        
+        # Query managers with role 'team_manager'
+        managers_query = User.objects.filter(role='team_manager')
+        
+        # Filter by specific manager if provided
+        if manager_id:
+            managers_query = managers_query.filter(id=manager_id)
+        
+        # Prefetch teams for each manager with efficient querying
+        managers = managers_query.prefetch_related(
+            Prefetch('managed_teams', queryset=Team.objects.all())
+        )
+        
+        # Create the response data
+        result = []
+        for manager in managers:
+            manager_data = {
+                'manager_id': manager.id,
+                'first_name': manager.first_name,
+                'last_name': manager.last_name,
+                'email': manager.email,
+                'teams': [
+                    {
+                        'team_id': team.id,
+                        'team_name': team.name,
+                        'status': team.status
+                    } for team in manager.managed_teams.all()
+                ]
+            }
+            result.append(manager_data)
+        
+        return Response(result)
+
+
     @extend_schema(
         summary="Create team",
         description="Create a new team. The authenticated user will be set as the team manager.",
@@ -86,6 +149,7 @@ class TeamsViewSet(viewsets.ModelViewSet):
             403: OpenApiResponse(description="Permission denied - user does not have team_manager role")
         }
     )
+    
     def create(self, request, *args, **kwargs):
         """
         Create a new team.
@@ -114,6 +178,62 @@ class TeamsViewSet(viewsets.ModelViewSet):
         Returns complete team information including players and event registrations.
         """
         return super().retrieve(request, *args, **kwargs)
+    
+    @extend_schema(
+        summary="Update team manager",
+        description="Update the manager of a team. Admin only.",
+        parameters=[
+            OpenApiParameter(name="id", location=OpenApiParameter.PATH, description="Team ID (UUID)", required=True, type=str),
+        ],
+        request={"application/json": {"type": "object", "properties": {"manager_id": {"type": "string", "format": "uuid"}}}},
+        responses={
+            200: TeamSerializer,
+            400: OpenApiResponse(description="Invalid input - user is not a team manager"),
+            401: OpenApiResponse(description="Authentication required"),
+            403: OpenApiResponse(description="Permission denied - admin only"),
+            404: OpenApiResponse(description="Team or user not found")
+        }
+    )
+    @action(detail=True, methods=['patch'], url_path='update-manager', permission_classes=[IsAdminUser])
+    def update_manager(self, request, pk=None):
+        """
+        Update the manager of a team.
+        
+        Only administrators can change team managers.
+        The new manager must have the 'team_manager' role.
+        """
+        team = self.get_object()
+        
+        # Validate the manager_id is provided
+        manager_id = request.data.get('manager_id')
+        if not manager_id:
+            return Response(
+                {"detail": _("Manager ID is required.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            from users.models import User
+            new_manager = User.objects.get(id=manager_id)
+        except User.DoesNotExist:
+            return Response(
+                {"error": _("User not found.")},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Ensure the new manager has the team_manager role
+        if new_manager.role != 'team_manager':
+            return Response(
+                {"error": _("The specified user does not have the team manager role.")},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Update the team manager
+        team.manager = new_manager
+        team.save(update_fields=['manager_id'])
+        
+        serializer = self.get_serializer(team)
+        return Response(serializer.data)
 
     @extend_schema(
         summary="Update team",
