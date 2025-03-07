@@ -151,6 +151,92 @@ class TeamsViewSet(viewsets.ModelViewSet):
             result.append(manager_data)
         
         return Response(result)
+    
+    @extend_schema(
+        summary="List available players",
+        description="Returns a list of users with 'player' role for team assignments.",
+        parameters=[
+            OpenApiParameter(name="search", description="Search by name or email", required=False, type=str),
+            OpenApiParameter(name="available_only", description="Filter out players already assigned to teams", required=False, type=bool),
+        ],
+        responses={
+            200: OpenApiResponse(description="List of players with their current team assignments"),
+            401: OpenApiResponse(description="Authentication credentials were not provided"),
+            403: OpenApiResponse(description="Permission denied - admin or team manager access required")
+        }
+    )
+    @action(detail=False, methods=['get'], url_path='available-players', permission_classes=[IsTeamManagerOrAdmin])
+    def available_players(self, request):
+        """
+        Get a list of users with 'player' role for team assignments.
+        
+        Returns a list of players with their personal information and current team assignments.
+        Can filter by availability and search by name/email.
+        Accessible by team managers and admins.
+        """
+        from django.db.models import Prefetch, Q
+        from users.models import User
+        
+        # Get query parameters
+        search_query = request.query_params.get('search', '')
+        available_only = request.query_params.get('available_only', '').lower() == 'true'
+        
+        # Base query for players
+        players_query = User.objects.filter(role='player')
+        
+        # Apply search if provided
+        if search_query:
+            players_query = players_query.filter(
+                Q(first_name__icontains=search_query) | 
+                Q(last_name__icontains=search_query) | 
+                Q(email__icontains=search_query) |
+                Q(username__icontains=search_query)
+            )
+        
+        # Prefetch related player profiles for efficiency
+        players = players_query.prefetch_related(
+            Prefetch('player_profiles', queryset=Player.objects.select_related('team'))
+        )
+        
+        # Create the response data
+        players_data = []
+        count = 0
+        
+        for player in players:
+            # Get current team assignments
+            current_teams = []
+            for profile in player.player_profiles.all():
+                current_teams.append({
+                    'team_id': profile.team.id,
+                    'team_name': profile.team.name,
+                    'jersey_number': profile.jersey_number,
+                    'is_active': profile.is_active,
+                    'is_captain': profile.is_captain
+                })
+            
+            # Skip if we only want available players and this player is already assigned
+            if available_only and current_teams:
+                continue
+            
+            # Add player to result
+            player_data = {
+                'player_id': player.id,
+                'username': player.username,
+                'first_name': player.first_name,
+                'last_name': player.last_name,
+                'email': player.email,
+                'current_teams': current_teams
+            }
+            players_data.append(player_data)
+            count += 1
+        
+        # Return with count
+        result = {
+            'count': count,
+            'players': players_data
+        }
+        
+        return Response(result)
 
 
     @extend_schema(
