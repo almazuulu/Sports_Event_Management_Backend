@@ -79,43 +79,58 @@ class TeamsViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary="List teams by manager",
-        description="Returns a list of teams grouped by team manager.",
+        description="Returns a list of teams grouped by team manager. Admins can see all managers, team managers can see only their own teams.",
         parameters=[
-            OpenApiParameter(name="manager_id", description="Filter by specific manager ID (optional)", required=False, type=str),
+            OpenApiParameter(name="manager_id", description="Filter by specific manager ID (admin only, optional)", required=False, type=str),
         ],
         responses={
             200: OpenApiResponse(description="List of team managers with their teams"),
             401: OpenApiResponse(description="Authentication credentials were not provided"),
-            403: OpenApiResponse(description="Permission denied - admin access required")
+            403: OpenApiResponse(description="Permission denied")
         }
     )
-    @action(detail=False, methods=['get'], url_path='by-manager', permission_classes=[IsAdminUser])
-    def list_teams_by_manager(self, request):
+    @action(detail=False, methods=['get'], url_path='by-manager', permission_classes=[permissions.IsAuthenticated])
+    def teams_by_manager(self, request):
         """
         Get a list of teams grouped by team manager.
         
         Returns a list of managers with their managed teams.
-        Optional filtering by specific manager ID.
-        Admin access only.
+        - Admins can see all team managers or filter by specific manager ID
+        - Team managers can see only their own teams
         """
         from django.db.models import Prefetch
         from users.models import User
-        from users.serializers import UserSerializer
         
-        # Check if specific manager ID is provided
-        manager_id = request.query_params.get('manager_id')
+        user = request.user
         
-        # Query managers with role 'team_manager'
-        managers_query = User.objects.filter(role='team_manager')
+        # Determine access level based on user role
+        is_admin = user.role == 'admin'
+        is_team_manager = user.role == 'team_manager'
         
-        # Filter by specific manager if provided
-        if manager_id:
-            managers_query = managers_query.filter(id=manager_id)
+        if not (is_admin or is_team_manager):
+            return Response(
+                {"detail": _("You do not have permission to access this resource.")},
+                status=status.HTTP_403_FORBIDDEN
+            )
         
-        # Prefetch teams for each manager with efficient querying
-        managers = managers_query.prefetch_related(
-            Prefetch('managed_teams', queryset=Team.objects.all())
-        )
+        # For team managers, only show their own teams
+        if is_team_manager:
+            managers = [user]  # Only the current user
+        else:  # Admin can see all or filter
+            # Check if specific manager ID is provided
+            manager_id = request.query_params.get('manager_id')
+            
+            # Query managers with role 'team_manager'
+            managers_query = User.objects.filter(role='team_manager')
+            
+            # Filter by specific manager if provided
+            if manager_id:
+                managers_query = managers_query.filter(id=manager_id)
+            
+            # Prefetch teams for each manager with efficient querying
+            managers = managers_query.prefetch_related(
+                Prefetch('managed_teams', queryset=Team.objects.all())
+            )
         
         # Create the response data
         result = []
