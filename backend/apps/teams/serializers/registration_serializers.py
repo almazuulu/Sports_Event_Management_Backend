@@ -133,17 +133,14 @@ class TeamRegistrationApprovalSerializer(serializers.ModelSerializer):
                 'error': _('Only administrators can approve or reject team registrations.')
             })
         
-        # Set approval information
-        if validated_data.get('status') == 'approved':
-            validated_data['approved_by'] = request_user
-            validated_data['approval_date'] = timezone.now()
-        
+        # Set approval/rejection information regardless of status
+        # This ensures we track who made the decision in both cases
         instance.status = validated_data.get('status', instance.status)
         instance.notes = validated_data.get('notes', instance.notes)
         
-        if validated_data.get('status') == 'approved':
-            instance.approved_by = request_user
-            instance.approval_date = timezone.now()
+        # Always set the admin who made the decision and when
+        instance.approved_by = request_user
+        instance.approval_date = timezone.now()
         
         instance.save()
         return instance
