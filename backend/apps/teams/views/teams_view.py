@@ -90,7 +90,7 @@ class TeamsViewSet(viewsets.ModelViewSet):
         }
     )
     @action(detail=False, methods=['get'], url_path='by-manager', permission_classes=[permissions.IsAuthenticated])
-    def teams_by_manager(self, request):
+    def list_teams_by_manager(self, request):
         """
         Get a list of teams grouped by team manager.
         
@@ -109,7 +109,7 @@ class TeamsViewSet(viewsets.ModelViewSet):
         
         if not (is_admin or is_team_manager):
             return Response(
-                {"detail": _("You do not have permission to access this resource.")},
+                {"error": _("You do not have permission to access this resource.")},
                 status=status.HTTP_403_FORBIDDEN
             )
         
