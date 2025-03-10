@@ -3,7 +3,8 @@ from .score_serializers import (
     ScoreUpdateSerializer,
     ScoreVerificationSerializer,
     ScoreDetailSerializer,
-    ScoreDetailCreateSerializer
+    ScoreDetailCreateSerializer,
+    ScoreCreateSerializer
 )
 from .public_serializers import (
     PublicScoreSerializer,

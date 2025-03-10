@@ -96,9 +96,9 @@ class Score(models.Model):
             return None
             
         if self.final_score_team1 > self.final_score_team2:
-            return self.game.team1
+            return self.game.team1 if hasattr(self.game, 'team1') else None
         elif self.final_score_team2 > self.final_score_team1:
-            return self.game.team2
+            return self.game.team2 if hasattr(self.game, 'team2') else None
         else:
             # It's a draw
             return None

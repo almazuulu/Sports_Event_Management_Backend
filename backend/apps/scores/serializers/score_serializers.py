@@ -292,3 +292,25 @@ class ScoreDetailCreateSerializer(serializers.ModelSerializer):
         score.save(update_fields=['final_score_team1', 'final_score_team2', 'updated_at'])
         
         return score_detail
+    
+class ScoreCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating a score record.
+    It requires the game_id and status to create a new score.
+    """
+    class Meta:
+        model = Score
+        fields = ['game', 'status']
+
+    def validate_game(self, value):
+        # Ensure that the game exists and is in a valid state
+        if value is None:
+            raise serializers.ValidationError("Game must be provided.")
+        return value
+
+    def validate_status(self, value):
+        # Ensure the status is valid
+        valid_statuses = dict(Score.STATUS_CHOICES)
+        if value not in valid_statuses:
+            raise serializers.ValidationError(f"Invalid status. Allowed statuses are {list(valid_statuses.keys())}.")
+        return value
