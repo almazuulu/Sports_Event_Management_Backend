@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 
@@ -14,8 +16,6 @@ from ..serializers import (
     GameStatusUpdateSerializer, 
     GameDetailSerializer,
     GameListSerializer,
-    PublicGameListSerializer,
-    PublicGameDetailSerializer,
     UpcomingGamesSerializer
 )
 from ..permissions import (
@@ -26,41 +26,39 @@ from ..permissions import (
 
 
 class GameViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for Game management.
-    """
     queryset = Game.objects.all().order_by('-start_datetime')
     authentication_classes = [JWTAuthentication]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['sport_event', 'status']
+    filterset_fields = ['sport_event', 'status', 'game_teams__team']
     search_fields = ['name', 'description', 'location']
     ordering_fields = ['start_datetime', 'name']
 
     def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [CanManageGame()]
-        elif self.action in ['public_list', 'public_detail']:
-            return [AllowAny()]
-        return [CanViewGame()]
+        elif self.action == 'update_status':
+            return [CanUpdateGameStatus()]
+        else:
+            return [CanViewGame()]
 
     def get_serializer_class(self):
-        if self.action in ['list']:
+        if self.action == 'list':
             return GameListSerializer
-        elif self.action in ['create']:
+        elif self.action == 'create':
             return GameCreateSerializer
         elif self.action in ['update', 'partial_update']:
             return GameUpdateSerializer
         elif self.action == 'update_status':
             return GameStatusUpdateSerializer
-        elif self.action in ['retrieve']:
+        elif self.action == 'retrieve':
             return GameDetailSerializer
-        elif self.action == 'public_list':
-            return PublicGameListSerializer
-        elif self.action == 'public_detail':
-            return PublicGameDetailSerializer
         elif self.action == 'upcoming_games':
             return UpcomingGamesSerializer
         return GameSerializer
+
 
     @extend_schema(
         summary="List all games",
@@ -73,6 +71,7 @@ class GameViewSet(viewsets.ModelViewSet):
         ],
         responses={200: GameListSerializer(many=True)}
     )
+    @method_decorator(cache_page(60*15))
     def list(self, request):
         """
         List all games that the user has permission to view.
@@ -184,76 +183,27 @@ class GameViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=204)
 
-    @extend_schema(
-        summary="Public games listing",
-        description="Get a list of public games with limited information",
-        parameters=[
-            OpenApiParameter(name="sport_event", description="Filter by sport event ID", required=False, type=str),
-            OpenApiParameter(name="status", description="Filter by game status", required=False, type=str)
-        ],
-        responses={200: PublicGameListSerializer(many=True)}
-    )
-    @action(detail=False, methods=['get'], url_path='public', authentication_classes=[])
-    def public_list(self, request):
-        """
-        List all public games with limited information.
-        Open to everyone without authentication.
-        Only shows scheduled and ongoing games.
-        """
-        queryset = Game.objects.filter(status__in=['scheduled', 'ongoing'])
-        
-        # Optional filtering
-        sport_event = request.query_params.get('sport_event')
-        if sport_event:
-            queryset = queryset.filter(sport_event_id=sport_event)
-        
-        status_param = request.query_params.get('status')
-        if status_param:
-            queryset = queryset.filter(status=status_param)
-        
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
-    @extend_schema(
-        summary="Public game details",
-        description="Get public details of a specific game",
-        responses={200: PublicGameDetailSerializer}
-    )
-    @action(detail=True, methods=['get'], url_path='public', authentication_classes=[])
-    def public_detail(self, request, pk=None):
-        """
-        Retrieve public details of a specific game.
-        Open to everyone without authentication.
-        """
-        game = self.get_object()
-        serializer = self.get_serializer(game)
-        return Response(serializer.data)
 
     @extend_schema(
         summary="Upcoming games",
-        description="Get a list of upcoming games for dashboard or homepage",
-        parameters=[
-            OpenApiParameter(name="sport_event", description="Filter by sport event ID", required=False, type=str)
-        ],
-        responses={200: UpcomingGamesSerializer(many=True)}
+        description="Get a list of upcoming games for dashboard or homepage"
     )
     @action(detail=False, methods=['get'], url_path='upcoming')
     def upcoming_games(self, request):
         """
         Get a list of upcoming games for dashboard or homepage.
         Only shows scheduled and ongoing games.
-        User must have permission to view games.
+        Public access allowed.
         """
         queryset = Game.objects.filter(status__in=['scheduled', 'ongoing'])
         
         sport_event = request.query_params.get('sport_event')
         if sport_event:
             queryset = queryset.filter(sport_event_id=sport_event)
+        
+        team = request.query_params.get('team')
+        if team:
+            queryset = queryset.filter(game_teams__team=team)
         
         page = self.paginate_queryset(queryset)
         if page is not None:

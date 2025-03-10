@@ -6,7 +6,7 @@ class CanViewGame(permissions.BasePermission):
     Permission to allow authenticated users to view games.
     """
     def has_permission(self, request, view):
-        return request.user.is_authenticated
+        return True
 
 
 class CanManageGame(permissions.BasePermission):

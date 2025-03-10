@@ -1,6 +1,9 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import AllowAny
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 
@@ -15,14 +18,16 @@ from ..permissions import CanManageGameTeams
 
 
 class GameTeamViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint for Game Team management.
-    """
     queryset = GameTeam.objects.all()
     authentication_classes = [JWTAuthentication]
-    permission_classes = [CanManageGameTeams]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['game', 'team', 'designation']
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        
+        return [CanManageGameTeams()]
 
     def get_serializer_class(self):
         if self.action in ['create']:
@@ -43,6 +48,7 @@ class GameTeamViewSet(viewsets.ModelViewSet):
         ],
         responses={200: GameTeamSerializer(many=True)}
     )
+    @method_decorator(cache_page(60*15))
     def list(self, request):
         """
         List all game teams.
