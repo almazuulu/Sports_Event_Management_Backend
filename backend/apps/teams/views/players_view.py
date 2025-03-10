@@ -54,7 +54,7 @@ class PlayersViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             # Public access for GET methods of listing players and retrieving a specific player
-            permission_classes = [permissions.AllowAny]
+            permission_classes = [permissions.AllowAny()]
         elif self.action in ['update', 'partial_update', 'destroy', 'set_as_captain']:
             permission_classes = [IsPlayerTeamManagerOrAdmin()]
         else:
