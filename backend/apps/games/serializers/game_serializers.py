@@ -50,13 +50,14 @@ class GameSerializer(serializers.ModelSerializer):
     sport_event_name = serializers.CharField(source='sport_event.name', read_only=True)
     scorekeeper_name = serializers.SerializerMethodField()
     teams = serializers.SerializerMethodField()
+    time_display = serializers.SerializerMethodField()
     
     class Meta:
         model = Game
         fields = [
             'id', 'sport_event', 'sport_event_name', 'name', 'description',
-            'location', 'start_datetime', 'end_datetime', 'status',
-            'scorekeeper', 'scorekeeper_name', 'teams', 'created_at'
+            'location', 'start_datetime', 'end_datetime', 'time_display', 
+            'status', 'scorekeeper', 'scorekeeper_name', 'teams', 'created_at'
         ]
         read_only_fields = ['id', 'created_at']
     
@@ -64,6 +65,9 @@ class GameSerializer(serializers.ModelSerializer):
         if obj.scorekeeper:
             return obj.scorekeeper.get_full_name()
         return None
+    
+    def get_time_display(self, obj):
+        return obj.start_datetime.strftime('%H:%M')
     
     def get_teams(self, obj):
         from ..serializers.game_team_serializers import GameTeamSerializer
@@ -113,7 +117,7 @@ class GameCreateSerializer(serializers.ModelSerializer):
         
         # Ensure the sport event is active or in registration phase
         sport_event = attrs.get('sport_event')
-        if sport_event.status not in ['registration', 'active']:
+        if sport_event.status not in ['registration', 'ongoing']:
             raise serializers.ValidationError({
                 'sport_event': _('Games can only be scheduled for active or registration phase sport events.')
             })
@@ -291,7 +295,16 @@ class PublicGameSerializer(serializers.ModelSerializer):
                 'start_datetime': '2025-04-15T14:00:00Z',
                 'location': 'Main Court',
                 'status': 'scheduled',
-                'teams_count': 2
+                'teams': [
+                    {
+                        'team_name': 'Thunderbolts',
+                        'designation': 'Team A'
+                    },
+                    {
+                        'team_name': 'Lightning Strikes',
+                        'designation': 'Team B'
+                    }
+                ]
             },
             response_only=True,
         )
@@ -299,21 +312,31 @@ class PublicGameSerializer(serializers.ModelSerializer):
 )
 class GameListSerializer(serializers.ModelSerializer):
     """
-    Serializer for listing games with summarized information.
-    Used for endpoints that return multiple games.
+    Serializer for listing games with team information.
+    Used for all list views of games.
     """
     sport_event_name = serializers.CharField(source='sport_event.name', read_only=True)
-    teams_count = serializers.SerializerMethodField()
+    teams = serializers.SerializerMethodField()
+    time_display = serializers.SerializerMethodField()
     
     class Meta:
         model = Game
         fields = [
             'id', 'name', 'sport_event_name', 'start_datetime',
-            'location', 'status', 'teams_count'
+            'time_display', 'location', 'status', 'teams'
         ]
     
-    def get_teams_count(self, obj):
-        return obj.game_teams.count()
+    def get_teams(self, obj):
+        result = []
+        for game_team in obj.game_teams.select_related('team').all():
+            result.append({
+                'team_name': game_team.team.name,
+                'designation': game_team.get_designation_display()
+            })
+        return result
+    
+    def get_time_display(self, obj):
+        return obj.start_datetime.strftime('%H:%M')
 
 
 @extend_schema_serializer(
@@ -373,7 +396,7 @@ class ScorekeeperGameSerializer(serializers.ModelSerializer):
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
-            'Game Detail With Players Example',
+            'Game Detail Example',
             value={
                 'id': '3fa85f64-5717-4562-b3fc-2c963f66afa6',
                 'sport_event': '3fa85f64-5717-4562-b3fc-2c963f66afa7',
@@ -384,38 +407,16 @@ class ScorekeeperGameSerializer(serializers.ModelSerializer):
                 'start_datetime': '2025-04-15T14:00:00Z',
                 'end_datetime': '2025-04-15T16:00:00Z',
                 'status': 'scheduled',
+                'scorekeeper_name': 'John Scorer',
                 'teams': [
                     {
-                        'id': '3fa85f64-5717-4562-b3fc-2c963f66afa9',
-                        'team': '3fa85f64-5717-4562-b3fc-2c963f66afaa',
                         'team_name': 'Thunderbolts',
-                        'designation': 'team_a',
-                        'designation_display': 'Team A',
-                        'selected_players': [
+                        'designation': 'Team A',
+                        'players': [
                             {
-                                'id': '3fa85f64-5717-4562-b3fc-2c963f66afad',
-                                'player': '3fa85f64-5717-4562-b3fc-2c963f66afae',
-                                'player_name': 'John Smith',
+                                'name': 'John Smith',
                                 'jersey_number': 23,
-                                'is_captain_for_game': True,
                                 'position': 'Forward'
-                            }
-                        ]
-                    },
-                    {
-                        'id': '3fa85f64-5717-4562-b3fc-2c963f66afab',
-                        'team': '3fa85f64-5717-4562-b3fc-2c963f66afac',
-                        'team_name': 'Lightning Strikes',
-                        'designation': 'team_b',
-                        'designation_display': 'Team B',
-                        'selected_players': [
-                            {
-                                'id': '3fa85f64-5717-4562-b3fc-2c963f66afaf',
-                                'player': '3fa85f64-5717-4562-b3fc-2c963f66afb0',
-                                'player_name': 'Mike Johnson',
-                                'jersey_number': 10,
-                                'is_captain_for_game': True,
-                                'position': 'Guard'
                             }
                         ]
                     }
@@ -428,18 +429,20 @@ class ScorekeeperGameSerializer(serializers.ModelSerializer):
 )
 class GameDetailSerializer(serializers.ModelSerializer):
     """
-    Detailed serializer for a game including all teams and selected players.
+    Detailed serializer for a game including teams and players.
     """
     sport_event_name = serializers.CharField(source='sport_event.name', read_only=True)
     scorekeeper_name = serializers.SerializerMethodField()
     teams = serializers.SerializerMethodField()
+    time_display = serializers.SerializerMethodField()
     
     class Meta:
         model = Game
         fields = [
             'id', 'sport_event', 'sport_event_name', 'name', 'description',
-            'location', 'start_datetime', 'end_datetime', 'status',
-            'scorekeeper', 'scorekeeper_name', 'teams', 'created_at', 'updated_at'
+            'location', 'start_datetime', 'end_datetime', 'time_display', 
+            'status', 'scorekeeper', 'scorekeeper_name', 'teams', 
+            'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
     
@@ -448,29 +451,84 @@ class GameDetailSerializer(serializers.ModelSerializer):
             return obj.scorekeeper.get_full_name()
         return None
     
+    def get_time_display(self, obj):
+        return obj.start_datetime.strftime('%H:%M')
+    
     def get_teams(self, obj):
         result = []
         for game_team in obj.game_teams.select_related('team').all():
-            # Get selected players for this game team
-            selected_players = []
-            for player in game_team.selected_players.select_related('player').all():
-                selected_players.append({
-                    'id': player.id,
-                    'player': player.player.id,
-                    'player_name': player.player.get_full_name(),
-                    'jersey_number': player.player.jersey_number,
-                    'is_captain_for_game': player.is_captain_for_game,
-                    'position': player.position,
-                    'notes': player.notes
-                })
-            
-            result.append({
-                'id': game_team.id,
-                'team': game_team.team.id,
+            team_data = {
                 'team_name': game_team.team.name,
-                'designation': game_team.designation,
-                'designation_display': game_team.get_designation_display(),
-                'selected_players': selected_players
-            })
+                'designation': game_team.get_designation_display(),
+            }
+            
+            # Include additional data for authenticated users
+            if self.context.get('request') and self.context['request'].user.is_authenticated:
+                team_data['id'] = game_team.id
+                team_data['team'] = game_team.team.id
+                
+            # Always include player data
+            players = []
+            for player in game_team.selected_players.select_related('player').all():
+                player_data = {
+                    'name': player.player.get_full_name(),
+                    'jersey_number': player.player.jersey_number,
+                    'position': player.position
+                }
+                
+                # Include additional player data for authenticated users
+                if self.context.get('request') and self.context['request'].user.is_authenticated:
+                    player_data['id'] = player.id
+                    player_data['player'] = player.player.id
+                    player_data['is_captain_for_game'] = player.is_captain_for_game
+                    player_data['notes'] = player.notes
+                
+                players.append(player_data)
+            
+            team_data['players'] = players
+            result.append(team_data)
         
         return result
+    
+
+@extend_schema_serializer(
+    examples=[
+        OpenApiExample(
+            'Upcoming Games Example',
+            value=[
+                {
+                    'id': '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+                    'name': 'Semifinals - Round 1',
+                    'sport_event_name': 'Annual Basketball Tournament 2025',
+                    'start_datetime': '2025-04-15T14:00:00Z',
+                    'location': 'Main Court',
+                    'teams': [
+                        'Thunderbolts vs Lightning Strikes'
+                    ]
+                }
+            ],
+            response_only=True,
+        )
+    ]
+)
+class UpcomingGamesSerializer(serializers.ModelSerializer):
+    """
+    Serializer for upcoming games with simplified information.
+    Used for homepage or dashboard widgets.
+    """
+    sport_event_name = serializers.CharField(source='sport_event.name', read_only=True)
+    teams = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Game
+        fields = [
+            'id', 'name', 'sport_event_name', 'start_datetime',
+            'location', 'teams'
+        ]
+    
+    def get_teams(self, obj):
+        teams = obj.game_teams.select_related('team').all()
+        if len(teams) == 2:
+            return [f"{teams[0].team.name} vs {teams[1].team.name}"]
+        else:
+            return [team.team.name for team in teams]

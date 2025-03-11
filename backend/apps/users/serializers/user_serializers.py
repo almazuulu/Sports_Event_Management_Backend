@@ -123,7 +123,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
    
     def validate(self, attrs):
         if attrs.get('password') != attrs.get('password_confirm'):
-            raise serializers.ValidationError({"password": "Password fields didn't match."})
+            raise serializers.ValidationError({"error": "Password fields didn't match."})
         return attrs
    
     def create(self, validated_data):

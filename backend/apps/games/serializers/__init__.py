@@ -3,10 +3,10 @@ from .game_serializers import (
     GameCreateSerializer,
     GameUpdateSerializer,
     GameStatusUpdateSerializer,
-    PublicGameSerializer,
     GameListSerializer,
     GameDetailSerializer,
-    ScorekeeperGameSerializer
+    ScorekeeperGameSerializer,
+    UpcomingGamesSerializer
 )
 
 from .game_team_serializers import (
@@ -21,10 +21,4 @@ from .game_player_serializers import (
     GamePlayerCreateSerializer,
     GamePlayerUpdateSerializer,
     GamePlayerBulkCreateSerializer
-)
-
-from .public_serializers import (
-    PublicGameListSerializer,
-    PublicGameDetailSerializer,
-    UpcomingGamesSerializer
 )

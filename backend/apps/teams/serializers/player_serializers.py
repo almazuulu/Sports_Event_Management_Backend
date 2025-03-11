@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
-from ..models import Player, Team
-from teams.serializers.team_serializers import SetTeamCaptainSerializer, TeamSerializer
+from ..models import Player
 
 
 @extend_schema_serializer(
@@ -94,28 +93,28 @@ class PlayerCreateSerializer(serializers.ModelSerializer):
         # Check for unique jersey number within the team
         if Player.objects.filter(team=team, jersey_number=jersey_number).exists():
             raise serializers.ValidationError({
-                'jersey_number': _('This jersey number is already in use by another player in this team.')
+                'error': _('This jersey number is already in use by another player in this team.')
             })
         
         # Check that the user is not already associated with another player in this team
         user = attrs.get('user')
         if Player.objects.filter(team=team, user=user).exists():
             raise serializers.ValidationError({
-                'user': _('This user is already registered as a player in this team.')
+                'error': _('This user is already registered as a player in this team.')
             })
         
         # Check if request exists and user is authenticated
         request = self.context.get('request')
         if not request or not request.user or not request.user.is_authenticated:
             raise serializers.ValidationError({
-                'detail': _('Authentication required to create a player.')
+                'error': _('Authentication required to create a player.')
             })
         
         # Check access rights (only after confirming user is authenticated)
         request_user = request.user
         if not hasattr(request_user, 'role') or (request_user.role != 'admin' and team.manager.id != request_user.id):
             raise serializers.ValidationError({
-                'team': _('Only the team manager or administrators can add players to this team.')
+                'error': _('Only the team manager or administrators can add players to this team.')
             })
         
         return attrs
@@ -148,28 +147,28 @@ class PlayerUpdateSerializer(serializers.ModelSerializer):
             
             if Player.objects.filter(team=team, jersey_number=jersey_number).exists():
                 raise serializers.ValidationError({
-                    'jersey_number': _('This jersey number is already in use by another player in this team.')
+                    'error': _('This jersey number is already in use by another player in this team.')
                 })
         
         # Check if request exists and user is authenticated
         request = self.context.get('request')
         if not request or not request.user or not request.user.is_authenticated:
             raise serializers.ValidationError({
-                'detail': _('Authentication required to update a player.')
+                'error': _('Authentication required to update a player.')
             })
         
         # Ensure the current user is the team manager or an admin (only after confirming user is authenticated)
         request_user = request.user
         if not hasattr(request_user, 'role') or (request_user.role != 'admin' and self.instance.team.manager.id != request_user.id):
             raise serializers.ValidationError({
-                'detail': _('Only the team manager or administrators can update this player.')
+                'error': _('Only the team manager or administrators can update this player.')
             })
         
         # Additional check: only the team manager or admin can designate the captain
         if 'is_captain' in attrs and attrs['is_captain']:
             if not hasattr(request_user, 'role') or (request_user.role != 'admin' and self.instance.team.manager.id != request_user.id):
                 raise serializers.ValidationError({
-                    'is_captain': _('Only the team manager or administrators can designate team captains.')
+                    'error': _('Only the team manager or administrators can designate team captains.')
                 })
         
         return attrs

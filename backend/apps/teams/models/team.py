@@ -33,7 +33,7 @@ class Team(models.Model):
         on_delete=models.CASCADE,
         related_name='managed_teams',
         verbose_name=_('Team Manager'),
-        limit_choices_to={'role': 'team_manager'}
+        limit_choices_to={'role': 'team_manager'},
     )
     team_captain = models.ForeignKey(
         'teams.Player',

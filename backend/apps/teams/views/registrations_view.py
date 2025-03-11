@@ -4,17 +4,16 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
 
-from events.models import SportEvent
-from teams.models import TeamRegistration, Team
+from teams.models import TeamRegistration
 from teams.serializers import (
     TeamRegistrationSerializer, TeamRegistrationCreateSerializer,
     TeamRegistrationApprovalSerializer
 )
 from teams.permissions import (
-    IsTeamManagerOrAdmin, IsRegistrationTeamManagerOrAdmin, 
-    CanManageRegistration, IsAdminUser
+    IsTeamManagerOrAdmin,
+    IsRegistrationTeamManagerOrAdmin,
+    IsAdminUser
 )
 
 
@@ -208,7 +207,7 @@ class TeamRegistrationViewSet(viewsets.ModelViewSet):
         
         if registration.status != 'pending':
             return Response(
-                {"detail": _("Only pending registrations can be cancelled.")},
+                {"error": _("Only pending registrations can be cancelled.")},
                 status=status.HTTP_400_BAD_REQUEST
             )
         

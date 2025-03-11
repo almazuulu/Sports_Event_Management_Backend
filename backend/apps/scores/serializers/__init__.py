@@ -8,7 +8,8 @@ from .score_serializers import (
 )
 from .public_serializers import (
     PublicScoreSerializer,
-    PublicLiveScoreSerializer
+    PublicLiveScoreSerializer,
+    LeaderboardScoreSerializer
 )
 
 __all__ = [
@@ -17,6 +18,8 @@ __all__ = [
     'ScoreVerificationSerializer',
     'ScoreDetailSerializer',
     'ScoreDetailCreateSerializer',
+    'ScoreCreateSerializer',
     'PublicScoreSerializer',
-    'PublicLiveScoreSerializer'
+    'PublicLiveScoreSerializer',
+    'LeaderboardScoreSerializer'
 ]

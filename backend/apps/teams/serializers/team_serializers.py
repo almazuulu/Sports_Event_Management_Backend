@@ -1,14 +1,11 @@
-from rest_framework import serializers, status
+from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 
 from users.serializers import UserSerializer
 from rest_framework.decorators import action
-from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 
-from teams.models import Player, Team
-from teams.permissions import IsTeamOwnerOrAdmin
+from teams.models import Team
 
 
 @extend_schema_serializer(
@@ -92,16 +89,16 @@ class TeamCreateSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request or not request.user or not request.user.is_authenticated:
             raise serializers.ValidationError({
-                'detail': _('Authentication required to create a team.')
+                'error': _('Authentication required to create a team.')
             })
         
         # Set the current user as the team manager
         user = request.user
         
         # Ensure the user has the team_manager role
-        if not hasattr(user, 'role') or user.role != 'team_manager':
+        if not hasattr(user, 'role') or not (user.role == 'team_manager' or user.role == "admin"):
             raise serializers.ValidationError({
-                'manager': _('Only users with the Team Manager role can create teams.')
+                'error': _('Only users with the Team Manager, Admin roles can create teams.')
             })
         
         team = Team.objects.create(
@@ -125,14 +122,14 @@ class TeamUpdateSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if not request or not request.user or not request.user.is_authenticated:
             raise serializers.ValidationError({
-                'detail': _('Authentication required to update a team.')
+                'error': _('Authentication required to update a team.')
             })
         
         # Ensure the current user is the team manager or an admin
         request_user = request.user
         if not hasattr(request_user, 'role') or (request_user.role != 'admin' and self.instance.manager.id != request_user.id):
             raise serializers.ValidationError({
-                'detail': _('Only the team manager or administrators can update this team.')
+                'error': _('Only the team manager or administrators can update this team.')
             })
         
         return attrs
