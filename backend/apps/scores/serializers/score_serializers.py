@@ -488,3 +488,26 @@ class ScoreCreateSerializer(serializers.ModelSerializer):
         score.save()
    
         return score
+
+class TeamScoreboardSerializer(serializers.Serializer):
+    team = serializers.CharField()
+    wins = serializers.IntegerField()
+    losses = serializers.IntegerField()
+    total_points = serializers.IntegerField()
+    goals_for = serializers.IntegerField()
+    goals_against = serializers.IntegerField()
+    goal_difference = serializers.IntegerField()
+    games_played = serializers.IntegerField()
+    win_percentage = serializers.FloatField()
+    points_per_game = serializers.FloatField()
+    goals_per_game = serializers.FloatField()
+    goals_against_per_game = serializers.FloatField()
+    clean_sheets = serializers.IntegerField()
+    yellow_cards = serializers.IntegerField()
+    red_cards = serializers.IntegerField()
+    fouls_committed = serializers.IntegerField()
+    fouls_suffered = serializers.IntegerField()
+    corners = serializers.IntegerField()
+    shots = serializers.IntegerField()
+    shots_on_target = serializers.IntegerField()
+    

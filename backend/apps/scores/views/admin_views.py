@@ -1,5 +1,3 @@
-# views/admin_views.py
-
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
@@ -8,7 +6,7 @@ from django.http import HttpResponse
 from rest_framework.decorators import action, permission_classes
 import csv
 from ..models import Score
-from ..serializers import PublicScoreSerializer
+from ..serializers import PublicScoreSerializer  # Ensure this serializer is correctly defined
 
 class AdminScoreReportViewSet(viewsets.ViewSet):
     """
@@ -18,7 +16,7 @@ class AdminScoreReportViewSet(viewsets.ViewSet):
     @extend_schema(
         summary="Generate Score Reports",
         description="Generate a report on game scores, accessible only to admin users. Can potentially include export functionality.",
-        responses={200: PublicScoreSerializer(many=True)},
+        responses={200: PublicScoreSerializer(many=True)},  # Ensure serializer is suitable for your data
     )
     @permission_classes([IsAdminUser])
     def list(self, request):
@@ -28,8 +26,7 @@ class AdminScoreReportViewSet(viewsets.ViewSet):
         """
         scores = Score.objects.all()
 
-        # You can modify this report generation logic based on requirements
-        # For this example, we just return the scores in a JSON response.
+        # Serialize the scores using PublicScoreSerializer
         serializer = PublicScoreSerializer(scores, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -49,9 +46,11 @@ class AdminScoreReportViewSet(viewsets.ViewSet):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="score_report.csv"'
 
+        # CSV writer to write the score data into the response
         writer = csv.writer(response)
         writer.writerow(['Score ID', 'Game Name', 'Sport Type', 'Total Score', 'Scorekeeper'])
 
+        # Ensure you are getting the correct fields from the Score model
         for score in scores:
             writer.writerow([score.id, score.game.name, score.game.sport_type, score.total_score, score.scorekeeper.username])
 

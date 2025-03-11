@@ -1,177 +1,132 @@
-from rest_framework import status, viewsets
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework import viewsets, permissions
+from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiResponse
-from scores.models import Score
-from scores.serializers import PublicScoreSerializer, ScoreCreateSerializer, ScoreUpdateSerializer, ScoreSerializer, ScoreVerificationSerializer
-from scores.permissions import CanManageScores, IsAssignedScorekeeper, CanVerifyScores
-from games.models import Game
-from django.utils import timezone
-from rest_framework.decorators import action, permission_classes
-from drf_spectacular.utils import OpenApiParameter
-from users.models import User
+from drf_spectacular.utils import extend_schema
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser
+from ..models import Score
+from ..serializers import ScoreSerializer, ScoreCreateSerializer, ScoreUpdateSerializer
+from ..permissions import CanManageScores, CanVerifyScores
+from rest_framework.pagination import PageNumberPagination
 
+class ScorePagination(PageNumberPagination):
+    page_size = 10  # Customize the pagination size if needed
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 class ScoreViewSet(viewsets.ModelViewSet):
+    """
+    Viewset for managing scores, including retrieval, creation, updating, and verification.
+    """
     queryset = Score.objects.all()
-    serializer_class = PublicScoreSerializer
-    """
-    API endpoint for Score management (creating and updating scores).
-    """
+    pagination_class = ScorePagination
+
+    def get_serializer_class(self):
+        """
+        Returns different serializers based on the action being performed.
+        """
+        if self.action == 'create':
+            return ScoreCreateSerializer
+        elif self.action == 'update' or self.action == 'partial_update':
+            return ScoreUpdateSerializer
+        return ScoreSerializer
+
+    def get_permissions(self):
+        """
+        Defines the permissions required for each action.
+        """
+        if self.action == 'create':
+            permission_classes = [IsAdminUser]  # Only admins can create scores
+        elif self.action == 'verify':
+            permission_classes = [CanVerifyScores]  # Only admins can verify scores
+        elif self.action == 'update' or self.action == 'partial_update':
+            permission_classes = [CanManageScores]  # Assigned scorekeeper or admin
+        else:
+            permission_classes = [permissions.IsAuthenticated]  # All authenticated users
+        return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        """
+        Filter the queryset based on user permissions.
+        """
+        queryset = Score.objects.all()
+        user = self.request.user
+        if user.role == 'team_captain':
+            # Filter scores only for the teams the user is associated with
+            queryset = queryset.filter(team__captain=user)
+        return queryset
 
     @extend_schema(
-        summary="Create a new game score",
-        description="Creates a new score record for a game. This is typically automated when a game is created.",
+        summary='Create a new score record for a game.',
+        description='Only accessible by admins to create new scores automatically linked with the game.',
         request=ScoreCreateSerializer,
-        responses={201: PublicScoreSerializer},
+        responses={201: ScoreSerializer}
     )
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         """
-        Create a new score record for a game. This is typically done when a game is created.
-        Only accessible by admin users.
+        Create a new score record for a game.
+        Only accessible by admins.
         """
-        self.check_permissions(request)
-
-        serializer = ScoreCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            score = serializer.save()
-
-            response_serializer = PublicScoreSerializer(score)
-            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)
 
     @extend_schema(
-        summary="Update a game score",
-        description="Updates a specific game score record. Only accessible by assigned scorekeepers and admin.",
-        request=ScoreUpdateSerializer,
-        responses={200: PublicScoreSerializer},
+        summary='Update a score record.',
+        description='This method is overridden to block PATCH requests.',
+        responses={405: 'Method Not Allowed'}
     )
-    @permission_classes([CanManageScores, IsAssignedScorekeeper])
-    def update(self, request, pk=None):
+    def partial_update(self, request, *args, **kwargs):
         """
-        Update a specific score record.
+        Update a score (PATCH method is restricted).
+        This method is overridden to block PATCH requests.
         """
-        self.check_permissions(request)
-        score = Score.objects.get(pk=pk)
-
-        serializer = ScoreUpdateSerializer(score, data=request.data)
-        if serializer.is_valid():
-            score = serializer.save()
-
-            response_serializer = PublicScoreSerializer(score)
-            return Response(response_serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        raise MethodNotAllowed("PATCH method is not allowed.")
 
     @extend_schema(
-        summary="Get game score details",
-        description="Returns the details of a specific score record.",
-        responses={200: ScoreSerializer},
+        summary='Delete a score record.',
+        description='This method is overridden to block DELETE requests.',
+        responses={405: 'Method Not Allowed'}
     )
-    def retrieve(self, request, pk=None):
+    def destroy(self, request, *args, **kwargs):
         """
-        Retrieve the details of a specific score record.
+        Delete a score (DELETE method is restricted).
+        This method is overridden to block DELETE requests.
         """
-        score = Score.objects.get(pk=pk)
-
-        serializer = PublicScoreSerializer(score)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        raise MethodNotAllowed("DELETE method is not allowed.")
 
     @extend_schema(
-        summary="List all game score records",
-        description="Get a list of all score records with optional filters.",
-        responses={200: PublicScoreSerializer(many=True)},
-        parameters=[
-            OpenApiParameter(name="sport_type", description="Filter by sport type", required=False, type=str),
-            OpenApiParameter(name="event", description="Filter by event", required=False, type=str),
-            OpenApiParameter(name="status", description="Filter by status", required=False, type=str),
-            OpenApiParameter(name="ordering", description="Order by field (e.g. status, -status)", required=False, type=str)
-        ]
+        summary='Verify a score record.',
+        description='Admins can verify completed scores and mark them as official.',
+        request=None,  # You can add a request schema if needed, such as for an optional confirmation field
+        responses={200: ScoreSerializer}
     )
-    def list(self, request):
+    @action(detail=True, methods=['post'], permission_classes=[CanVerifyScores])
+    def verify(self, request, *args, **kwargs):
         """
-        List all score records with filtering options by sport type, event, status, etc.
+        Mark a score as verified (only accessible by admins).
         """
-        queryset = self.filter_queryset(self.get_queryset())
-        
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    @extend_schema(
-        summary="Delete a game score",
-        description="Deletes a specific score record.",
-        responses={204: None},
-    )
-    def destroy(self, request, pk=None):
-        """
-        Delete a specific score record.
-        """
-        self.check_permissions(request)
-        score = Score.objects.get(pk=pk)
-        score.delete()
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @extend_schema(
-        summary="Verify a game score",
-        description="Verifies a score record. Only accessible by admin users.",
-        request = ScoreVerificationSerializer,
-        responses={200: PublicScoreSerializer},
-    )
-    @action(detail=True, methods=['patch'], permission_classes=[CanVerifyScores])
-
-    def verify(self, request, pk=None):
-        """
-        Verify a score record.
-        """
-        self.check_permissions(request)
-        score = Score.objects.get(pk=pk)
-
-        score.verified_by = request.user
-        score.verified_at = timezone.now()
+        score = self.get_object()
+        score.is_verified = True
         score.save()
+        return self.retrieve(request, *args, **kwargs)
 
-        serializer = PublicScoreSerializer(score)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
     @extend_schema(
-        summary="Assign a scorekeeper to a game",
-        description="Assigns a scorekeeper user to a specific game. This action can only be performed by admin users.",
-        request=PublicScoreSerializer,
-        responses={200: PublicScoreSerializer},
+        summary='List all scores with filtering options.',
+        description='Retrieve a paginated list of scores with options to filter by sport type, event, or status.',
+        responses={200: ScoreSerializer}
     )
-    @permission_classes([IsAdminUser])
-    @action(detail=True, methods=['post'], url_path='assign-scorekeeper')
-    def assign_scorekeeper(self, request, pk=None):
+    def list(self, request, *args, **kwargs):
         """
-        Assign a scorekeeper to a specific game.
-        Only accessible by admin users.
+        List all game scores with filtering options.
         """
-        try:
-            # Get the score object based on the provided score_id (pk)
-            score = Score.objects.get(pk=pk)
-        except Score.DoesNotExist:
-            return Response({"detail": "Score not found."}, status=status.HTTP_404_NOT_FOUND)
+        return super().list(request, *args, **kwargs)
 
-        # Get the scorekeeper user ID from the request body
-        scorekeeper_id = request.data.get('scorekeeper_id')
-        if not scorekeeper_id:
-            return Response({"detail": "Scorekeeper ID is required."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            # Get the user object based on the scorekeeper_id
-            scorekeeper = User.objects.get(id=scorekeeper_id)
-        except User.DoesNotExist:
-            return Response({"detail": "Scorekeeper not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        # Assign the scorekeeper to the score
-        score.scorekeeper = scorekeeper
-        score.save()
-
-        # Return the updated score object with the assigned scorekeeper
-        serializer = PublicScoreSerializer(score)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    @extend_schema(
+        summary='Retrieve detailed information about a specific score.',
+        description='Retrieve detailed information, including all scoring events, for a specific score.',
+        responses={200: ScoreSerializer}
+    )
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Get detailed information about a specific score.
+        """
+        return super().retrieve(request, *args, **kwargs)

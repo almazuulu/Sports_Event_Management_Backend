@@ -4,7 +4,8 @@ from .score_serializers import (
     ScoreVerificationSerializer,
     ScoreDetailSerializer,
     ScoreDetailCreateSerializer,
-    ScoreCreateSerializer
+    ScoreCreateSerializer,
+    TeamScoreboardSerializer
 )
 from .public_serializers import (
     PublicScoreSerializer,
