@@ -31,15 +31,24 @@ class PlayersViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """
-        Filter players based on user role:
+        Filter players based on user role and authentication status:
         - Admins see all players
         - Team managers see only their team's players
+        - Public (unauthenticated) users see all active players
         """
         user = self.request.user
-        if user.role == 'admin':
-            return Player.objects.all()
-        elif user.role == 'team_manager':
-            return Player.objects.filter(team__manager=user)
+        
+        # For unauthenticated users or GET requests, return all active players
+        if self.action in ['list', 'retrieve'] or not user.is_authenticated:
+            return Player.objects.filter(is_active=True)
+            
+        # For authenticated users with specific roles
+        if user.is_authenticated:
+            if user.role == 'admin':
+                return Player.objects.all()
+            elif user.role == 'team_manager':
+                return Player.objects.filter(team__manager=user)
+                
         return Player.objects.none()
     
     def get_serializer_class(self):
@@ -53,8 +62,8 @@ class PlayersViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            # Public access for GET methods of listing players and retrieving a specific player
-            permission_classes = [permissions.AllowAny()]
+            # Allow anyone to view player lists and details
+            return []
         elif self.action in ['update', 'partial_update', 'destroy', 'set_as_captain']:
             permission_classes = [IsPlayerTeamManagerOrAdmin()]
         else:
