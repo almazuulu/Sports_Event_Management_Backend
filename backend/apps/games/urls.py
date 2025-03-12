@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from games.views import GameViewSet, GameTeamViewSet, GamePlayerViewSet
+from games.views import GameViewSet, GameTeamViewSet, GamePlayerViewSet, scorekeepers_list
 
 router = DefaultRouter()
 router.register(r'games', GameViewSet, basename='game')
@@ -15,4 +15,6 @@ urlpatterns = [
     path('game-players/bulk-create/', 
          GamePlayerViewSet.as_view({'post': 'bulk_create'}), 
          name='game-player-bulk-create'),
+    
+    path('scorekeepers/', scorekeepers_list, name='scorekeepers-list'),
 ]
