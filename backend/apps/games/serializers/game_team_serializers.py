@@ -3,6 +3,11 @@ from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 from games.models import Game, GameTeam
 
+from rest_framework import serializers
+from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
+from games.models import Game, GameTeam
+
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
@@ -11,6 +16,10 @@ from games.models import Game, GameTeam
                 'id': '3fa85f64-5717-4562-b3fc-2c963f66afa9',
                 'game': '3fa85f64-5717-4562-b3fc-2c963f66afa6',
                 'game_name': 'Semifinals - Round 1',
+                'sport_event_name': 'Annual Basketball Tournament 2025',
+                'game_location': 'Main Court',
+                'game_start_datetime': '2025-04-15T14:00:00Z',
+                'game_end_datetime': '2025-04-15T16:00:00Z',
                 'team': '3fa85f64-5717-4562-b3fc-2c963f66afaa',
                 'team_name': 'Thunderbolts',
                 'designation': 'team_a',
@@ -26,6 +35,10 @@ class GameTeamSerializer(serializers.ModelSerializer):
     Serializer for the GameTeam model with detailed information.
     """
     game_name = serializers.CharField(source='game.name', read_only=True)
+    sport_event_name = serializers.CharField(source='game.sport_event.name', read_only=True)
+    game_location = serializers.CharField(source='game.location', read_only=True)
+    game_start_datetime = serializers.DateTimeField(source='game.start_datetime', read_only=True)
+    game_end_datetime = serializers.DateTimeField(source='game.end_datetime', read_only=True)
     team_name = serializers.CharField(source='team.name', read_only=True)
     designation_display = serializers.CharField(source='get_designation_display', read_only=True)
     selected_players_count = serializers.SerializerMethodField()
@@ -33,7 +46,8 @@ class GameTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameTeam
         fields = [
-            'id', 'game', 'game_name', 'team', 'team_name',
+            'id', 'game', 'game_name', 'sport_event_name', 'game_location',
+            'game_start_datetime', 'game_end_datetime', 'team', 'team_name',
             'designation', 'designation_display', 'selected_players_count'
         ]
         read_only_fields = ['id']

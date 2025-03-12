@@ -42,8 +42,8 @@ class GameTeamViewSet(viewsets.ModelViewSet):
         summary="List all game teams",
         description="Get a list of all game teams with filtering options",
         parameters=[
-            OpenApiParameter(name="game", description="Filter by game ID", required=False, type=int),
-            OpenApiParameter(name="team", description="Filter by team ID", required=False, type=int),
+            OpenApiParameter(name="game", description="Filter by game ID", required=False, type=str),
+            OpenApiParameter(name="team", description="Filter by team ID", required=False, type=str),
             OpenApiParameter(name="designation", description="Filter by team designation (home/away)", required=False, type=str)
         ],
         responses={200: GameTeamSerializer(many=True)}
