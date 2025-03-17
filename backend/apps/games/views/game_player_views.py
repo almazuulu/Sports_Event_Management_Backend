@@ -53,7 +53,6 @@ class GamePlayerViewSet(viewsets.ModelViewSet):
         ],
         responses={200: GamePlayerSerializer(many=True)}
     )
-    @method_decorator(cache_page(60*15))
     def list(self, request):
         """
         List all game players.

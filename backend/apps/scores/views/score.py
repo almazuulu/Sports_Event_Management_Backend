@@ -218,7 +218,6 @@ class ScoreViewSet(viewsets.ModelViewSet):
         responses={200: PublicScoreSerializer(many=True)}
     )
     @action(detail=False, methods=['get'], url_path='public', permission_classes=[AllowAny])
-    @method_decorator(cache_page(60*5))  # Cache for 5 minutes
     def public_scores(self, request):
         """
         Get a list of scores for public display.
@@ -303,7 +302,6 @@ class ScoreViewSet(viewsets.ModelViewSet):
         responses={200: LeaderboardScoreSerializer(many=True)}
     )
     @action(detail=False, methods=['get'], url_path='leaderboard', permission_classes=[AllowAny])
-    @method_decorator(cache_page(60*15))  # Cache for 15 minutes
     def event_leaderboard(self, request):
         """
         Get a leaderboard for a specific sport event.
