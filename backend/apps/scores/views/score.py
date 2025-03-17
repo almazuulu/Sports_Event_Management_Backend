@@ -25,6 +25,8 @@ from scores.permissions import (
     CanManageScores,
     CanVerifyScores
 )
+from games.models import Game
+from games.serializers import GameListSerializer
 
 
 class ScoreViewSet(viewsets.ModelViewSet):
@@ -286,14 +288,8 @@ class ScoreViewSet(viewsets.ModelViewSet):
         Get games directly assigned to the current scorekeeper.
         This helps diagnose issues with the my-assignments endpoint.
         """
-        from games.models import Game
-        from games.serializers import GameListSerializer
-        
         # Get games where the user is assigned as scorekeeper
         assigned_games = Game.objects.filter(scorekeeper=request.user)
-        
-        # Log for debugging
-        print(f"Found {assigned_games.count()} games with scorekeeper {request.user.id}")
         
         serializer = GameListSerializer(assigned_games, many=True)
         return Response(serializer.data)
