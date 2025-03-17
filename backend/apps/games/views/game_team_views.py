@@ -48,7 +48,6 @@ class GameTeamViewSet(viewsets.ModelViewSet):
         ],
         responses={200: GameTeamSerializer(many=True)}
     )
-    @method_decorator(cache_page(60*15))
     def list(self, request):
         """
         List all game teams.

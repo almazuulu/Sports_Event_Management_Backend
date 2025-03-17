@@ -1,7 +1,8 @@
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions, status, filters
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from drf_spectacular.utils import extend_schema, OpenApiResponse
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiParameter
+from django_filters.rest_framework import DjangoFilterBackend
 
 from ..models import User
 from ..serializers import (
@@ -19,6 +20,10 @@ class UserListView(generics.ListCreateAPIView):
     API endpoint for listing all users and creating new users.
     """
     queryset = User.objects.all()
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['email', 'first_name', 'last_name', 'username', 'role']
+    search_fields = ['email', 'first_name', 'last_name', 'username']
+    ordering_fields = ['email', 'first_name', 'last_name', 'username', 'date_joined']
    
     def get_permissions(self):
         if self.request.method == 'GET':
@@ -34,13 +39,23 @@ class UserListView(generics.ListCreateAPIView):
     
     @extend_schema(
         summary="List users",
-        description="Get a list of all users in the system. Admin only."
+        description="Get a list of all users in the system. Admin only.",
+        parameters=[
+            OpenApiParameter(name="email", description="Filter by email", required=False, type=str, location=OpenApiParameter.QUERY),
+            OpenApiParameter(name="first_name", description="Filter by first name", required=False, type=str, location=OpenApiParameter.QUERY),
+            OpenApiParameter(name="last_name", description="Filter by last name", required=False, type=str, location=OpenApiParameter.QUERY),
+            OpenApiParameter(name="username", description="Filter by username", required=False, type=str, location=OpenApiParameter.QUERY),
+            OpenApiParameter(name="role", description="Filter by role (admin, team_manager, player, scorekeeper, public)", required=False, type=str, location=OpenApiParameter.QUERY),
+            OpenApiParameter(name="search", description="Search in email, first name, last name, and username", required=False, type=str, location=OpenApiParameter.QUERY),
+            OpenApiParameter(name="ordering", description="Order by field (e.g. email, first_name, -date_joined)", required=False, type=str, location=OpenApiParameter.QUERY),
+        ]
     )
     def list(self, request, *args, **kwargs):
         """
         List all users in the system.
         
         Returns a paginated list of all user accounts.
+        Supports filtering by email, name, username, and role.
         Note: Only administrators can access this endpoint.
         """
         return super().list(request, *args, **kwargs)
