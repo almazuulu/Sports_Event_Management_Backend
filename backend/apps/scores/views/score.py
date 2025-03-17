@@ -62,6 +62,8 @@ class ScoreViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthenticated, CanVerifyScores]
         elif self.action in ['public_scores', 'live_scores']:
             permission_classes = [AllowAny]
+        elif self.action == 'my_assignments':
+            permission_classes = [IsAuthenticated, IsScorekeeper]
         else:
             permission_classes = [IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -274,24 +276,26 @@ class ScoreViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     @extend_schema(
-        summary="Scorekeeper's assigned games",
-        description="Get scores for games assigned to the current scorekeeper",
-        responses={200: ScoreSerializer(many=True)}
+        summary="Scorekeeper's assigned games (direct)",
+        description="Get games assigned to the current scorekeeper (direct game assignments)",
+        responses={200: OpenApiResponse(description="List of games assigned to this scorekeeper")}
     )
     @action(detail=False, methods=['get'], url_path='my-assignments', permission_classes=[IsAuthenticated, IsScorekeeper])
     def my_assignments(self, request):
         """
-        Get scores for games assigned to the current scorekeeper.
-        Only available to users with the scorekeeper role.
+        Get games directly assigned to the current scorekeeper.
+        This helps diagnose issues with the my-assignments endpoint.
         """
-        queryset = self.queryset.filter(scorekeeper=request.user)
+        from games.models import Game
+        from games.serializers import GameListSerializer
         
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        # Get games where the user is assigned as scorekeeper
+        assigned_games = Game.objects.filter(scorekeeper=request.user)
         
-        serializer = self.get_serializer(queryset, many=True)
+        # Log for debugging
+        print(f"Found {assigned_games.count()} games with scorekeeper {request.user.id}")
+        
+        serializer = GameListSerializer(assigned_games, many=True)
         return Response(serializer.data)
     
     @extend_schema(
