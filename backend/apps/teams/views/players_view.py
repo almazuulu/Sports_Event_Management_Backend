@@ -29,28 +29,6 @@ class PlayersViewSet(viewsets.ModelViewSet):
     search_fields = ['first_name', 'last_name', 'position']
     ordering_fields = ['team', 'last_name', 'first_name', 'jersey_number']
     
-    def get_queryset(self):
-        """
-        Filter players based on user role and authentication status:
-        - Admins see all players
-        - Team managers see only their team's players
-        - Public (unauthenticated) users see all active players
-        """
-        user = self.request.user
-        
-        # For unauthenticated users or GET requests, return all active players
-        if self.action in ['list', 'retrieve'] or not user.is_authenticated:
-            return Player.objects.filter(is_active=True)
-            
-        # For authenticated users with specific roles
-        if user.is_authenticated:
-            if user.role == 'admin':
-                return Player.objects.all()
-            elif user.role == 'team_manager':
-                return Player.objects.filter(team__manager=user)
-                
-        return Player.objects.none()
-    
     def get_serializer_class(self):
         if self.action == 'create':
             return PlayerCreateSerializer
@@ -59,6 +37,44 @@ class PlayersViewSet(viewsets.ModelViewSet):
         elif self.action == 'set_as_captain':
             return TeamCaptainSerializer
         return PlayerSerializer
+    
+    def get_queryset(self):
+        """
+        Filter players based on user role:
+        - Admin sees all players
+        - Team Manager sees players on their team
+        - Player sees players on their team
+        - Scorekeeper sees players in games they're assigned to
+        - Public sees all players (as before)
+        """
+        queryset = super().get_queryset()
+        user = self.request.user
+        
+        if not user.is_authenticated:
+            return queryset  # Public user sees all
+            
+        if user.role == 'admin':
+            return queryset  # Admin sees all
+            
+        if user.role == 'team_manager':
+            # Team manager sees players on their team
+            return queryset.filter(team__manager=user)
+            
+        if user.role == 'player':
+            # Player sees players on their team
+            player_profiles = user.player_profiles.all()
+            if player_profiles.exists():
+                team_ids = player_profiles.values_list('team_id', flat=True)
+                return queryset.filter(team_id__in=team_ids)
+            return queryset.none()
+            
+        if user.role == 'scorekeeper':
+            # Scorekeeper sees players in games they're assigned to
+            return queryset.filter(
+                game_selections__game_team__game__scorekeeper=user
+            ).distinct()
+            
+        return queryset
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:

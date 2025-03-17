@@ -38,6 +38,7 @@ class GameViewSet(viewsets.ModelViewSet):
     search_fields = ["name", "description", "location"]
     ordering_fields = ["start_datetime", "name"]
 
+
     def get_permissions(self):
         if self.request.method == "GET":
             return [AllowAny()]
@@ -48,6 +49,43 @@ class GameViewSet(viewsets.ModelViewSet):
             return [CanUpdateGameStatus()]
         else:
             return [CanViewGame()]
+        
+    def get_queryset(self):
+        """
+        Filter games based on user role:
+        - Admin sees all games
+        - Team Manager sees games with their team
+        - Player sees games they participate in
+        - Scorekeeper sees games they're assigned to
+        - Public sees all games (as before)
+        """
+        queryset = super().get_queryset()
+        user = self.request.user
+        
+        if not user.is_authenticated:
+            return queryset  # Public user sees all
+            
+        if user.role == 'admin':
+            return queryset  # Admin sees all
+            
+        if user.role == 'team_manager':
+            # Team manager sees games with their team
+            return queryset.filter(game_teams__team__manager=user).distinct()
+            
+        if user.role == 'player':
+            # Player sees games they participate in
+            player_profiles = user.player_profiles.all()
+            if player_profiles.exists():
+                # Get player's teams
+                team_ids = player_profiles.values_list('team_id', flat=True)
+                return queryset.filter(game_teams__team_id__in=team_ids).distinct()
+            return queryset.none()
+            
+        if user.role == 'scorekeeper':
+            # Scorekeeper sees games they're assigned to
+            return queryset.filter(scorekeeper=user)
+            
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":

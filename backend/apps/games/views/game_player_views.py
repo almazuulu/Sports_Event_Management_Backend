@@ -42,6 +42,42 @@ class GamePlayerViewSet(viewsets.ModelViewSet):
         elif self.action in ['update', 'partial_update']:
             return GamePlayerUpdateSerializer
         return GamePlayerSerializer
+    
+    def get_queryset(self):
+        """
+        Filter game players based on user role:
+        - Admin sees all game players
+        - Team Manager sees game players with their team
+        - Player sees game players for games they participate in
+        - Scorekeeper sees game players for games they're assigned to
+        - Public sees all game players (as before)
+        """
+        queryset = super().get_queryset()
+        user = self.request.user
+        
+        if not user.is_authenticated:
+            return queryset  # Public user sees all
+            
+        if user.role == 'admin':
+            return queryset  # Admin sees all
+            
+        if user.role == 'team_manager':
+            # Team manager sees game players with their team
+            return queryset.filter(game_team__team__manager=user)
+            
+        if user.role == 'player':
+            # Player sees game players for games they participate in
+            player_profiles = user.player_profiles.all()
+            if player_profiles.exists():
+                team_ids = player_profiles.values_list('team_id', flat=True)
+                return queryset.filter(game_team__team_id__in=team_ids)
+            return queryset.none()
+            
+        if user.role == 'scorekeeper':
+            # Scorekeeper sees game players for games they're assigned to
+            return queryset.filter(game_team__game__scorekeeper=user)
+            
+        return queryset
 
     @extend_schema(
         summary="List all game players",

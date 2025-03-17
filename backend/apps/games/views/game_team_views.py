@@ -28,6 +28,42 @@ class GameTeamViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         
         return [CanManageGameTeams()]
+    
+    def get_queryset(self):
+        """
+        Filter game teams based on user role:
+        - Admin sees all game teams
+        - Team Manager sees game teams with their team
+        - Player sees game teams for games they participate in
+        - Scorekeeper sees game teams for games they're assigned to
+        - Public sees all game teams (as before)
+        """
+        queryset = super().get_queryset()
+        user = self.request.user
+        
+        if not user.is_authenticated:
+            return queryset  # Public user sees all
+            
+        if user.role == 'admin':
+            return queryset  # Admin sees all
+            
+        if user.role == 'team_manager':
+            # Team manager sees game teams with their team
+            return queryset.filter(team__manager=user)
+            
+        if user.role == 'player':
+            # Player sees game teams for games they participate in
+            player_profiles = user.player_profiles.all()
+            if player_profiles.exists():
+                team_ids = player_profiles.values_list('team_id', flat=True)
+                return queryset.filter(team_id__in=team_ids)
+            return queryset.none()
+            
+        if user.role == 'scorekeeper':
+            # Scorekeeper sees game teams for games they're assigned to
+            return queryset.filter(game__scorekeeper=user)
+            
+        return queryset
 
     def get_serializer_class(self):
         if self.action in ['create']:
