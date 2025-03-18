@@ -9,7 +9,8 @@ from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timedelta
+import pytz
 
 from users.models import User
 from users.permissions import IsAdminUser
@@ -253,18 +254,59 @@ class GameViewSet(viewsets.ModelViewSet):
         return Response(status=204)
 
     @extend_schema(
-        summary="Upcoming games",
-        description="Get a list of upcoming games for dashboard or homepage",
+        summary="Upcoming games for current week",
+        description="Get a list of upcoming games for the current week for dashboard or homepage",
     )
     @action(detail=False, methods=["get"], url_path="upcoming")
     def upcoming_games(self, request):
         """
-        Get a list of upcoming games for dashboard or homepage.
-        Only shows scheduled and ongoing games.
-        Public access allowed.
+        Get a list of upcoming games for the current week.
+        - Admin and public (unauthenticated) users see all upcoming games
+        - Team managers see only games with their teams
+        - Players see only games with teams they belong to
+        - Scorekeepers see only games they're assigned to
         """
-        queryset = Game.objects.filter(status__in=["scheduled", "ongoing"])
-
+        from datetime import datetime, timedelta
+        import pytz
+        
+        today = datetime.now(pytz.timezone(settings.TIME_ZONE))
+        
+        # Calculate start of week (Monday)
+        start_of_week = today - timedelta(days=today.weekday())
+        start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # Calculate end of week (Sunday)
+        end_of_week = start_of_week + timedelta(days=6)
+        end_of_week = end_of_week.replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        # Base queryset - filter by status and current week
+        queryset = Game.objects.filter(
+            status__in=["scheduled", "ongoing"],
+            start_datetime__gte=start_of_week,
+            start_datetime__lte=end_of_week
+        )
+        
+        # Apply role-based filtering
+        user = request.user
+        
+        if user.is_authenticated:
+            if user.role == 'team_manager':
+                # Team manager sees games with their teams
+                queryset = queryset.filter(game_teams__team__manager=user).distinct()
+            elif user.role == 'player':
+                # Player sees games they participate in
+                player_profiles = user.player_profiles.all()
+                if player_profiles.exists():
+                    team_ids = player_profiles.values_list('team_id', flat=True)
+                    queryset = queryset.filter(game_teams__team_id__in=team_ids).distinct()
+                else:
+                    queryset = queryset.none()  # No teams = no games
+            elif user.role == 'scorekeeper':
+                # Scorekeeper sees games they're assigned to
+                queryset = queryset.filter(scorekeeper=user)
+            # Admin sees all (no additional filtering)
+        
+        # Apply additional filters from query params
         sport_event = request.query_params.get("sport_event")
         if sport_event:
             queryset = queryset.filter(sport_event_id=sport_event)
@@ -272,7 +314,8 @@ class GameViewSet(viewsets.ModelViewSet):
         team = request.query_params.get("team")
         if team:
             queryset = queryset.filter(game_teams__team=team)
-
+        
+        # Paginate and return results
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

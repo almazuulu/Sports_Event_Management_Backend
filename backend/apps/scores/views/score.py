@@ -26,7 +26,7 @@ from scores.permissions import (
     CanVerifyScores
 )
 from games.models import Game
-from games.serializers import GameListSerializer
+from games.serializers import ScorekeeperAssignmentSerializer
 
 
 class ScoreViewSet(viewsets.ModelViewSet):
@@ -326,9 +326,11 @@ class ScoreViewSet(viewsets.ModelViewSet):
         # Get games where the user is assigned as scorekeeper
         assigned_games = Game.objects.filter(scorekeeper=request.user)
         
-        serializer = GameListSerializer(assigned_games, many=True)
+        # Используем специальный сериализатор, который переименовывает id в game_id
+        serializer = ScorekeeperAssignmentSerializer(assigned_games, many=True)
+        
         return Response(serializer.data)
-    
+        
     @extend_schema(
         summary="Event leaderboard",
         description="Get a leaderboard for a specific sport event",

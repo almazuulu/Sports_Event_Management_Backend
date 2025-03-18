@@ -6,7 +6,8 @@ from .game_serializers import (
     GameListSerializer,
     GameDetailSerializer,
     ScorekeeperGameSerializer,
-    UpcomingGamesSerializer
+    UpcomingGamesSerializer,
+    ScorekeeperAssignmentSerializer
 )
 
 from .game_team_serializers import (
