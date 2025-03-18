@@ -40,6 +40,40 @@ class TeamsViewSet(viewsets.ModelViewSet):
             return TeamDetailSerializer
         return TeamSerializer
     
+    def get_queryset(self):
+        """
+        Filter teams based on user role:
+        - Admin sees all teams
+        - Team Manager sees their own team
+        - Player sees their team
+        - Scorekeeper sees teams in games they're assigned to
+        - Public sees all teams (as before)
+        """
+        queryset = super().get_queryset()
+        user = self.request.user
+        
+        if not user.is_authenticated:
+            return queryset  # Public user sees all
+            
+        if user.role == 'admin':
+            return queryset  # Admin sees all
+            
+        if user.role == 'team_manager':
+            # Team manager sees only their team
+            return queryset.filter(manager=user)
+            
+        if user.role == 'player':
+            # Player sees team they belong to
+            return queryset.filter(players__user=user).distinct()
+            
+        if user.role == 'scorekeeper':
+            # Scorekeeper sees teams in games they're assigned to
+            return queryset.filter(
+                game_participations__game__scorekeeper=user
+            ).distinct()
+            
+        return queryset
+    
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'team_players']:
             # Public access for GET methods of main resources

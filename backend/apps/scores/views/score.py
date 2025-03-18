@@ -55,6 +55,42 @@ class ScoreViewSet(viewsets.ModelViewSet):
             return ScoreVerificationSerializer
         return ScoreSerializer
     
+    def get_queryset(self):
+        """
+        Filter scores based on user role:
+        - Admin sees all scores
+        - Team Manager sees scores for games with their team
+        - Player sees scores for games they participate in
+        - Scorekeeper sees scores for games they're assigned to
+        - Public sees all scores (as before)
+        """
+        queryset = super().get_queryset()
+        user = self.request.user
+        
+        if not user.is_authenticated:
+            return queryset  # Public user sees all
+            
+        if user.role == 'admin':
+            return queryset  # Admin sees all
+            
+        if user.role == 'team_manager':
+            # Team manager sees scores for games with their team
+            return queryset.filter(game__game_teams__team__manager=user).distinct()
+            
+        if user.role == 'player':
+            # Player sees scores for games they participate in
+            player_profiles = user.player_profiles.all()
+            if player_profiles.exists():
+                team_ids = player_profiles.values_list('team_id', flat=True)
+                return queryset.filter(game__game_teams__team_id__in=team_ids).distinct()
+            return queryset.none()
+            
+        if user.role == 'scorekeeper':
+            # Scorekeeper sees scores for games they're assigned to
+            return queryset.filter(game__scorekeeper=user)
+            
+        return queryset
+    
     def get_permissions(self):
         if self.action in ['create', 'destroy']:
             permission_classes = [IsAuthenticated, CanManageScores]
