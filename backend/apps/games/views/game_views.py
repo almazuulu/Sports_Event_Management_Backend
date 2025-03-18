@@ -261,9 +261,13 @@ class GameViewSet(viewsets.ModelViewSet):
     def upcoming_games(self, request):
         """
         Get a list of upcoming games for the current week.
-        Only shows scheduled and ongoing games within the current week.
-        Public access allowed.
+        - Admin and public (unauthenticated) users see all upcoming games
+        - Team managers see only games with their teams
+        - Players see only games with teams they belong to
+        - Scorekeepers see only games they're assigned to
         """
+        from datetime import datetime, timedelta
+        import pytz
         
         today = datetime.now(pytz.timezone(settings.TIME_ZONE))
         
@@ -275,13 +279,34 @@ class GameViewSet(viewsets.ModelViewSet):
         end_of_week = start_of_week + timedelta(days=6)
         end_of_week = end_of_week.replace(hour=23, minute=59, second=59, microsecond=999999)
         
-        # Filter games by status and date range for current week
+        # Base queryset - filter by status and current week
         queryset = Game.objects.filter(
             status__in=["scheduled", "ongoing"],
             start_datetime__gte=start_of_week,
             start_datetime__lte=end_of_week
         )
-
+        
+        # Apply role-based filtering
+        user = request.user
+        
+        if user.is_authenticated:
+            if user.role == 'team_manager':
+                # Team manager sees games with their teams
+                queryset = queryset.filter(game_teams__team__manager=user).distinct()
+            elif user.role == 'player':
+                # Player sees games they participate in
+                player_profiles = user.player_profiles.all()
+                if player_profiles.exists():
+                    team_ids = player_profiles.values_list('team_id', flat=True)
+                    queryset = queryset.filter(game_teams__team_id__in=team_ids).distinct()
+                else:
+                    queryset = queryset.none()  # No teams = no games
+            elif user.role == 'scorekeeper':
+                # Scorekeeper sees games they're assigned to
+                queryset = queryset.filter(scorekeeper=user)
+            # Admin sees all (no additional filtering)
+        
+        # Apply additional filters from query params
         sport_event = request.query_params.get("sport_event")
         if sport_event:
             queryset = queryset.filter(sport_event_id=sport_event)
@@ -289,7 +314,8 @@ class GameViewSet(viewsets.ModelViewSet):
         team = request.query_params.get("team")
         if team:
             queryset = queryset.filter(game_teams__team=team)
-
+        
+        # Paginate and return results
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
