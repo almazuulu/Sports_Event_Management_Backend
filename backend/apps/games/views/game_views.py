@@ -9,7 +9,8 @@ from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from django.conf import settings
-from datetime import datetime
+from datetime import datetime, timedelta
+import pytz
 
 from users.models import User
 from users.permissions import IsAdminUser
@@ -253,17 +254,33 @@ class GameViewSet(viewsets.ModelViewSet):
         return Response(status=204)
 
     @extend_schema(
-        summary="Upcoming games",
-        description="Get a list of upcoming games for dashboard or homepage",
+        summary="Upcoming games for current week",
+        description="Get a list of upcoming games for the current week for dashboard or homepage",
     )
     @action(detail=False, methods=["get"], url_path="upcoming")
     def upcoming_games(self, request):
         """
-        Get a list of upcoming games for dashboard or homepage.
-        Only shows scheduled and ongoing games.
+        Get a list of upcoming games for the current week.
+        Only shows scheduled and ongoing games within the current week.
         Public access allowed.
         """
-        queryset = Game.objects.filter(status__in=["scheduled", "ongoing"])
+        
+        today = datetime.now(pytz.timezone(settings.TIME_ZONE))
+        
+        # Calculate start of week (Monday)
+        start_of_week = today - timedelta(days=today.weekday())
+        start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # Calculate end of week (Sunday)
+        end_of_week = start_of_week + timedelta(days=6)
+        end_of_week = end_of_week.replace(hour=23, minute=59, second=59, microsecond=999999)
+        
+        # Filter games by status and date range for current week
+        queryset = Game.objects.filter(
+            status__in=["scheduled", "ongoing"],
+            start_datetime__gte=start_of_week,
+            start_datetime__lte=end_of_week
+        )
 
         sport_event = request.query_params.get("sport_event")
         if sport_event:

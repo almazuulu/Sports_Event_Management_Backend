@@ -449,7 +449,15 @@ class GameListSerializer(serializers.ModelSerializer):
 
     def get_time_display(self, obj):
         return obj.start_datetime.strftime("%H:%M")
+    
 
+class ScorekeeperAssignmentSerializer(GameListSerializer):
+    game_id = serializers.CharField(source='id', read_only=True)
+    
+    class Meta:
+        model = Game
+        fields = ['game_id', 'name', 'sport_event_name', 'start_datetime', 'time_display', 
+                 'location', 'status', 'teams']
 
 @extend_schema_serializer(
     examples=[
