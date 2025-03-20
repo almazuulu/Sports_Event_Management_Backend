@@ -358,6 +358,7 @@ class ScoreDetailSerializer(serializers.ModelSerializer):
         OpenApiExample(
             'Score Detail Create Example',
             value={
+                'score': '3fa85f64-5717-4562-b3fc-2c963f66afa6',
                 'team': '3fa85f64-5717-4562-b3fc-2c963f66afa8',
                 'player': '3fa85f64-5717-4562-b3fc-2c963f66afb2',
                 'assisted_by': '3fa85f64-5717-4562-b3fc-2c963f66afb3',
@@ -369,6 +370,23 @@ class ScoreDetailSerializer(serializers.ModelSerializer):
                 'description': 'Goal from left wing'
             },
             request_only=True,
+        ),
+        OpenApiExample(
+            'Nested Score Detail Create Example',
+            value={
+                # No score field needed when using nested URL path /api/scores/{score_id}/details/
+                'team': '3fa85f64-5717-4562-b3fc-2c963f66afa8',
+                'player': '3fa85f64-5717-4562-b3fc-2c963f66afb2',
+                'assisted_by': '3fa85f64-5717-4562-b3fc-2c963f66afb3',
+                'points': 1,
+                'event_type': 'goal',
+                'time_occurred': '00:15:30',
+                'minute': 15,
+                'period': 'First Half',
+                'description': 'Goal from left wing'
+            },
+            request_only=True,
+            summary="For nested routes where score is in URL"
         )
     ]
 )
