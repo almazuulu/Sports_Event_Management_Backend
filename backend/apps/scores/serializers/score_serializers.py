@@ -379,11 +379,15 @@ class ScoreDetailCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScoreDetail
         fields = [
-            'team', 'player', 'assisted_by', 'points', 'event_type',
+            'score', 'team', 'player', 'assisted_by', 'points', 'event_type',
             'time_occurred', 'minute', 'period', 'description', 'video_url'
         ]
     
     def validate(self, attrs):
+        # Ensure score is provided when not in nested URL context
+        if 'score' not in attrs and 'score' not in self.context:
+            raise serializers.ValidationError({'score': _('The score field is required.')})
+        
         # Ensure minute is valid if provided
         if 'minute' in attrs and attrs['minute'] is not None:
             if attrs['minute'] < 0:
@@ -393,8 +397,10 @@ class ScoreDetailCreateSerializer(serializers.ModelSerializer):
         if 'points' in attrs and attrs['points'] <= 0:
             raise serializers.ValidationError({'points': _('Points must be positive')})
         
+        # Get the score either from attrs or context
+        score = attrs.get('score') or self.context.get('score')
+        
         # Ensure team is part of the game
-        score = self.context.get('score')
         team = attrs.get('team')
         if score and team:
             # Get teams from game_teams relations
@@ -424,20 +430,15 @@ class ScoreDetailCreateSerializer(serializers.ModelSerializer):
         return attrs
     
     def create(self, validated_data):
-        # Set the score and created_by fields
-        score = self.context.get('score')
-        user = self.context.get('request').user
-        
-        score_detail = ScoreDetail.objects.create(
-            score=score,
-            created_by=user,
-            **validated_data
-        )
-        
-        # The Score and overall statistics will be updated via the ScoreDetail's save method
-        # which calls update_parent_score()
-        
-        return score_detail
+        # If score is not in validated_data but in context, add it
+        if 'score' not in validated_data and 'score' in self.context:
+            validated_data['score'] = self.context['score']
+            
+        # Set created_by from context
+        if 'request' in self.context:
+            validated_data['created_by'] = self.context['request'].user
+            
+        return super().create(validated_data)
 
 
 class ScoreCreateSerializer(serializers.ModelSerializer):

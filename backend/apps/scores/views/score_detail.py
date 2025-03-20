@@ -81,13 +81,14 @@ class ScoreDetailViewSet(viewsets.ModelViewSet):
     
     def get_serializer_context(self):
         """
-        Add the score object to the serializer context if score_id is provided
+        Add the score object to the serializer context if score_pk is provided
         """
         context = super().get_serializer_context()
         
-        if self.action == 'create' and 'score_id' in self.kwargs:
+        # Check if this is a nested route using score_pk
+        if 'score_pk' in self.kwargs:
             try:
-                context['score'] = Score.objects.get(id=self.kwargs['score_id'])
+                context['score'] = Score.objects.get(id=self.kwargs['score_pk'])
             except Score.DoesNotExist:
                 pass
         
@@ -98,10 +99,11 @@ class ScoreDetailViewSet(viewsets.ModelViewSet):
         Set the score field when creating a score detail
         """
         # If nested under a score, get the score from URL
-        if 'score_id' in self.kwargs:
-            score = Score.objects.get(id=self.kwargs['score_id'])
-            serializer.save(score=score)  # Remove created_by parameter
+        if 'score_pk' in self.kwargs:
+            score = Score.objects.get(id=self.kwargs['score_pk'])
+            serializer.save()  # The serializer will handle setting the score from context
         else:
+            # For direct creation, the serializer validation ensures score is provided
             serializer.save()
     
     @extend_schema(
