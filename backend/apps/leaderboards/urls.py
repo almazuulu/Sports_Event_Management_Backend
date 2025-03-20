@@ -1,10 +1,14 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import LeaderboardViewSet, LeaderboardEntryViewSet
+
+router = DefaultRouter()
+router.register(r'', LeaderboardViewSet, basename='leaderboard')
+router.register(r'entries', LeaderboardEntryViewSet, basename='leaderboard-entry')
 
 app_name = 'leaderboards'
 
 urlpatterns = [
-    # Will contain leaderboard-related endpoints like:
-    # path('', views.LeaderboardView.as_view(), name='overall-leaderboard'),
-    # path('<int:event_id>/', views.EventLeaderboardView.as_view(), name='event-leaderboard'),
+    # Main router URLs
+    path('', include(router.urls)),
 ]
