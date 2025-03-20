@@ -95,14 +95,14 @@ class ScoreDetailViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         """
-        Set the score and created_by fields when creating a score detail
+        Set the score field when creating a score detail
         """
         # If nested under a score, get the score from URL
         if 'score_id' in self.kwargs:
             score = Score.objects.get(id=self.kwargs['score_id'])
-            serializer.save(score=score, created_by=self.request.user)
+            serializer.save(score=score)  # Remove created_by parameter
         else:
-            serializer.save(created_by=self.request.user)
+            serializer.save()
     
     @extend_schema(
         summary="List score details",
