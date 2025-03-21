@@ -102,7 +102,18 @@ class LeaderboardViewSet(viewsets.ModelViewSet):
         Initializes a new leaderboard for a sport event.
         Only administrators can create leaderboards.
         """
-        return super().create(request, *args, **kwargs)
+        # Make sure we have a sport_event
+        if 'sport_event' not in request.data:
+            return Response(
+                {"sport_event": "This field is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
     @extend_schema(
         summary="Update leaderboard",

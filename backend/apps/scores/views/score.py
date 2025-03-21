@@ -98,7 +98,7 @@ class ScoreViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthenticated, IsAssignedScorekeeper|CanManageScores]
         elif self.action == 'verify_score':
             permission_classes = [IsAuthenticated, CanVerifyScores]
-        elif self.action in ['public_scores', 'live_scores']:
+        elif self.action in ['public_scores', 'live_scores', 'retrieve']:
             permission_classes = [AllowAny]
         elif self.action == 'my_assignments':
             permission_classes = [IsAuthenticated, IsScorekeeper]
