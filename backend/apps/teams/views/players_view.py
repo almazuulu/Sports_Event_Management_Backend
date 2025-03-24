@@ -24,6 +24,7 @@ class PlayersViewSet(viewsets.ModelViewSet):
     Team managers can manage their own team's players.
     Admins can manage all players.
     """
+    queryset = Player.objects.all()  
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['team', 'is_active', 'is_captain']
     search_fields = ['first_name', 'last_name', 'position']
@@ -47,7 +48,7 @@ class PlayersViewSet(viewsets.ModelViewSet):
         - Scorekeeper sees players in games they're assigned to
         - Public sees all players (as before)
         """
-        queryset = super().get_queryset()
+        queryset = self.queryset
         user = self.request.user
         
         if not user.is_authenticated:
