@@ -59,11 +59,11 @@ class LeaderboardSerializer(serializers.ModelSerializer):
     """
     sport_event_name = serializers.CharField(source='sport_event.name', read_only=True)
     entries = LeaderboardEntrySerializer(many=True, read_only=True)
-    
+   
     class Meta:
         model = Leaderboard
         fields = ['id', 'sport_event', 'sport_event_name', 'last_updated', 'is_final', 'entries']
-        read_only_fields = fields
+        read_only_fields = ['id', 'sport_event_name', 'last_updated', 'entries']
 
 
 class LeaderboardSummarySerializer(serializers.ModelSerializer):
