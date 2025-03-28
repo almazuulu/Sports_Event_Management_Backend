@@ -24,10 +24,10 @@ class LeaderboardEntryInline(admin.TabularInline):
     can_delete = False  # Prevent deleting entries manually
     
     # Make the inline display more compact for better overview
-    fields = [
-        'position', 'team', 'played', 'won', 'drawn', 'lost', 
-        'points', 'goal_difference', 'goals_for', 'goals_against'
-    ]
+    # fields = [
+        #'position', 'team', 'played', 'won', 'drawn', 'lost', 
+        #'points', 'goal_difference', 'goals_for', 'goals_against'
+    #]
     
     # Show additional fields in expanded view
     fieldsets = [
