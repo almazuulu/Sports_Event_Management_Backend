@@ -20,6 +20,8 @@ from games.models import Game, GameTeam
                 'game_location': 'Main Court',
                 'game_start_datetime': '2025-04-15T14:00:00Z',
                 'game_end_datetime': '2025-04-15T16:00:00Z',
+                'game_status': 'scheduled',
+                'game_status_display': 'Scheduled',
                 'team': '3fa85f64-5717-4562-b3fc-2c963f66afaa',
                 'team_name': 'Thunderbolts',
                 'designation': 'team_a',
@@ -39,6 +41,8 @@ class GameTeamSerializer(serializers.ModelSerializer):
     game_location = serializers.CharField(source='game.location', read_only=True)
     game_start_datetime = serializers.DateTimeField(source='game.start_datetime', read_only=True)
     game_end_datetime = serializers.DateTimeField(source='game.end_datetime', read_only=True)
+    game_status = serializers.CharField(source='game.status', read_only=True)
+    game_status_display = serializers.CharField(source='game.get_status_display', read_only=True)
     team_name = serializers.CharField(source='team.name', read_only=True)
     designation_display = serializers.CharField(source='get_designation_display', read_only=True)
     selected_players_count = serializers.SerializerMethodField()
@@ -47,8 +51,8 @@ class GameTeamSerializer(serializers.ModelSerializer):
         model = GameTeam
         fields = [
             'id', 'game', 'game_name', 'sport_event_name', 'game_location',
-            'game_start_datetime', 'game_end_datetime', 'team', 'team_name',
-            'designation', 'designation_display', 'selected_players_count'
+            'game_start_datetime', 'game_end_datetime', 'game_status', 'game_status_display',
+            'team', 'team_name', 'designation', 'designation_display', 'selected_players_count'
         ]
         read_only_fields = ['id']
     
